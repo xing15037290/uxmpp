@@ -25,43 +25,94 @@ using namespace uxmpp;
 
 int main (int argc, char* argv[])
 {
-    //XmlObject top ("stream", "http://etherx.jabber.org/streams", "", "jabber:client");
+    cout << "Default constructor" << endl;
+    XmlObject tc1;
+    cout << "to_string(false): " << to_string(tc1, false) << endl;
 
-    XmlObject top;
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\")" << endl;
+    XmlObject tc2 ("name");
+    cout << "to_string(false): " << to_string(tc2, false) << endl;
 
-    top.setName ("stream");
-    //top.setNamespace ("http://etherx.jabber.org/streams");
-    //top.setNamespace ("http://etherx.jabber.org/streams");
-    //top.setNamespaceAlias ("stream");
-    top.setDefaultNamespaceAttr ("jabber:client");
-    top.setNamespace ("trallallalal", true);
-    top.addNamespaceAlias ("hej", "a_long_namespace_that_has_an_alias");
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"namespace\")" << endl;
+    XmlObject tc3 ("name", "namespace");
+    cout << "to_string(false): " << to_string(tc3, false) << endl;
 
-    top.setAttribute ("from", "dan@ultramarin.se");
-    top.setAttribute ("to", "ultramarin.se");
-    top.setAttribute ("version", "1.0");
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"namespace\", false)" << endl;
+    XmlObject tc4 ("name", "namespace", false);
+    cout << "to_string(false): " << to_string(tc4, false) << endl;
 
-    XmlObject node ("child");
-    node.setAttribute ("hej", "true");
-    node.setContent ("blablabla");
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"namespace\", false, false)" << endl;
+    XmlObject tc5 ("name", "namespace", false, false);
+    cout << "to_string(false): " << to_string(tc5, false) << endl;
 
-    top.addNode (node);
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"namespace\", true, false)" << endl;
+    XmlObject tc6 ("name", "namespace", true, false);
+    cout << "to_string(false): " << to_string(tc6, false) << endl;
 
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"namespace\")" << endl;
+    XmlObject tc7 ("name", "namespace");
+    cout << "to_string(false): " << to_string(tc7, false) << endl;
+    cout << "setDefaultNamespaceAttr(\"nsattr\")" << endl;
+    tc7.setDefaultNamespaceAttr ("def_ns");
+    cout << "to_string(false): " << to_string(tc7, false) << endl;
+    cout << "isNamespaceDefault(false)" << endl;
+    tc7.isNamespaceDefault (false);
+    cout << "to_string(false): " << to_string(tc7, false) << endl;
 
-    top.addNode (XmlObject("rum", "hej").setAttribute("type", "kök").setContent("rymligt"));
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"a\", false, false)" << endl;
+    cout << "addNamespaceAlias (\"a\", \"namespace\")" << endl;
+    XmlObject tc8 ("name", "a", false, false);
+    tc8.addNamespaceAlias ("a", "namespace");
+    cout << "to_string(false): " << to_string(tc8, false) << endl;
 
-//    top.setPart (XmlObjPart::start);
-//    cout << to_string(top) << endl;
+    cout << endl;
+    cout << "Constructor: XmlObject(\"name\", \"namespace\")" << endl;
+    XmlObject tc9 ("name", "namespace");
+    cout << "setAttribute(\"attrname\", \"attrvalue\")" << endl;
+    tc9.setAttribute ("attrname", "attrvalue");
+    cout << "to_string(false): " << to_string(tc9, false) << endl;
 
-//    top.setPart (XmlObjPart::end);
-//    cout << to_string(top) << endl;
+    cout << "addNode(XmlObject(\"<element>\", \"namespace\", false).setAttribute(\"some_attr\", \"some_value\"))" << endl;
+    tc9.addNode (XmlObject("<element>", "namespace", false).setAttribute("some_attr", "some_value"));
+    cout << "to_string(false): " << to_string(tc9, false) << endl;
+    cout << "to_string(true): " << to_string(tc9) << endl;
 
-    top.setPart (XmlObjPart::all);
-    cout << to_string(top) << endl;
+    cout << "addNode(XmlObject(\"child\", \"namespace\", false).setAttribute(\"num\", \"two\").addNode(XmlObject(\"body\", \"namespace\", false).setAttribute(\"att\", \"val\").setContent(\"A message\")))" << endl;
 
-    XmlObject timer_obj (XmlUxmppTimerTag, XmlUxmppTimerNs);
-    timer_obj.setAttribute ("id", "timer-id");
-    cout << to_string(timer_obj) << endl;
+    tc9.addNode (XmlObject("child", "namespace", false).setAttribute("num", "two")
+                 .addNode(XmlObject("body", "namespace", false)
+                          .setAttribute("att", "val").setContent("A message")));
+    cout << "to_string(false): " << to_string(tc9, false) << endl;
+    cout << "to_string(true): " << to_string(tc9) << endl;
+
+    cout << "setPart(XmlObjPart::start)" << endl;
+    tc9.setPart (XmlObjPart::start);
+    cout << "to_string(false): " << to_string(tc9, false) << endl;
+
+    cout << "setPart(XmlObjPart::body)" << endl;
+    tc9.setPart (XmlObjPart::body);
+    cout << "to_string(false): " << to_string(tc9, false) << endl;
+
+    cout << "setPart(XmlObjPart::end)" << endl;
+    tc9.setPart (XmlObjPart::end);
+    cout << "to_string(false): " << to_string(tc9, false) << endl;
+
+    cout << endl;
+    cout << "Constructor: XmlObject xobj;" << endl;
+    XmlObject xobj;
+    cout << "xobj == true : " << (xobj==true) << endl;
+    cout << "xobj == false: " << (xobj==false) << endl;
+    cout << "xobj.setName(\"name\") " << endl;
+    xobj.setName ("name");
+    cout << "xobj == true : " << (xobj==true) << endl;
+    cout << "xobj == false: " << (xobj==false) << endl;
 
     return 0;
 }
