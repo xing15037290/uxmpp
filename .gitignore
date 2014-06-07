@@ -25,6 +25,9 @@ stamp-h*
 /Makefile
 /doc/Makefile.in
 /doc/Makefile
+/doc/doxyfile.stamp
+/doc/doxygen.cfg
+/doc/html
 /src/Makefile
 /src/Makefile.in
 /src/config.h.in
