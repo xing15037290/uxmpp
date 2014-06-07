@@ -30,27 +30,39 @@ namespace uxmpp {
 
 
     /**
-     *
+     * This defines a specific part of the XML object.
      */
     enum class XmlObjPart {
-        start=1, body=2, end=4, all=5
+        start, /**< The start tag with all attributes. */
+        body,  /**< The body of the XML object. */
+        end,   /**< The end tag of the XML object. */
+        all    /**< The whole XML object. */
     };
 
 
     /**
-     *
+     * Return a string representation of an XmlObjPart value.
+     * @param part The XmlObjPart value.
+     * @return A string representation of an XmlObjPart value.
      */
     std::string to_string (const XmlObjPart& part);
 
 
     /**
-     * This s a representation of an XML object.
+     * This is a representation of an XML object including attributes and child elements.
      */
     class XmlObject {
     public:
 
         /**
-         * Default constructor.
+         * Constructor.
+         * This will create an empty nameless XML object that will be
+         * treated as a false value in boolean expressions and as an
+         * empty string when converted to a string.
+         * @param reserved_nodes The number of reserved child nodes for the XML object.
+         *                       If it is known at creation time how may child nodes
+         *                       that will be added to the XML object this can be used
+         *                       to optimize memory allocation a bit.
          */
         XmlObject (int reserved_nodes=4) : is_namespace_default{false}, part{XmlObjPart::all} {
             nodes.reserve (reserved_nodes);
@@ -58,9 +70,22 @@ namespace uxmpp {
 
         /**
          * Constructor.
-         * @param the_name The name of the XML element.
+         * This will create an XML object with specified tag name and namespace.
+         * <br/><em>Warning:</em> No check is made if the element or namespace
+         * have valid XML names.
+         * @param the_name The tag name of the XML element.
+         *                 If the name of the XML element is an empty string, the
+         *                 XML object will be treated as an invalid object and will
+         *                 have a value of false in boolean expressions and an empty
+         *                 string when converted to a string (event if it has valid
+         *                 child elements).
+         *                 <br/><em>Note:</em> Do not include the namespace in the
+         *                 name, use parameter <code>the_namespace</code> instead.
          * @param the_namespace The namespace of the XML element.
+         *                      This defines the namespace the object belongs to.
          * @param set_namespace_attr Set the namespace as an 'xmlns' attribute.
+         *                           It true, the attribute 'xmlns' will be set with the
+         *                           namespace as value.
          * @param namespace_is_default True if the_namespace is the default namespace.
          * @param the_default_namespace The default namespace to use for
          *                              this elemens and it's children if
@@ -305,7 +330,7 @@ namespace uxmpp {
          * Add or change an attribute of the XML object.
          * @return A reference to this object.
          */
-        XmlObject& setAttribute (const std::string& name, const std::string& value) {
+        XmlObject& setAttribute (const std::string& name, const std::string& value="") {
             attributes[name] = value;
             return *this;
         }

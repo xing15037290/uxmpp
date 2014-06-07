@@ -140,10 +140,9 @@ std::string to_string (const XmlObject& xml_obj, bool pretty, const std::string&
     }
     if (default_ns.length())
         ss << " xmlns=" << "'" << default_ns << "'";
-    //for (auto attr=xml_obj.attributes.rbegin(); attr!=xml_obj.attributes.rend(); attr++) {
-    for (auto attr=xml_obj.attributes.begin(); attr!=xml_obj.attributes.end(); attr++) {
+    //for (auto attr=xml_obj.attributes.rbegin(); attr!=xml_obj.attributes.rend(); attr++)
+    for (auto attr=xml_obj.attributes.begin(); attr!=xml_obj.attributes.end(); attr++)
         ss << ' ' << xml_escape(attr->first) << "='" << xml_escape(attr->second) << "'";
-    }
 
     // Check if we should only write the start tag.
     //
