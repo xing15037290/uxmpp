@@ -1,0 +1,10 @@
+
+ACLOCAL_AMFLAGS=-I m4
+
+SUBDIRS  = src
+
+if ENABLE_TESTAPPS_SET
+SUBDIRS += test
+endif
+
+SUBDIRS  += doc
