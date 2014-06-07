@@ -22,7 +22,8 @@
 namespace uxmpp {
 
     /**
-     * XMPP modules.
+     * This namespace contains modules that can be loaded
+     * into an XMPP session to extend it's functionality.
      */
     namespace mod {
     }

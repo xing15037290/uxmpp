@@ -19,8 +19,15 @@
 #ifndef UXMPP_HPP
 #define UXMPP_HPP
 
+/*! \mainpage Ultramarin XMPP library (uxmpp)
+ *
+ * uxmpp is an XMPP client stack written in C++ that implements RFC6120, RFC6121 and a number of XEPs.
+ *
+ */
+
+
 /**
- * Ultramarin XMPP stack.
+ * This is the top-level namespace for all classes in libuxmpp.
  */
 namespace uxmpp {
 }
