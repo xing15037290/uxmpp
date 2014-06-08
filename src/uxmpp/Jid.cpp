@@ -17,6 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/Jid.hpp>
+#include <uxmpp/Logger.hpp>
 
 #define THIS_FILE "Jid"
 
@@ -94,7 +95,12 @@ Jid::Jid (const std::string& localpart, const std::string& domainpart, const std
 //------------------------------------------------------------------------------
 void Jid::setLocal (const std::string& localpart)
 {
-    local = localpart.length() > 1023 ? std::string(localpart, 1023) : localpart;
+    if (localpart.length() > 1023) {
+        uxmppLogInfo (THIS_FILE, "localpart longer than 1023 bytes, truncate it");
+        local = std::string(localpart, 1023);
+    }else{
+        local = localpart;
+    }
 }
 
 
@@ -102,7 +108,12 @@ void Jid::setLocal (const std::string& localpart)
 //------------------------------------------------------------------------------
 void Jid::setDomain (const std::string& domainpart)
 {
-    domain = domainpart.length() > 1023 ? std::string(domainpart, 1023) : domainpart;
+    if (domainpart.length() > 1023) {
+        uxmppLogInfo (THIS_FILE, "domainpart longer than 1023 bytes, truncate it");
+        domain = std::string(domainpart, 1023);
+    }else{
+        domain = domainpart;
+    }
 }
 
 
@@ -110,7 +121,12 @@ void Jid::setDomain (const std::string& domainpart)
 //------------------------------------------------------------------------------
 void Jid::setResource (const std::string& resourcepart)
 {
-    resource = resourcepart.length() > 1023 ? std::string(resourcepart, 1023) : resourcepart;
+    if (resourcepart.length() > 1023) {
+        uxmppLogInfo (THIS_FILE, "resourcepart longer than 1023 bytes, truncate it");
+        resource = std::string(resourcepart, 1023);
+    }else{
+        resource = resourcepart;
+    }
 }
 
 
