@@ -28,23 +28,31 @@ namespace uxmpp {
 
 
 /**
- * A Jabber Identifier (JID).
+ * This class represents a Jabber Identifier (JID).
  */
 class Jid {
 public:
 
     /**
      * Constructor.
+     * @param jid A JID represented as a string.
      */
     Jid (const std::string& jid="");
 
     /**
      * Constructor.
+     * No part(localpart, domainpart, or resourcepart) of the JID
+     * may be longer than 1023 bytes long. If it is longer it will
+     * be truncated.
+     * @param localpart The localpart of the JID.
+     * @param domainpart The domainpart of the JID.
+     * @param resourcepart An optional resourcepart.
      */
     Jid (const std::string& localpart, const std::string& domainpart, const std::string& resourcepart="");
 
     /**
      * Copy constructor.
+     * @param jid The JID to copy.
      */
     Jid (const Jid& jid) {
         local    = jid.local;
@@ -54,6 +62,7 @@ public:
 
     /**
      * Move constructor.
+     * @param jid The JID to move.
      */
     Jid (Jid& jid) {
         local    = std::move (jid.local);
@@ -68,6 +77,8 @@ public:
 
     /**
      * Assignment operator.
+     * @param jid The JID to copy.
+     * @return A reference to this object.
      */
     Jid& operator= (const Jid& jid) {
         if (&jid != this) {
@@ -80,6 +91,8 @@ public:
 
     /**
      * Move operator.
+     * @param jid The JID to move.
+     * @return A reference to this object.
      */
     Jid& operator= (Jid& jid) {
         local    = std::move (jid.local);
@@ -90,6 +103,8 @@ public:
 
     /**
      * Equality operator.
+     * @param jid The JID to compare.
+     * @return true if the two jid's are identical, false otherwise.
      */
     bool operator== (const Jid& jid) {
         return jid.local==local && jid.domain==domain && jid.resource==resource;
@@ -97,6 +112,8 @@ public:
 
     /**
      * Inequality operator.
+     * @param jid The JID to compare.
+     * @return true if the two jid's differ, false otherwise.
      */
     bool operator!= (const Jid& jid) {
         return !(*this == jid);
@@ -104,11 +121,14 @@ public:
 
     /**
      * Set the local part of the JID.
+     * @param localpart The localpart of the JID.
+     *                  If it is longer than 1023 bytes it will be truncated.
      */
     void setLocal (const std::string& localpart);
 
     /**
      * Return the local part of the JID.
+     * @return The local part of the JID.
      */
     const std::string& getLocal () const {
         return local;
@@ -116,11 +136,14 @@ public:
 
     /**
      * Set the domain part of the JID.
+     * @param domaipart The domainpart of the JID.
+     *                  If it is longer than 1023 bytes it will be truncated.
      */
     void setDomain (const std::string& domainpart);
 
     /**
      * Return the domain part of the JID.
+     * @return The domain part of the JID.
      */
     const std::string& getDomain () const {
         return domain;
@@ -128,11 +151,14 @@ public:
 
     /**
      * Set the resource part of the JID.
+     * @param resourcepart The resourcepart of the JID.
+     *                     If it is longer than 1023 bytes it will be truncated.
      */
     void setResource (const std::string& resourcepart);
 
     /**
      * Return the resource part of the JID.
+     * @return The resource part of the JID.
      */
     const std::string& getResource () const {
         return resource;
@@ -140,6 +166,8 @@ public:
 
     /**
      * Return a 'bare' jid based on this jid.
+     * A bare JID is a JID with only a localpart and a domainpart.
+     * @return A copy of this JID but without the resourcepart.
      */
     Jid bare () const {
         return Jid (local, domain, "");
@@ -147,6 +175,8 @@ public:
 
     /**
      * Return true if this is a bare jid.
+     * A bare JID is a JID with only a localpart and a domainpart.
+     * @return true if the resourcepart is empty, false otherwise.
      */
     bool isBare () const {
         return resource.length() == 0;
@@ -155,14 +185,15 @@ public:
 
 protected:
 
-    std::string local;
-    std::string domain;
-    std::string resource;
+    std::string local;    /**< The localpart of the JID. */
+    std::string domain;   /**< The domainpart of the JID. */
+    std::string resource; /**< The resourcepart of the JID. */
 };
 
 
 /**
  * Return a string represenation of a Jid.
+ * @return A string representing the Jid object.
  */
 std::string to_string (const Jid& jid);
 
