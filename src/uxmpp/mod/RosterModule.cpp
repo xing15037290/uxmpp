@@ -142,7 +142,7 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
                     iq.getFrom().bare() != sess->getJid().bare())
                 {
                     uxmppLogInfo (THIS_FILE, "Got roster push with faulty 'from' attribute: ",
-                                  to_string(query));
+                                  to_string(query, true));
                     // Return an empty result stanza
                     sess->sendStanza (IqStanza(IqType::result,
                                                "",
@@ -176,7 +176,7 @@ void RosterModule::handleRosterPush (RosterItem& item)
 {
     bool roster_updated = false;
 
-    uxmppLogDebug (THIS_FILE, "Got roster push: ", to_string(item));
+    uxmppLogDebug (THIS_FILE, "Got roster push: ", to_string(item, true));
 
     //for (auto& roster_item : roster.getItems()) {
     auto& items = roster.getItems ();

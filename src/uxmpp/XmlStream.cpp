@@ -642,10 +642,11 @@ bool XmlStream::write (const XmlObject& xml_obj)
         return false;
     }
 
-    string xml_str = to_string (xml_obj, false);
+    string xml_str = to_string (xml_obj);
     size_t len = xml_str.length ();
     size_t sent = 0;
-    uxmppLogDebug (THIS_FILE, "Send xml object: ", /*xml_str*/ to_string(xml_obj));
+
+    uxmppLogDebug (THIS_FILE, "Send xml object: ", /*xml_str*/ to_string(xml_obj, true));
     while (sent < len) {
         int result;
 

@@ -339,7 +339,7 @@ void Session::onClose (XmlStream& stream)
 //------------------------------------------------------------------------------
 void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
 {
-    uxmppLogDebug (THIS_FILE, "Got XML obj: ", to_string(xml_obj));
+    uxmppLogDebug (THIS_FILE, "Got XML obj: ", to_string(xml_obj, true));
 
     // Find an XMPP module to handle the XML object.
     //

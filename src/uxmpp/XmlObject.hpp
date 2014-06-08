@@ -30,7 +30,7 @@ namespace uxmpp {
 
 
     /**
-     * This defines a specific part of the XML object.
+     * This defines a specific part of an XML object.
      */
     enum class XmlObjPart {
         start, /**< The start tag with all attributes. */
@@ -58,7 +58,7 @@ namespace uxmpp {
          * Constructor.
          * This will create an empty nameless XML object that will be
          * treated as a false value in boolean expressions and as an
-         * empty string when converted to a string.
+         * empty string when represented as a string.
          * @param reserved_nodes The number of reserved child nodes for the XML object.
          *                       If it is known at creation time how may child nodes
          *                       that will be added to the XML object this can be used
@@ -71,25 +71,30 @@ namespace uxmpp {
         /**
          * Constructor.
          * This will create an XML object with specified tag name and namespace.
-         * <br/><em>Warning:</em> No check is made if the element or namespace
-         * have valid XML names.
+         * <br/><em>Warning:</em> No check is made for valid XML names.
          * @param the_name The tag name of the XML element.
          *                 If the name of the XML element is an empty string, the
          *                 XML object will be treated as an invalid object and will
          *                 have a value of false in boolean expressions and an empty
-         *                 string when converted to a string (event if it has valid
+         *                 string when represented as a string (even if it has valid
          *                 child elements).
          *                 <br/><em>Note:</em> Do not include the namespace in the
          *                 name, use parameter <code>the_namespace</code> instead.
          * @param the_namespace The namespace of the XML element.
          *                      This defines the namespace the object belongs to.
          * @param set_namespace_attr Set the namespace as an 'xmlns' attribute.
-         *                           It true, the attribute 'xmlns' will be set with the
-         *                           namespace as value.
+         *                           If true, the attribute 'xmlns' will be set with the
+         *                           namespace as value. If false, the attribute 'xmlns'
+         *                           will not be set.
          * @param namespace_is_default True if the_namespace is the default namespace.
-         * @param the_default_namespace The default namespace to use for
-         *                              this elemens and it's children if
-         *                              no namespace is specified.
+         *                             This will affect how the XML object is represented
+         *                             as a string. If the namespace is the default namespace
+         *                             it won't be printed as part of the XML tag. But if it
+         *                             isn't, it will be printed like: <namespace:name ...
+         * @param reserved_nodes The number of reserved child nodes for the XML object.
+         *                       If it is known at creation time how may child nodes
+         *                       that will be added to the XML object this can be used
+         *                       to optimize memory allocation a bit.
          */
         XmlObject (const std::string& the_name,
                    const std::string& the_namespace="",
@@ -109,6 +114,7 @@ namespace uxmpp {
 
         /**
          * Copy constructor.
+         * @param xml_obj The XML object to be copied.
          */
         XmlObject (const XmlObject& xml_obj) {
             name                 = xml_obj.name;
@@ -124,6 +130,10 @@ namespace uxmpp {
 
         /**
          * Move constructor.
+         * Move the object attributes of the input object
+         * to this object and set the input object to it's
+         * default state.
+         * @param xml_obj The XML object to be moved.
          */
         XmlObject (XmlObject&& xml_obj) {
             name                 = std::move (xml_obj.name);
@@ -135,6 +145,8 @@ namespace uxmpp {
             nodes                = std::move (xml_obj.nodes);
             content              = std::move (xml_obj.content);
             part                 = xml_obj.part;
+            xml_obj.is_namespace_default = false;
+            xml_obj.part                 = XmlObjPart::all;
         }
 
         /**
@@ -144,6 +156,8 @@ namespace uxmpp {
 
         /**
          * Assignment operator.
+         * @param xml_obj The XML object to be copied.
+         * @return A reference to this object.
          */
         XmlObject& operator= (const XmlObject& xml_obj) {
             if (&xml_obj != this) {
@@ -162,6 +176,11 @@ namespace uxmpp {
 
         /**
          * Move operator.
+         * Move the object attributes of the input object
+         * to this object and set the input object to it's
+         * default state.
+         * @param xml_obj The XML object to be moved.
+         * @return A reference to this object.
          */
         XmlObject& operator= (XmlObject&& xml_obj) {
             name                 = std::move (xml_obj.name);
@@ -173,11 +192,13 @@ namespace uxmpp {
             nodes                = std::move (xml_obj.nodes);
             content              = std::move (xml_obj.content);
             part                 = xml_obj.part;
+            xml_obj.is_namespace_default = false;
+            xml_obj.part                 = XmlObjPart::all;
             return *this;
         }
 
         /**
-         * Convert the xml object into a boolean which is false if the
+         * Convert the XML object into a boolean which is false if the
          * name of the object is an empty string and true otherwise.
          * @return true if the object has a name, false if not.
          */
@@ -187,6 +208,7 @@ namespace uxmpp {
 
         /**
          * Get the name of the XML object without the namespace prefix.
+         * @return The name of the XML object.
          */
         std::string getName () const {
             return name;
@@ -194,6 +216,17 @@ namespace uxmpp {
 
         /**
          * Set the name of the XML object.
+         * This will set the name of the XML tag for this XML object.
+         * @param name The new name of the XML object.
+         *             If the name of the XML element is an empty string, the
+         *             XML object will be treated as an invalid object and will
+         *             have a value of false in boolean expressions and an empty
+         *             string when represented as a string (even if it has valid
+         *             child elements).
+         *             <br/><em>Note:</em> Do not include the namespace in the
+         *             name, use method <code>setNamespace</code> instead.
+         *             <br/><em>Warning:</em> No check is made for a valid
+         *             XML tag name.
          * @return A reference to this object.
          */
         XmlObject& setName (const std::string& name) {
@@ -203,6 +236,7 @@ namespace uxmpp {
 
         /**
          * Get the namespace of the XML object.
+         * @return The namespace this XML object belongs to.
          */
         std::string getNamespace () const {
             return xml_namespace;
@@ -487,25 +521,26 @@ namespace uxmpp {
         XmlObjPart part;
 
 
-        //friend std::string to_string (const XmlObject& xml_obj);
         friend std::string to_string (const XmlObject& xml_obj, bool pretty, const std::string& indentation);
     };
 
 
     /**
      * Return a string representation of the XML object.
-     * @param xml_obj The XML object to print to a string.
+     * @param xml_obj The XML object to be presented as a string.
      * @param pretty_print Print the object in a more human readable form.
-     * @param indentation The number of spaces to indent the output.
+     *                     This will introduce new lines and whitespace indentation
+     *                     to make the XML object more readable.
+     *                     <br/><em>Note:</em> This will introduce data to the XML body.
+     *                     Use this only when you want to present the XML object to
+     *                     a user in a readable format.
+     * @param indentation String used to indent the output. This is only used when
+     *                    the parameter pretty is set to true. Every line of output
+     *                    will be prepended with this string(normally a number of
+     *                    space characters). And each level of child elements will
+     *                    have an extra 'indentation' string prepended.
      */
-        //std::string to_string (const XmlObject& xml_obj, bool pretty_print, const unsigned indentation=0);
-
-    /**
-     * Return a string representation of the XML object.
-     */
-    //std::string to_string (const XmlObject& xml_obj);
-    std::string to_string (const XmlObject& xml_obj, bool pretty=true, const std::string& indentation="");
-
+    std::string to_string (const XmlObject& xml_obj, bool pretty=false, const std::string& indentation="");
 
 }
 
