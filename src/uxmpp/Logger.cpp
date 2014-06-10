@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -25,7 +25,7 @@
 #include <event2/event.h>
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 using namespace std;
 using namespace std::chrono;
@@ -180,4 +180,4 @@ LogLevel Logger::getLogLevel ()
 
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

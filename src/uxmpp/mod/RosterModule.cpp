@@ -26,7 +26,7 @@
 #define THIS_FILE "RosterModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -257,4 +257,4 @@ void RosterModule::rosterSet (const RosterItem& item, bool remove)
 }
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

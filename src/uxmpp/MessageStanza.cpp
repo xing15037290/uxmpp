@@ -23,7 +23,7 @@
 #define THIS_FILE "MessageStanza.cpp"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 using namespace std;
 
@@ -287,4 +287,4 @@ MessageStanza& MessageStanza::setChatState (const ChatState state)
 }
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

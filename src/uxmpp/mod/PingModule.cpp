@@ -26,7 +26,7 @@
 #define THIS_FILE "PingModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -159,4 +159,4 @@ void PingModule::ping (const uxmpp::Jid& jid)
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

@@ -25,7 +25,7 @@
 #define THIS_FILE "SessionConfig"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -46,4 +46,4 @@ SessionConfig::SessionConfig ()
 
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

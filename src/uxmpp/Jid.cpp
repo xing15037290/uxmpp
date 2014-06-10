@@ -22,7 +22,7 @@
 #define THIS_FILE "Jid"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -154,4 +154,4 @@ std::string to_string (const Jid& jid)
 }
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

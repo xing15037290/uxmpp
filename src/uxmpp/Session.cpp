@@ -27,7 +27,7 @@
 #define THIS_FILE "Session"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -592,4 +592,4 @@ static std::vector<IpHostAddr> get_server_address_list (const SessionConfig& cfg
 }
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

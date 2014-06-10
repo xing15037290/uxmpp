@@ -24,7 +24,7 @@
 #define THIS_FILE "KeepAliveModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -126,4 +126,4 @@ void KeepAliveModule::setInterval (unsigned new_interval)
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

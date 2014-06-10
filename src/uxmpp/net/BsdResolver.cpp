@@ -41,7 +41,7 @@
 #define THIS_FILE "BsdResolver"
 
 
-START_NAMESPACE2(uxmpp, net)
+UXMPP_START_NAMESPACE2(uxmpp, net)
 
 using namespace std;
 
@@ -295,6 +295,6 @@ std::vector<IpHostAddr> BsdResolver::lookup_host (const std::string& host,
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2
 
 #endif

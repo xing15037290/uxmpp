@@ -23,7 +23,7 @@
 #define THIS_FILE "Roster"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -34,4 +34,4 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

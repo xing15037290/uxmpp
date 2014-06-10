@@ -25,7 +25,7 @@
 #define THIS_FILE "AuthModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -147,4 +147,4 @@ bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

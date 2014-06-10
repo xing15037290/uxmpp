@@ -23,7 +23,7 @@
 #define THIS_FILE "PresenceStanza.cpp"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 
@@ -214,4 +214,4 @@ PresenceStanza& PresenceStanza::setPriority (int prio)
 
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

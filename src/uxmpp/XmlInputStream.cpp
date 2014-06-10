@@ -38,7 +38,7 @@
 #endif
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -602,4 +602,4 @@ XmlInputStream& XmlInputStream::operator<< (const XmlObject& xml_obj)
 }
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

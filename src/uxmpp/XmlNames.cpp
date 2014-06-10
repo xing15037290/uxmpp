@@ -19,7 +19,7 @@
 #include <uxmpp/XmlNames.hpp>
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 // stream
 //
@@ -145,4 +145,4 @@ extern const std::string XmlUxmppTimerTag = "timer";
 extern const std::string XmlUxmppTimerTagFull = XmlUxmppTimerNs + std::string(":") + XmlUxmppTimerTag;
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

@@ -7,7 +7,7 @@
 #include <uxmpp/utils.hpp>
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 using namespace std;
 
@@ -87,4 +87,4 @@ std::string base64_decode (const std::string &ascdata)
 }
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

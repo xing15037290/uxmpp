@@ -26,7 +26,7 @@
 #define THIS_FILE "SessionModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -112,4 +112,4 @@ void SessionModule::onStateChange (uxmpp::Session& session,
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

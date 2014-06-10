@@ -24,7 +24,7 @@
 #define THIS_FILE "TlsModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -96,4 +96,4 @@ bool TlsModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xm
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

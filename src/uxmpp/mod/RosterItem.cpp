@@ -22,7 +22,7 @@
 #define THIS_FILE "RosterItem"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -45,4 +45,4 @@ std::vector<std::string> RosterItem::getGroups ()
 }
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

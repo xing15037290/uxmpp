@@ -25,7 +25,7 @@
 #define THIS_FILE "Stanza"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -70,4 +70,4 @@ static std::string default_makeId ()
 
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

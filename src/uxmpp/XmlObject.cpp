@@ -24,7 +24,7 @@
 #define THIS_FILE "XmlObject"
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -197,4 +197,4 @@ std::string to_string (const XmlObject& xml_obj)
 }
 */
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

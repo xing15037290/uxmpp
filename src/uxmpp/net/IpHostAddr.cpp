@@ -23,7 +23,7 @@
 #include <arpa/inet.h>
 
 
-START_NAMESPACE2(uxmpp, net)
+UXMPP_START_NAMESPACE2(uxmpp, net)
 
 
 //------------------------------------------------------------------------------
@@ -72,4 +72,4 @@ std::string to_string (const IpHostAddr& addr)
 }
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

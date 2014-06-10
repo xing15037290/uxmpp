@@ -47,7 +47,7 @@
 #endif
 
 
-START_NAMESPACE1(uxmpp)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
@@ -1223,4 +1223,4 @@ void XmlStream::on_rx (const char* buf, int bytes)
 
 
 
-END_NAMESPACE1
+UXMPP_END_NAMESPACE1

@@ -23,11 +23,11 @@
 #include <uxmpp/uxmpp_config.hpp>
 
 
-#define START_NAMESPACE1(name) namespace name {
-#define END_NAMESPACE1 }
+#define UXMPP_START_NAMESPACE1(name) namespace name {
+#define UXMPP_END_NAMESPACE1 }
 
-#define START_NAMESPACE2(name1, name2) namespace name1 { namespace name2 {
-#define END_NAMESPACE2 }}
+#define UXMPP_START_NAMESPACE2(name1, name2) namespace name1 { namespace name2 {
+#define UXMPP_END_NAMESPACE2 }}
 
 
 #endif

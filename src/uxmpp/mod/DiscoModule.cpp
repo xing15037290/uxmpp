@@ -24,7 +24,7 @@
 #define THIS_FILE "DiscoModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -183,4 +183,4 @@ void DiscoModule::onStateChange (uxmpp::Session& session,
 
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2

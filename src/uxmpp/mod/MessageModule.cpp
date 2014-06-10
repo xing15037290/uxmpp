@@ -27,7 +27,7 @@
 #define THIS_FILE "MessageModule"
 
 
-START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 
 using namespace std;
@@ -226,4 +226,4 @@ void MessageModule::sendMessage (const uxmpp::Jid& to, const std::string& body, 
 }
 
 
-END_NAMESPACE2
+UXMPP_END_NAMESPACE2
