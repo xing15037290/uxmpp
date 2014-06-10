@@ -30,10 +30,15 @@ START_NAMESPACE1(uxmpp)
 
 using namespace std;
 
+static std::string default_makeId ();
+
+
+std::function<std::string (void)> Stanza::makeId = default_makeId;
+
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string Stanza::makeId ()
+static std::string default_makeId ()
 {
     static random_device rd;
     static default_random_engine re (rd());

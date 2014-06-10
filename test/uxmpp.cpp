@@ -304,7 +304,6 @@ static void print_help ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-/*
 static std::string generate_uuid_v4 ()
 {
     static std::random_device rd;
@@ -347,7 +346,7 @@ static std::string generate_uuid_v4 ()
 
     return std::move (ss.str());
 }
-*/
+
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -452,6 +451,10 @@ int main (int argc, char* argv[])
     //
     if (cfg.pass.length() == 0)
         read_passphrase (to_string(cfg.jid.bare()), cfg.pass);
+
+    // Set Stanza id generator
+    //
+    Stanza::makeId = generate_uuid_v4;
 
     // Create and start the XMPP application object
     //

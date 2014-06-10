@@ -204,8 +204,9 @@ namespace uxmpp {
 
         /**
          * Generate a pseudo random id string.
+         * This method is used to generate a random ID string for Stanza's.
          */
-        static std::string makeId ();
+        static std::function<std::string (void)> makeId;
     };
 
 
