@@ -99,12 +99,9 @@ nobase_libuxmpp_HEADERS += uxmpp/mod/TlsModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/AuthModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/KeepAliveModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/DiscoModule.hpp
-nobase_libuxmpp_HEADERS += uxmpp/mod/RosterModuleListener.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/RosterModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/PresenceModule.hpp
-nobase_libuxmpp_HEADERS += uxmpp/mod/PresenceModuleListener.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/MessageModule.hpp
-nobase_libuxmpp_HEADERS += uxmpp/mod/MessageModuleListener.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/SessionModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/PingModule.hpp
 
