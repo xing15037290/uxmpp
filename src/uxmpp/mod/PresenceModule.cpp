@@ -40,33 +40,9 @@ static const string XmlPresenceTagFull {"jabber:client:presence"};
 //------------------------------------------------------------------------------
 PresenceModule::PresenceModule ()
     : uxmpp::XmppModule ("mod_presence"),
-      sess (nullptr)
+      sess (nullptr),
+      presence_handler (nullptr)
 {
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void PresenceModule::addPresenceListener (PresenceModuleListener& listener)
-{
-    for (auto& l : listeners) {
-        if (l == &listener)
-            return; // Already added
-    }
-    listeners.push_back (&listener);
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void PresenceModule::delPresenceListener (PresenceModuleListener& listener)
-{
-    for (auto i=listeners.begin(); i!=listeners.end(); i++) {
-        if ((*i) == &listener) {
-            listeners.erase (i);
-            return;
-        }
-    }
 }
 
 
@@ -101,9 +77,10 @@ bool PresenceModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObjec
     //
     if (xml_obj.getFullName() == XmlPresenceTagFull) {
         PresenceStanza& pr = reinterpret_cast<PresenceStanza&> (xml_obj);
-        // Inform listeners
-        for (auto& listener : listeners)
-            listener->onPresence (*this, pr);
+        // Call registered presence handler
+        if (presence_handler)
+            presence_handler (*this, pr);
+
         return true;
     }
 

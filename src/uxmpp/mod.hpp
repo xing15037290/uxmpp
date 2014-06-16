@@ -36,12 +36,9 @@ namespace uxmpp {
 #include <uxmpp/mod/DiscoModule.hpp>
 #include <uxmpp/mod/RosterItem.hpp>
 #include <uxmpp/mod/Roster.hpp>
-#include <uxmpp/mod/RosterModuleListener.hpp>
 #include <uxmpp/mod/RosterModule.hpp>
 #include <uxmpp/mod/PresenceModule.hpp>
-#include <uxmpp/mod/PresenceModuleListener.hpp>
 #include <uxmpp/mod/MessageModule.hpp>
-#include <uxmpp/mod/MessageModuleListener.hpp>
 #include <uxmpp/mod/SessionModule.hpp>
 #include <uxmpp/mod/PingModule.hpp>
 

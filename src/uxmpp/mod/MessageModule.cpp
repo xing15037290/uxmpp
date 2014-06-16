@@ -42,33 +42,10 @@ static const std::string XmlMessageTagFull {"jabber:client:message"};
 //------------------------------------------------------------------------------
 MessageModule::MessageModule ()
     : uxmpp::XmppModule ("mod_message"),
-      sess (nullptr)
+      sess (nullptr),
+      message_handler (nullptr),
+      receipt_handler (nullptr)
 {
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void MessageModule::addMessageListener (MessageModuleListener& listener)
-{
-    for (auto& l : listeners) {
-        if (l == &listener)
-            return; // Already added
-    }
-    listeners.push_back (&listener);
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void MessageModule::delMessageListener (MessageModuleListener& listener)
-{
-    for (auto i=listeners.begin(); i!=listeners.end(); i++) {
-        if ((*i) == &listener) {
-            listeners.erase (i);
-            return;
-        }
-    }
 }
 
 
@@ -139,21 +116,20 @@ bool MessageModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject
         //
         XmlObject receipt = msg.getNode ("urn:xmpp:receipts:received", true);
         if (receipt) {
-            // Inform listeners of incoming receipt
-            for (auto& listener : listeners)
-                listener->onReceipt (*this, msg.getFrom(), receipt.getAttribute("id"));
+            // Call registered receipt handler
+            if (receipt_handler)
+                receipt_handler (*this, msg.getFrom(), receipt.getAttribute("id"));
 
             // The receipt should not include a message body, but if it does we
-            // inform the listeners of an incoming message.
+            // call the registered message handler
             if (msg.getNode("body")) {
-                for (auto& listener : listeners) {
-                    listener->onMessage (*this, msg);
-                }
+                if (message_handler)
+                    message_handler (*this, msg);
             }
         }else{
-            // Inform listeners of incoming message
-            for (auto& listener : listeners)
-                listener->onMessage (*this, msg);
+            // Call registered message handler
+            if (message_handler)
+                message_handler (*this, msg);
         }
 
         // Check for requested receipt (XEP-0184)

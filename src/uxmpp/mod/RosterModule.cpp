@@ -37,33 +37,10 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 RosterModule::RosterModule ()
     : uxmpp::XmppModule ("mod_roster"),
-      sess (nullptr)
+      sess (nullptr),
+      roster_handler (nullptr),
+      roster_push_handler (nullptr)
 {
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void RosterModule::addRosterListener (RosterModuleListener& listener)
-{
-    for (auto& l : listeners) {
-        if (l == &listener)
-            return; // Already added
-    }
-    listeners.push_back (&listener);
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void RosterModule::delRosterListener (RosterModuleListener& listener)
-{
-    for (auto i=listeners.begin(); i!=listeners.end(); i++) {
-        if ((*i) == &listener) {
-            listeners.erase (i);
-            return;
-        }
-    }
 }
 
 
@@ -106,9 +83,9 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
             if (node) {
                 uxmppLogTrace (THIS_FILE, "Got roster query result");
                 roster = std::move (node);
-                // Inform listeners
-                for (auto& listener : listeners)
-                    listener->onRoster (*this, roster);
+                // Call registered roster handler
+                if (roster_handler != nullptr)
+                    roster_handler (*this, roster);
 
                 return true;
             }
@@ -119,9 +96,10 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
         else if (iq.getId()==roster_query_id && iq.getType()==IqType::error) {
             uxmppLogDebug (THIS_FILE, "Got roster result - roster not found");
             roster = Roster ();
-            // Inform listeners
-            for (auto& listener : listeners)
-                listener->onRoster (*this, roster);
+            // Call registered roster handler
+            if (roster_handler != nullptr)
+                roster_handler (*this, roster);
+
             return true;
         }
         //
@@ -199,9 +177,9 @@ void RosterModule::handleRosterPush (RosterItem& item)
         uxmppLogDebug (THIS_FILE, "Roster item added");
     }
 
-    // Inform listeners
-    for (auto& listener : listeners)
-        listener->onRosterPush (*this, item);
+    // Call roster push handler
+    if (roster_push_handler)
+        roster_push_handler (*this, item);
 }
 
 

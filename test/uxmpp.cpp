@@ -61,11 +61,7 @@ struct app_config_t {
 /**
  * Application logic.
  */
-class AppLogic : public SessionListener,
-                 RosterModuleListener,
-                 PresenceModuleListener,
-                 MessageModuleListener
-{
+class AppLogic : public SessionListener {
 public:
     AppLogic (app_config_t& app_config);
     virtual ~AppLogic () = default;
@@ -198,9 +194,11 @@ void AppLogic::run ()
     sess.registerModule (mod_ping);
     sess.registerModule (mod_disco);
 
-    mod_roster.addRosterListener (*this);
-    mod_pr.addPresenceListener   (*this);
-    mod_msg.addMessageListener   (*this);
+    mod_roster.setRosterHandler ([this](RosterModule& rm, Roster& r) { onRoster (rm, r); });
+    mod_roster.setRosterPushHandler ([this](RosterModule& rm, RosterItem& ri) { onRosterPush (rm, ri); });
+    mod_pr.setPresenceHandler ([this](PresenceModule& pm, PresenceStanza& ps) { onPresence (pm, ps); });
+    mod_msg.setMessageHandler ([this](MessageModule& mm, MessageStanza& ms) { onMessage(mm, ms); });
+    mod_msg.setReceiptHandler ([this](MessageModule& mm, const Jid& f, const string& id) { onReceipt(mm, f, id); });
 
     sess.addSessionListener (*this);
 

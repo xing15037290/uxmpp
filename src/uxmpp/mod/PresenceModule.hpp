@@ -24,7 +24,7 @@
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/Jid.hpp>
-#include <uxmpp/mod/PresenceModuleListener.hpp>
+#include <uxmpp/PresenceStanza.hpp>
 
 
 namespace uxmpp { namespace mod {
@@ -45,16 +45,6 @@ namespace uxmpp { namespace mod {
          * Destructor.
          */
         virtual ~PresenceModule () = default;
-
-        /**
-         * Add a listener object that will receive events from the module.
-         */
-        virtual void addPresenceListener (PresenceModuleListener& listener);
-
-        /**
-         * Remove a listener object that is receiving events from the module.
-         */
-        virtual void delPresenceListener (PresenceModuleListener& listener);
 
         /**
          * Called when the module is registered to a session.
@@ -101,14 +91,16 @@ namespace uxmpp { namespace mod {
          */
         virtual void cancelSubscription (const uxmpp::Jid& jid);
 
+        /**
+         *
+         */
+        void setPresenceHandler (std::function<void (PresenceModule&, uxmpp::PresenceStanza&)> on_presence) {
+            presence_handler = on_presence;
+        }
 
     protected:
         uxmpp::Session* sess;
-
-        /**
-         * A list of event listeners.
-         */
-        std::vector<PresenceModuleListener*> listeners;
+        std::function<void (PresenceModule&, uxmpp::PresenceStanza&)> presence_handler;
     };
 
 

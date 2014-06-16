@@ -23,8 +23,8 @@
 #include <vector>
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmppModule.hpp>
-#include <uxmpp/mod/MessageModuleListener.hpp>
 #include <uxmpp/Jid.hpp>
+#include <uxmpp/MessageStanza.hpp>
 
 
 namespace uxmpp { namespace mod {
@@ -45,16 +45,6 @@ namespace uxmpp { namespace mod {
          * Destructor.
          */
         virtual ~MessageModule () = default;
-
-        /**
-         * Add a listener object that will receive events from the module.
-         */
-        virtual void addMessageListener (MessageModuleListener& listener);
-
-        /**
-         * Remove a listener object that is receiving events from the module.
-         */
-        virtual void delMessageListener (MessageModuleListener& listener);
 
         /**
          * Called when the module is registered to a session.
@@ -85,7 +75,7 @@ namespace uxmpp { namespace mod {
          * @param msg The message stanza to send.
          * @param want_receipt If a recepipt is required as defined in XEP-0184.
          */
-        virtual void sendMessage (const MessageStanza& msg, bool want_receipt=false);
+        virtual void sendMessage (const uxmpp::MessageStanza& msg, bool want_receipt=false);
 
         /**
          * Send a message.
@@ -95,14 +85,28 @@ namespace uxmpp { namespace mod {
          */
         virtual void sendMessage (const uxmpp::Jid& to, const std::string& body, bool want_receipt=false);
 
+        /**
+         *
+         */
+        void setMessageHandler (std::function<void (MessageModule&, uxmpp::MessageStanza&)> on_message) {
+            message_handler = on_message;
+        }
+
+        /**
+         *
+         */
+        void setReceiptHandler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
+                                on_receipt)
+        {
+            receipt_handler = on_receipt;
+        }
+
 
     protected:
         uxmpp::Session* sess;
 
-        /**
-         * A list of event listeners.
-         */
-        std::vector<MessageModuleListener*> listeners;
+        std::function<void (MessageModule&, uxmpp::MessageStanza&)> message_handler;
+        std::function<void (MessageModule&, const uxmpp::Jid& from, const std::string& id)> receipt_handler;
     };
 
 

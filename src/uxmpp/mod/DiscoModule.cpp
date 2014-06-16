@@ -54,17 +54,17 @@ static void query_server_features (uxmpp::Session& session, string& query_id)
 
         if (!node_attr.length() || !ver_attr.length()) {
             session.sendStanza (IqStanza(IqType::get,
-                                       session.getStreamFromAttr(),
-                                       session.getJid(),
-                                       query_id).
-                              addNode(XmlObject("query", XmlDiscoInfoNS)));
+                                         session.getStreamFromAttr(),
+                                         session.getJid(),
+                                         query_id).
+                                addNode(XmlObject("query", XmlDiscoInfoNS)));
         }else{
             session.sendStanza (IqStanza(IqType::get,
-                                       session.getStreamFromAttr(),
-                                       session.getJid(),
-                                       query_id).
-                              addNode(XmlObject("query", XmlDiscoInfoNS).
-                                      setAttribute("node", node_attr + string("#") + ver_attr)));
+                                         session.getStreamFromAttr(),
+                                         session.getJid(),
+                                         query_id).
+                                addNode(XmlObject("query", XmlDiscoInfoNS).
+                                        setAttribute("node", node_attr + string("#") + ver_attr)));
         };
         break;
     }

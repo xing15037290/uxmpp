@@ -30,11 +30,7 @@ static TlsModule tls_module;
 static AuthModule auth_module;
 
 
-class StateListener : public SessionListener,
-                      RosterModuleListener,
-                      PresenceModuleListener,
-                      MessageModuleListener
-{
+class StateListener : public SessionListener {
 public:
     StateListener (KeepAliveModule& mod_alive,
                    RosterModule& mod_roster,
@@ -66,9 +62,9 @@ public:
 
             // Register new modules
             //
-            roster_module.addRosterListener (*this);
-            pr_module.addPresenceListener (*this);
-            msg_module.addMessageListener (*this);
+            //roster_module.addRosterListener (*this);
+            //pr_module.addPresenceListener (*this);
+            //msg_module.addMessageListener (*this);
 
             session.registerModule (roster_module);
             session.registerModule (pr_module);

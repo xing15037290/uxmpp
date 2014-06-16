@@ -25,10 +25,13 @@
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/mod/Roster.hpp>
 #include <uxmpp/mod/RosterItem.hpp>
-#include <uxmpp/mod/RosterModuleListener.hpp>
 
 
 namespace uxmpp { namespace mod {
+
+
+    // Forward declarations
+        //class RosterModle;
 
 
     /**
@@ -46,16 +49,6 @@ namespace uxmpp { namespace mod {
          * Destructor.
          */
         virtual ~RosterModule () = default;
-
-        /**
-         * Add a listener object that will receive events from the module.
-         */
-        virtual void addRosterListener (RosterModuleListener& listener);
-
-        /**
-         * Remove a listener object that is receiving events from the module.
-         */
-        virtual void delRosterListener (RosterModuleListener& listener);
 
         /**
          * Called when the module is registered to a session.
@@ -120,6 +113,20 @@ namespace uxmpp { namespace mod {
             rosterSet (RosterItem(jid), true);
         }
 
+        /**
+         *
+         */
+        void setRosterHandler (std::function<void (RosterModule&, Roster&)> on_roster) {
+            roster_handler = on_roster;
+        }
+
+        /**
+         *
+         */
+        void setRosterPushHandler (std::function<void (RosterModule&, RosterItem&)> on_roster_push) {
+            roster_push_handler = on_roster_push;
+        }
+
 
     protected:
         uxmpp::Session* sess;
@@ -131,17 +138,22 @@ namespace uxmpp { namespace mod {
          */
         void handleRosterPush (RosterItem& item);
 
-        /**
-         * A list of event listeners.
-         */
-        std::vector<RosterModuleListener*> listeners;
-
 
     private:
         /**
          * Add/modify/remove a roster item.
          */
         void rosterSet (const RosterItem& item, bool remove=false);
+
+        /**
+         * Callback for roster query result.
+         */
+        std::function<void (RosterModule&, Roster&)> roster_handler;
+
+        /**
+         * Callback for roster push'es.
+         */
+        std::function<void (RosterModule&, RosterItem&)> roster_push_handler;
     };
 
 
