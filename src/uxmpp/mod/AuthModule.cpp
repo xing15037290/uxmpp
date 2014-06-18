@@ -133,7 +133,7 @@ bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
     //
     if (xml_obj.getFullName() == XmlFailureTagFull) {
         uxmppLogWarning (THIS_FILE, "Failure to authenticate: ",
-                         xml_obj.getNodes().size() ? xml_obj.getNodes()[0].getName() : "unknown");
+                         xml_obj.getNodes().size() ? xml_obj.getNodes()[0].getTagName() : "unknown");
         session.setAppError ("authentication-failure",
                              "Authentication failed");
         session.stop ();

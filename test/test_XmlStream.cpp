@@ -37,20 +37,20 @@ public:
             cout << "(end-tag) ";
         }
 
-        cout << xml_obj.getName() << endl;
+        cout << xml_obj.getTagName() << endl;
 
 
-        if (xml_obj.getName() == "error") {
+        if (xml_obj.getTagName() == "error") {
             cout << "Got error, close stream" << endl;
             stream.stop ();
         }
 
-        if (xml_obj.getName()=="stream" && xml_obj.getPart() == XmlObjPart::end) {
+        if (xml_obj.getTagName()=="stream" && xml_obj.getPart() == XmlObjPart::end) {
             cout << "Got EOS, close stream" << endl;
             stream.stop ();
         }
 
-        if (xml_obj.getName() == "features") {
+        if (xml_obj.getTagName() == "features") {
             cout << "Got features, close stream" << endl;
             stream.stop ();
         }

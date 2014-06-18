@@ -22,6 +22,7 @@
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/Session.hpp>
+#include <uxmpp/IqStanza.hpp>
 #include <vector>
 
 
@@ -81,6 +82,10 @@ namespace uxmpp { namespace mod {
         std::string feature_version;
 
         std::vector<std::string> features;
+        uxmpp::XmlObject server_info_query_result;
+
+    private:
+        void handle_feature_request_result (uxmpp::IqStanza& iq);
     };
 
 

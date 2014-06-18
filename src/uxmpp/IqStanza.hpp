@@ -65,7 +65,7 @@ namespace uxmpp {
         IqStanza (const IqType type, const std::string& to="", const std::string& from="", const std::string& id="")
             : Stanza (to, from, id)
         {
-            setName ("iq");
+            setTagName ("iq");
             setAttribute ("type", to_string(type));
         }
 
@@ -75,7 +75,7 @@ namespace uxmpp {
         IqStanza (const IqType type, const Jid& to, const Jid& from, const std::string& id="")
             : Stanza (to, from, id)
         {
-            setName ("iq");
+            setTagName ("iq");
             setAttribute ("type", to_string(type));
         }
 

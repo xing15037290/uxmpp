@@ -19,7 +19,6 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/DiscoModule.hpp>
 #include <uxmpp/Stanza.hpp>
-#include <uxmpp/IqStanza.hpp>
 
 #define THIS_FILE "DiscoModule"
 
@@ -107,14 +106,16 @@ void DiscoModule::moduleUnregistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-static void handle_feature_request_result (IqStanza& iq, vector<string>& features)
+void DiscoModule::handle_feature_request_result (IqStanza& iq)
 {
     XmlObject query = iq.getNode (XmlDiscoInfoQueryTagFull, true);
     if (!query)
         return;
 
+    server_info_query_result = query;
+
     for (auto xml_obj : query.getNodes()) {
-        if (xml_obj.getName() != "feature")
+        if (xml_obj.getTagName() != "feature")
             continue;
 
         string feature = xml_obj.getAttribute ("var");
@@ -144,7 +145,7 @@ bool DiscoModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& 
         //
         if (iq.getId() == feature_request_id) {
             if (iq.getType() == IqType::result) {
-                handle_feature_request_result (iq, features);
+                handle_feature_request_result (iq);
                 return true;
             }
             else if (iq.getType() == IqType::error) {

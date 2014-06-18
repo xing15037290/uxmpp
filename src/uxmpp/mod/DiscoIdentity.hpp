@@ -30,32 +30,25 @@ namespace uxmpp { namespace mod {
     /**
      * Disco Identity.
      */
-    class DiscoIdentity : public XmlObject {
+    class DiscoIdentity : public uxmpp::XmlObject {
     public:
         /**
          * Constructor.
          */
-        DiscoIdentity (const std::string& to="",
-                       const std::string& from="",
-                       const std::string& id="",
-                       const IdentityType& type=IdentityType::normal)
-            : Stanza (to, from, id)
+        DiscoIdentity (const std::string& category,
+                       const std::string& type,
+                       const std::string& name="")
+            : XmlObject ("identity", "http://jabber.org/protocol/disco#info", false)
         {
-            setName ("identity");
-            setIdentityType (type);
+            setIdentityName ();
         }
 
         /**
          * Constructor.
          */
-        DiscoIdentity (const Jid& to,
-                       const Jid& from,
-                       const std::string& id="",
-                       const IdentityType& type=IdentityType::normal)
-            : Stanza (to, from, id)
+        DiscoIdentity (const uxmpp::XmlObject& identity)
+            : XmlObject (identity)
         {
-            setName ("identity");
-            setIdentityType (type);
         }
 
         /**

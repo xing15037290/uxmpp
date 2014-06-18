@@ -102,7 +102,7 @@ namespace uxmpp {
                    const bool         namespace_is_default=true,
                    const int          reserved_nodes=0)
             :
-            name                 {the_name},
+            tag_name             {the_name},
             xml_namespace        {the_namespace},
             is_namespace_default {namespace_is_default},
             part                 {XmlObjPart::all}
@@ -117,7 +117,7 @@ namespace uxmpp {
          * @param xml_obj The XML object to be copied.
          */
         XmlObject (const XmlObject& xml_obj) {
-            name                 = xml_obj.name;
+            tag_name             = xml_obj.tag_name;
             xml_namespace        = xml_obj.xml_namespace;
             is_namespace_default = xml_obj.is_namespace_default;
             namespace_alias      = xml_obj.namespace_alias;
@@ -136,7 +136,7 @@ namespace uxmpp {
          * @param xml_obj The XML object to be moved.
          */
         XmlObject (XmlObject&& xml_obj) {
-            name                 = std::move (xml_obj.name);
+            tag_name             = std::move (xml_obj.tag_name);
             xml_namespace        = std::move (xml_obj.xml_namespace);
             is_namespace_default = xml_obj.is_namespace_default;
             namespace_alias      = std::move (xml_obj.namespace_alias);
@@ -161,7 +161,7 @@ namespace uxmpp {
          */
         XmlObject& operator= (const XmlObject& xml_obj) {
             if (&xml_obj != this) {
-                name                 = xml_obj.name;
+                tag_name             = xml_obj.tag_name;
                 xml_namespace        = xml_obj.xml_namespace;
                 is_namespace_default = xml_obj.is_namespace_default;
                 namespace_alias      = xml_obj.namespace_alias;
@@ -183,7 +183,7 @@ namespace uxmpp {
          * @return A reference to this object.
          */
         XmlObject& operator= (XmlObject&& xml_obj) {
-            name                 = std::move (xml_obj.name);
+            tag_name             = std::move (xml_obj.tag_name);
             xml_namespace        = std::move (xml_obj.xml_namespace);
             is_namespace_default = xml_obj.is_namespace_default;
             namespace_alias      = std::move (xml_obj.namespace_alias);
@@ -203,20 +203,20 @@ namespace uxmpp {
          * @return true if the object has a name, false if not.
          */
         operator bool () const {
-            return name.length() != 0;
+            return tag_name.length() != 0;
         }
 
         /**
-         * Get the name of the XML object without the namespace prefix.
-         * @return The name of the XML object.
+         * Get the tag name of the XML object without the namespace prefix.
+         * @return The tag name of the XML object.
          */
-        std::string getName () const {
-            return name;
+        std::string getTagName () const {
+            return tag_name;
         }
 
         /**
-         * Set the name of the XML object.
-         * This will set the name of the XML tag for this XML object.
+         * Set the tag name of the XML object.
+         * This will set the tag name of the XML tag for this XML object.
          * @param name The new name of the XML object.
          *             If the name of the XML element is an empty string, the
          *             XML object will be treated as an invalid object and will
@@ -229,8 +229,8 @@ namespace uxmpp {
          *             XML tag name.
          * @return A reference to this object.
          */
-        XmlObject& setName (const std::string& name) {
-            this->name = name;
+        XmlObject& setTagName (const std::string& name) {
+            tag_name = name;
             return *this;
         }
 
@@ -362,15 +362,15 @@ namespace uxmpp {
          */
         std::string getFullName () const {
             if (xml_namespace.length())
-                return xml_namespace + std::string(":") + name;
+                return xml_namespace + std::string(":") + tag_name;
             /*
             else if (namespace_alias.length())
-                return namespace_alias + std::string(":") + name;
+                return namespace_alias + std::string(":") + tag_name;
             */
             else if (default_namespace.length())
-                return default_namespace + std::string(":") + name;
+                return default_namespace + std::string(":") + tag_name;
             else
-                return name;
+                return tag_name;
         }
 
         /**
@@ -459,7 +459,7 @@ namespace uxmpp {
          */
         XmlObject getNode (const std::string& name, bool full_name=false) {
             for (auto& node : getNodes()) {
-                std::string node_name = full_name ? node.getFullName() : node.getName();
+                std::string node_name = full_name ? node.getFullName() : node.getTagName();
                 if (node_name == name)
                     return node;
             }
@@ -540,9 +540,9 @@ namespace uxmpp {
     protected:
 
         /**
-         * The name of the XML object.
+         * The tag name of the XML object.
          */
-        std::string name;
+        std::string tag_name;
 
         /**
          * The namespace of the XML object.

@@ -125,7 +125,7 @@ namespace uxmpp {
                        const std::string& lang="")
             : Stanza (to, from, id)
         {
-            setName ("message");
+            setTagName ("message");
             setMessageType (type);
             setChatState (chat_state);
             setBody (body, lang);
@@ -143,7 +143,7 @@ namespace uxmpp {
                        const std::string& lang="")
             : Stanza (to, from, id)
         {
-            setName ("message");
+            setTagName ("message");
             setMessageType (type);
             setChatState (chat_state);
             setBody (body, lang);

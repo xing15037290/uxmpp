@@ -124,7 +124,7 @@ MessageStanza& MessageStanza::setThread (const std::string& thread_id, const std
 {
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "thread")
+        if (i->getTagName() != "thread")
             continue;
         if (thread_id == "") {
             nodes.erase (i);
@@ -162,7 +162,7 @@ MessageStanza& MessageStanza::setParentThread (const std::string& parent_thread_
 {
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "thread")
+        if (i->getTagName() != "thread")
             continue;
         if (parent_thread_id=="")
             i->removeAttribute ("parent");
@@ -181,7 +181,7 @@ std::string MessageStanza::getBody (std::string lang)
     string configured_lang = getAttribute ("xml:lang");
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "body")
+        if (i->getTagName() != "body")
             continue;
         string node_lang = i->getAttribute ("xml:lang");
         if (lang=="") {
@@ -203,7 +203,7 @@ MessageStanza& MessageStanza::setBody (const std::string& body, std::string lang
     std::string configured_lang = getAttribute ("xml:lang");
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "body")
+        if (i->getTagName() != "body")
             continue;
         std::string node_lang = i->getAttribute ("xml:lang");
         if (lang=="") {
@@ -249,7 +249,7 @@ MessageStanza& MessageStanza::setBody (const std::string& body, std::string lang
 //------------------------------------------------------------------------------
 ChatState MessageStanza::getChatState ()
 {
-    string state = getNsNode(ChatStateNs).getName ();
+    string state = getNsNode(ChatStateNs).getTagName ();
 
     if (state == "active")
         return ChatState::active;
@@ -275,7 +275,7 @@ MessageStanza& MessageStanza::setChatState (const ChatState state)
         // Find the first node with the correct name space and set the name of the object.
         //
         if (node.getNamespace() == ChatStateNs) {
-            node.setName (to_string(state));
+            node.setTagName (to_string(state));
             return *this;
         }
     }

@@ -110,7 +110,7 @@ int main (int argc, char* argv[])
     cout << "xobj == true : " << (xobj==true) << endl;
     cout << "xobj == false: " << (xobj==false) << endl;
     cout << "xobj.setName(\"name\") " << endl;
-    xobj.setName ("name");
+    xobj.setTagName ("name");
     cout << "xobj == true : " << (xobj==true) << endl;
     cout << "xobj == false: " << (xobj==false) << endl;
 

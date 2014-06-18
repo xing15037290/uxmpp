@@ -84,7 +84,7 @@ PresenceStanza& PresenceStanza::setShow (const std::string& content)
 {
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() == "show") {
+        if (i->getTagName() == "show") {
             if (content == "")
                 nodes.erase (i);
             else
@@ -105,7 +105,7 @@ std::string PresenceStanza::getStatus (const std::string& lang)
     std::string configured_lang = getAttribute ("xml:lang");
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "status")
+        if (i->getTagName() != "status")
             continue;
         std::string node_lang = i->getAttribute ("xml:lang");
         if (lang=="") {
@@ -126,7 +126,7 @@ std::vector<std::pair<std::string, std::string> > PresenceStanza::getStatusList 
 {
     std::vector<std::pair<std::string, std::string> > status_list;
     for (auto node : getNodes()) {
-        if (node.getName() == "status")
+        if (node.getTagName() == "status")
             status_list.push_back (std::pair<std::string, std::string>(node.getContent(),
                                                                        node.getAttribute("xml:lang")));
     }
@@ -141,7 +141,7 @@ PresenceStanza& PresenceStanza::setStatus (const std::string& status, const std:
     std::string configured_lang = getAttribute ("xml:lang");
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "status")
+        if (i->getTagName() != "status")
             continue;
         std::string node_lang = i->getAttribute ("xml:lang");
         if (lang=="") {
@@ -198,7 +198,7 @@ PresenceStanza& PresenceStanza::setPriority (int prio)
 
     auto& nodes = getNodes ();
     for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getName() != "priority")
+        if (i->getTagName() != "priority")
             continue;
         if (prio == 0)
             nodes.erase (i);

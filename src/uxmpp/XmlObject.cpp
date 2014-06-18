@@ -116,10 +116,10 @@ std::string to_string (const XmlObject& xml_obj, bool pretty, const std::string&
     // Get the name of the tag to print.
     //
     if (ns.length() && !xml_obj.isNamespaceDefault()) {
-        tag_name = xml_escape (ns + string(":") + xml_escape(xml_obj.getName()));
+        tag_name = xml_escape (ns + string(":") + xml_escape(xml_obj.getTagName()));
     }
     else {
-        tag_name = xml_escape (xml_obj.getName());
+        tag_name = xml_escape (xml_obj.getTagName());
     }
 
     // Check if we should only print the end tag.

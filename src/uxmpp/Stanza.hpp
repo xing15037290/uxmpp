@@ -195,7 +195,7 @@ namespace uxmpp {
             if (node) {
                 auto child_nodes = node.getNodes ();
                 if (child_nodes.size() > 0)
-                    return child_nodes[0].getName ();
+                    return child_nodes[0].getTagName ();
                 else
                     return "";
             }

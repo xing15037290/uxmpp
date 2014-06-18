@@ -78,7 +78,7 @@ namespace uxmpp {
                         const std::string& id="")
             : Stanza (to, from, id)
         {
-            setName ("presence");
+            setTagName ("presence");
         }
 
         /**
@@ -87,7 +87,7 @@ namespace uxmpp {
         PresenceStanza (const Jid& to, const Jid& from, const std::string& id="")
             : Stanza (to, from, id)
         {
-            setName ("presence");
+            setTagName ("presence");
         }
 
         /**

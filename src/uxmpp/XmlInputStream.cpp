@@ -345,7 +345,7 @@ void XmlInputStream::XmlParseData::start_xml_node (void* user_data,
     // Split the full tag name into name and namespace.
     //
     parse_xml_tag_name (name, tag_name, xml_namespace);
-    xml_obj.setName (tag_name);
+    xml_obj.setTagName (tag_name);
     if (xml_namespace.length())
         xml_obj.setNamespace (xml_namespace);
 
@@ -400,7 +400,7 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
     // Split the name into namespace and name
     //
     parse_xml_tag_name (name, tag_name, xml_namespace);
-    xml_obj.setName (tag_name);
+    xml_obj.setTagName (tag_name);
     if (xml_namespace.length())
         xml_obj.setNamespace (xml_namespace);
 

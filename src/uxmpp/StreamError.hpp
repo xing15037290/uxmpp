@@ -43,9 +43,9 @@ namespace uxmpp {
          * Construct a stream error from an XmlObject.
          */
         StreamError (XmlObject& xml_obj) : XmlObject ("error", XmlStreamNsAlias, false, false, 2) {
-            setErrorName (xml_obj.getNodes().size() ? xml_obj.getNodes()[0].getName() : "");
+            setErrorName (xml_obj.getNodes().size() ? xml_obj.getNodes()[0].getTagName() : "");
             for (auto& node : xml_obj.getNodes()) {
-                if (node.getName() == "text") {
+                if (node.getTagName() == "text") {
                     setText (node.getContent());
                     break;
                 }
@@ -72,9 +72,9 @@ namespace uxmpp {
                 return *this;
 
             XmlObject& obj = const_cast<XmlObject&> (xml_obj);
-            setErrorName (obj.getNodes().size() ? obj.getNodes()[0].getName() : "");
+            setErrorName (obj.getNodes().size() ? obj.getNodes()[0].getTagName() : "");
             for (auto& node : obj.getNodes()) {
-                if (node.getName() == "text") {
+                if (node.getTagName() == "text") {
                     setText (node.getContent());
                     break;
                 }
@@ -102,7 +102,7 @@ namespace uxmpp {
          * Return the error condition.
          */
         std::string getErrorName () {
-            return getNodes().size() ? getNodes()[0].getName() : "";
+            return getNodes().size() ? getNodes()[0].getTagName() : "";
         }
 
         /**
@@ -120,8 +120,8 @@ namespace uxmpp {
         std::string getAppError () {
             auto& nodes = getNodes ();
             for (unsigned i=1; i<nodes.size(); i++) {
-                if (nodes[i].getName() != "text")
-                    return nodes[i].getName ();
+                if (nodes[i].getTagName() != "text")
+                    return nodes[i].getTagName ();
             }
             return "";
         }
@@ -131,7 +131,7 @@ namespace uxmpp {
          */
         std::string getText () {
             for (auto& node : getNodes()) {
-                if (node.getName() == "text")
+                if (node.getTagName() == "text")
                     return node.getContent ();
             }
             return "";
@@ -143,7 +143,7 @@ namespace uxmpp {
          */
         void setText (const std::string& text) {
             for (auto& node : getNodes()) {
-                if (node.getName() == "text") {
+                if (node.getTagName() == "text") {
                     node.setContent (text);
                     return;
                 }

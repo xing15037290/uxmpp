@@ -56,7 +56,7 @@ static const bool valid_session_state_matrix [5/*old state*/][5/*new state*/] = 
 static XmlObject* getChildNode (XmlObject& xml_obj, const string& name)
 {
     for (auto& node : xml_obj.getNodes())
-        if (node.getName() == name)
+        if (node.getTagName() == name)
             return &node;
     return nullptr;
 }
@@ -384,7 +384,7 @@ void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
     //
     if (getState() == SessionState::negotiating) {
         for (auto& feature : features) {
-            if (feature.getName() == "bind") {
+            if (feature.getTagName() == "bind") {
                 IqStanza iq (IqType::set, "", "", "b#1");
                 XmlObject bind_node (XmlBindTag, XmlBindNs, true, true, 1);
                 if (cfg.resource.length() > 0) {
@@ -444,7 +444,7 @@ bool Session::proccessXmlObject (Session& session, XmlObject& xml_obj)
     if (xml_obj.getFullName() ==  XmlFeaturesTagFull) {
         features.clear ();
         for (auto& node : xml_obj.getNodes()) {
-            uxmppLogTrace (THIS_FILE, "Got feature: ", node.getName());
+            uxmppLogTrace (THIS_FILE, "Got feature: ", node.getTagName());
             features.push_back (node);
         }
     }
