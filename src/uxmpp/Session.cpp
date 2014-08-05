@@ -375,7 +375,7 @@ void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
         //
         if (iq.getType()==IqType::set || iq.getType()==IqType::get) {
             // Send result
-            sendStanza (IqStanza(IqType::result, "", "", iq.getId()));
+            sendStanza (IqStanza(IqType::result, iq.getFrom(), iq.getTo(), iq.getId()));
         }
     }
 
