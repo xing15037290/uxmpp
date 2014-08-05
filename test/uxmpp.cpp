@@ -292,6 +292,7 @@ static void print_help ()
          << "|" << endl
          << "+----- Misc --------------------------------------------------------" << endl
          << "| ping [index|jid]     - Send XMPP ping." << endl
+         << "| dq [index|jid]       - Send disco info query." << endl
          << "| ll <value>           - Set log level (0-5)."             << endl
          << "| ka <value>           - Set keep alive timer in seconds (0 to disable)." << endl
          << "| quit                 - Quit the application."            << endl
@@ -651,6 +652,29 @@ int main (int argc, char* argv[])
                 app.mod_ping.ping ();
             else
                 app.mod_ping.ping (Jid(jid));
+        }
+        else if (cmd == "dq") {
+            pair<bool/*int-arg*/, bool/*sting-arg*/> got_arg;
+            int index {0};
+            string jid_arg;
+            Jid jid;
+
+            got_arg = get_int_or_string_argument ("Enter buddy index or JID: ", ss, index, jid_arg);
+            if (got_arg.first) { // int argument
+                auto items = app.mod_roster.getRoster().getItems ();
+                if (index < 0 || (unsigned)index >= items.size()) {
+                    cout << "Invalid buddy index" << endl;
+                    continue;
+                }
+                jid = items[index].getJid ();
+            }
+            else if (got_arg.second) { // string argument
+                jid = Jid (jid_arg);
+            }
+            else {
+                continue;
+            }
+            app.mod_disco.queryInfo (jid);
         }
         else if (cmd == "") {
         }
