@@ -33,6 +33,8 @@ namespace uxmpp {
 #include <uxmpp/mod/TlsModule.hpp>
 #include <uxmpp/mod/AuthModule.hpp>
 #include <uxmpp/mod/KeepAliveModule.hpp>
+#include <uxmpp/mod/DiscoIdentity.hpp>
+#include <uxmpp/mod/DiscoInfo.hpp>
 #include <uxmpp/mod/DiscoModule.hpp>
 #include <uxmpp/mod/RosterItem.hpp>
 #include <uxmpp/mod/Roster.hpp>

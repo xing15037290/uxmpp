@@ -29,22 +29,36 @@ namespace uxmpp { namespace mod {
 
     /**
      * Disco Identity.
+     * This is an xml object with tag name 'identity' in
+     * namespace http://jabber.org/protocol/disco#info.
+     * It should have the attributes 'category' and 'type'.
      */
     class DiscoIdentity : public uxmpp::XmlObject {
     public:
+
         /**
          * Constructor.
+         * Construct an xml object named 'identity' qualified
+         * by the namespace http://jabber.org/protocol/disco#info
+         * with the attributes 'category', 'type', and optionally
+         * 'name'.
+         * @param category The 'category' attribute.
+         * @param type The 'type' attribute.
+         * @param name The 'name' attribute.
          */
         DiscoIdentity (const std::string& category,
                        const std::string& type,
                        const std::string& name="")
             : XmlObject ("identity", "http://jabber.org/protocol/disco#info", false)
         {
-            setIdentityName ();
+            setCategory (category);
+            setType (type);
+            setName (name);
         }
 
         /**
          * Constructor.
+         * @param identity An xml object viewed as a sevice discovery identity object.
          */
         DiscoIdentity (const uxmpp::XmlObject& identity)
             : XmlObject (identity)
@@ -53,14 +67,16 @@ namespace uxmpp { namespace mod {
 
         /**
          * Copy constructor.
+         * @param identity The object to copy.
          */
-        DiscoIdentity (const DiscoIdentity& msg_stanza) : Stanza (msg_stanza) {
+        DiscoIdentity (const DiscoIdentity& identity) : XmlObject (identity) {
         }
 
         /**
          * Move constructor.
+         * @param identity The object to move.
          */
-        DiscoIdentity (DiscoIdentity&& msg_stanza) : Stanza (msg_stanza) {
+        DiscoIdentity (const DiscoIdentity&& identity) : XmlObject (identity) {
         }
 
         /**
@@ -70,61 +86,73 @@ namespace uxmpp { namespace mod {
 
         /**
          * Assignment operator.
+         * @param identity The object to copy.
          */
-        DiscoIdentity& operator= (const DiscoIdentity& msg_stanza) {
-            if (this != &msg_stanza)
-                Stanza::operator= (msg_stanza);
+        DiscoIdentity& operator= (const DiscoIdentity& identity) {
+            if (this != &identity)
+                XmlObject::operator= (identity);
             return *this;
         }
 
         /**
          * Move operator.
+         * @param identity The object to move.
          */
-        DiscoIdentity& operator= (DiscoIdentity&& msg_stanza) {
-            Stanza::operator= (msg_stanza);
+        DiscoIdentity& operator= (const DiscoIdentity&& identity) {
+            XmlObject::operator= (identity);
             return *this;
         }
 
         /**
-         * Return the identity type.
+         * Return the identity category.
+         * This will return the value of the 'category' attribute.
+         * @return The identity category.
          */
-        IdentityType getIdentityType ();
+        const std::string getCategory () const {
+            return getAttribute ("category");
+        }
+
+        /**
+         * Set the identity category.
+         * @param category The value of the 'category' attribute.
+         */
+        void setCategory (const std::string& category) {
+            setAttribute ("category", category);
+        }
+
+        /**
+         * Return the identity type.
+         * This will return the value of the 'type' attribute.
+         * @return The identity type.
+         */
+        const std::string getType () const {
+            return getAttribute ("type");
+        }
 
         /**
          * Set the identity type.
+         * @param type The value of the 'type' attribute.
          */
-        DiscoIdentity& setIdentityType (const IdentityType& type);
+        void setType (const std::string& type) {
+            setAttribute ("type", type);
+        }
 
         /**
-         * Return the identity thread id.
+         * Return the identity name.
+         * This will return the value of the 'name attribute.
+         * @return The identity name.
          */
-        std::string getThread ();
+        const std::string getName () const {
+            return getAttribute ("name");
+        }
 
         /**
-         * Set the identity thread id.
+         * Set the identity name.
+         * @param name The value of the 'name' attribute.
          */
-        DiscoIdentity& setThread (const std::string& thread_id, const std::string& parent_thread_id="");
-
-        /**
-         * Return the identity parent thread id.
-         */
-        std::string getParentThread ();
-
-        /**
-         * Set the identity parent thread id.
-         */
-        DiscoIdentity& setParentThread (const std::string& parent_thread_id);
-
-        /**
-         * Return the identity body.
-         */
-        std::string getBody (std::string lang="");
-
-        /**
-         * Set the identity body.
-         */
-        DiscoIdentity& setBody (const std::string& body, std::string lang="");
-
+        void setName (const std::string& name) {
+            setAttribute ("name", name);
+        }
     };
 
 

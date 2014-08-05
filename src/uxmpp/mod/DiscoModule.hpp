@@ -23,7 +23,10 @@
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/Session.hpp>
 #include <uxmpp/IqStanza.hpp>
+#include <uxmpp/mod/DiscoIdentity.hpp>
+//#include <uxmpp/mod/DiscoInfo.hpp>
 #include <vector>
+#include <set>
 
 
 namespace uxmpp { namespace mod {
@@ -69,23 +72,48 @@ namespace uxmpp { namespace mod {
                                     uxmpp::SessionState old_state);
 
         /**
+         * Return the identities received from the server.
+         */
+        std::vector<DiscoIdentity>& getServerIdentities () {
+            return server_identities;
+        }
+
+        /**
          * Return the features received from the server.
          */
-        std::vector<std::string>& getFeatures () {
-            return features;
+        std::vector<std::string>& getServerFeatures () {
+            return server_features;
         }
+
+        /**
+         * Send an info query to a specific jid.
+         * This will send a 
+         * @param jid The JID where to send the query.
+         * @param query_id An optional identifier for the query. If not given,
+         *                 <code>uxmpp::Stanza::makeId()</code> will be used.
+         *                 The identifier should be unique.
+         */
+        std::string queryInfo (const uxmpp::Jid& jid, const std::string& query_id="");
 
 
     protected:
-        uxmpp::Session* sess;
-        std::string feature_request_id;
-        std::string feature_version;
+        uxmpp::Session* sess; /**< The XMPP session */
+        std::string server_feature_request_id; /**< Id string used when querying the server features. */
+        std::string server_feature_version;    /**< The version of the server features. */
 
-        std::vector<std::string> features;
-        uxmpp::XmlObject server_info_query_result;
+        std::vector<DiscoIdentity> server_identities; /**< The server identities. */
+        std::vector<std::string> server_features;     /**< The server features. */
+        uxmpp::XmlObject server_info_query_result;    /**< The xmlobject returned when querying server features. */
+
+        std::set<std::string> query_ids; /**< A set of id strings of sent stanzas. */
 
     private:
         void handle_feature_request_result (uxmpp::IqStanza& iq);
+
+        //std::function<void (DiscoModule&, DiscoInfo&)>  info_handler;
+        //std::function<void (DiscoModule&, DiscoItems&)> items_handler;
+        std::function<void (DiscoModule&, XmlObject&)> info_handler;
+        std::function<void (DiscoModule&, XmlObject&)> items_handler;
     };
 
 
