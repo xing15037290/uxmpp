@@ -49,24 +49,24 @@ namespace uxmpp {
         /**
          * Called when the stream is opened.
          */
-        virtual void onOpen (XmlStream& stream) {
+        virtual void on_open (XmlStream& stream) {
         }
 
         /**
          * Called when the stream is closed.
          */
-        virtual void onClose (XmlStream& stream) {
+        virtual void on_close (XmlStream& stream) {
         }
 
         /**
          * Called whan an XML object is received.
          */
-        virtual void onRxXmlObj (XmlStream& stream, XmlObject& xml_obj) = 0;
+        virtual void on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj) = 0;
 
         /**
          * Called whan an XML object is received.
          */
-        virtual void onRxXmlError (XmlStream& stream) = 0;
+        virtual void on_rx_xml_error (XmlStream& stream) = 0;
     };
 
 

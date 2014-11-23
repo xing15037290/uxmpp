@@ -124,13 +124,13 @@ public:
      * @param localpart The localpart of the JID.
      *                  If it is longer than 1023 bytes it will be truncated.
      */
-    void setLocal (const std::string& localpart);
+    void set_local (const std::string& localpart);
 
     /**
      * Return the local part of the JID.
      * @return The local part of the JID.
      */
-    const std::string& getLocal () const {
+    const std::string& get_local () const {
         return local;
     }
 
@@ -139,13 +139,13 @@ public:
      * @param domaipart The domainpart of the JID.
      *                  If it is longer than 1023 bytes it will be truncated.
      */
-    void setDomain (const std::string& domainpart);
+    void set_domain (const std::string& domainpart);
 
     /**
      * Return the domain part of the JID.
      * @return The domain part of the JID.
      */
-    const std::string& getDomain () const {
+    const std::string& get_domain () const {
         return domain;
     }
 
@@ -154,13 +154,13 @@ public:
      * @param resourcepart The resourcepart of the JID.
      *                     If it is longer than 1023 bytes it will be truncated.
      */
-    void setResource (const std::string& resourcepart);
+    void set_resource (const std::string& resourcepart);
 
     /**
      * Return the resource part of the JID.
      * @return The resource part of the JID.
      */
-    const std::string& getResource () const {
+    const std::string& get_resource () const {
         return resource;
     }
 
@@ -178,7 +178,7 @@ public:
      * A bare JID is a JID with only a localpart and a domainpart.
      * @return true if the resourcepart is empty, false otherwise.
      */
-    bool isBare () const {
+    bool is_bare () const {
         return resource.length() == 0;
     }
 

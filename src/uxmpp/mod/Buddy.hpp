@@ -52,22 +52,22 @@ namespace uxmpp { namespace mod {
         /**
          * Get the group(s) that the buddy belongs to.
          */
-        std::vector<std::string> getGroups () {
+        std::vector<std::string> get_groups () {
             return roster_item.getGroups;
         }
 
         /**
          * Get the name of the buddy.
          */
-        std::string getName () const {
-            return roster_item.getHandle ();
+        std::string get_name () const {
+            return roster_item.get_handle ();
         }
 
         /**
          * Get the bare JID of the buddy.
          */
-        uxmpp::Jid getJid () const {
-            return roster_item.getJid().bare ();
+        uxmpp::Jid get_jid () const {
+            return roster_item.get_jid().bare ();
         }
 
 

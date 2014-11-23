@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -85,7 +85,7 @@ namespace uxmpp {
         /**
          * Return the instance of the logger.
          */
-        static Logger& getInstance ();
+        static Logger& get_instance ();
 
         /**
          * Log a message.
@@ -101,13 +101,13 @@ namespace uxmpp {
          * @param level The new log level to use.
          * @return The old log level.
          */
-        LogLevel setLogLevel (LogLevel level);
+        LogLevel set_log_level (LogLevel level);
 
         /**
          * Get the current log level.
          * @return The current log level.
          */
-        LogLevel getLogLevel ();
+        LogLevel get_log_level ();
 
 
     private:
@@ -145,9 +145,9 @@ namespace uxmpp {
      * @param level The new log level to use.
      * @return The old log level.
      */
-    inline LogLevel uxmppSetLogLevel (LogLevel level)
+    inline LogLevel uxmpp_set_log_level (LogLevel level)
     {
-        return Logger::getInstance().setLogLevel (level);
+        return Logger::get_instance().set_log_level (level);
     }
 
 
@@ -157,17 +157,17 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLog (LogLevel level, const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log (LogLevel level, const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (level, prefix, msg);
+        Logger::get_instance().log (level, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLog (LogLevel level, const std::string& prefix,
-                   const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log (LogLevel level, const std::string& prefix,
+                    const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLog (level, prefix, ss.str(), msg_args...);
+        uxmpp_log (level, prefix, ss.str(), msg_args...);
     }
 
 
@@ -176,16 +176,16 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLogFatal (const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log_fatal (const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (LogLevel::fatal, prefix, msg);
+        Logger::get_instance().log (LogLevel::fatal, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLogFatal (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log_fatal (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLogFatal (prefix, ss.str(), msg_args...);
+        uxmpp_log_fatal (prefix, ss.str(), msg_args...);
     }
 
 
@@ -194,16 +194,16 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLogError (const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log_error (const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (LogLevel::error, prefix, msg);
+        Logger::get_instance().log (LogLevel::error, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLogError (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log_error (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLogError (prefix, ss.str(), msg_args...);
+        uxmpp_log_error (prefix, ss.str(), msg_args...);
     }
 
 
@@ -212,16 +212,16 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLogWarning (const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log_warning (const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (LogLevel::warning, prefix, msg);
+        Logger::get_instance().log (LogLevel::warning, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLogWarning (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log_warning (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLogWarning (prefix, ss.str(), msg_args...);
+        uxmpp_log_warning (prefix, ss.str(), msg_args...);
     }
 
 
@@ -230,16 +230,16 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLogInfo (const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log_info (const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (LogLevel::info, prefix, msg);
+        Logger::get_instance().log (LogLevel::info, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLogInfo (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log_info (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLogInfo (prefix, ss.str(), msg_args...);
+        uxmpp_log_info (prefix, ss.str(), msg_args...);
     }
 
 
@@ -248,16 +248,16 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLogDebug (const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log_debug (const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (LogLevel::debug, prefix, msg);
+        Logger::get_instance().log (LogLevel::debug, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLogDebug (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log_debug (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLogDebug (prefix, ss.str(), msg_args...);
+        uxmpp_log_debug (prefix, ss.str(), msg_args...);
     }
 
 
@@ -266,22 +266,22 @@ namespace uxmpp {
      * @param prefix A prefix to the log message.
      * @param message The log message.
      */
-    inline void uxmppLogTrace (const std::string& prefix, const std::string& msg)
+    inline void uxmpp_log_trace (const std::string& prefix, const std::string& msg)
     {
-        Logger::getInstance().log (LogLevel::trace, prefix, msg);
+        Logger::get_instance().log (LogLevel::trace, prefix, msg);
     }
     template<typename T, typename... Targs>
-    void uxmppLogTrace (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
+    void uxmpp_log_trace (const std::string& prefix, const std::string& msg, T arg, Targs... msg_args)
     {
         std::stringstream ss;
         ss << msg << arg;
-        uxmppLogTrace (prefix, ss.str(), msg_args...);
+        uxmpp_log_trace (prefix, ss.str(), msg_args...);
     }
 
 
 #ifndef NDEBUG
-#define UXMPP_LOG_DEBUG(prefix, message) uxmppLogDebug(prefix, message)
-#define UXMPP_LOG_TRACE(prefix, message) uxmppLogTrace(prefix, message)
+#define UXMPP_LOG_DEBUG(prefix, message) uxmpp_log_debug(prefix, message)
+#define UXMPP_LOG_TRACE(prefix, message) uxmpp_log_trace(prefix, message)
 #else
 #define UXMPP_LOG_DEBUG(prefix, message)
 #define UXMPP_LOG_TRACE(prefix, message)

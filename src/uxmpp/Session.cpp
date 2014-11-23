@@ -53,10 +53,10 @@ static const bool valid_session_state_matrix [5/*old state*/][5/*new state*/] = 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-static XmlObject* getChildNode (XmlObject& xml_obj, const string& name)
+static XmlObject* get_child_node (XmlObject& xml_obj, const string& name)
 {
-    for (auto& node : xml_obj.getNodes())
-        if (node.getTagName() == name)
+    for (auto& node : xml_obj.get_nodes())
+        if (node.get_tag_name() == name)
             return &node;
     return nullptr;
 }
@@ -72,8 +72,8 @@ Session::Session ()
     sess_from  {""},
     state      {SessionState::closed}
 {
-    xs.addListener (*this);
-    registerModule (*this);
+    xs.add_listener (*this);
+    register_module (*this);
 }
 
 
@@ -87,25 +87,25 @@ Session::~Session ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::addSessionListener (SessionListener& listener)
+void Session::add_session_listener (SessionListener& listener)
 {
     for (auto& l : listeners) {
         if (l == &listener)
             return; // Already added
     }
     listeners.push_back (&listener);
-    uxmppLogTrace (THIS_FILE, "Added session listener");
+    uxmpp_log_trace (THIS_FILE, "Added session listener");
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::delSessionListener (SessionListener& listener)
+void Session::del_session_listener (SessionListener& listener)
 {
-    for (auto i=listeners.begin(); i!=listeners.end(); i++) {
+    for (auto i=listeners.begin(); i!=listeners.end(); ++i) {
         if ((*i) == &listener) {
             listeners.erase (i);
-            uxmppLogTrace (THIS_FILE, "Removed session listener");
+            uxmpp_log_trace (THIS_FILE, "Removed session listener");
             return;
         }
     }
@@ -114,37 +114,37 @@ void Session::delSessionListener (SessionListener& listener)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::registerModule (XmppModule& module)
+void Session::register_module (XmppModule& module)
 {
     for (XmppModule* m : xmpp_modules) {
         if (&module == m) {
-            uxmppLogInfo (THIS_FILE,
-                          string("Not registering XMPP module '") +
-                          module.getName() + "' - already registered");
+            uxmpp_log_info (THIS_FILE,
+                            string("Not registering XMPP module '") +
+                            module.get_name() + "' - already registered");
             return;
         }
     }
     xmpp_modules.push_back (&module);
-    module.moduleRegistered (*this);
-    uxmppLogInfo (THIS_FILE, string("XMPP module '") + module.getName() + "' - registered");
+    module.module_registered (*this);
+    uxmpp_log_info (THIS_FILE, string("XMPP module '") + module.get_name() + "' - registered");
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::unregisterModule (XmppModule& module)
+void Session::unregister_module (XmppModule& module)
 {
-    for (auto i=xmpp_modules.begin(); i!=xmpp_modules.end(); i++) {
+    for (auto i=xmpp_modules.begin(); i!=xmpp_modules.end(); ++i) {
         if (*i == &module) {
             xmpp_modules.erase (i);
-            module.moduleUnregistered (*this);
-            uxmppLogInfo (THIS_FILE, string("XMPP module '") + module.getName() + "' - unregistered");
+            module.module_unregistered (*this);
+            uxmpp_log_info (THIS_FILE, string("XMPP module '") + module.get_name() + "' - unregistered");
             return;
         }
     }
-    uxmppLogInfo (THIS_FILE,
-                  string("Not unregistering XMPP module '") +
-                  module.getName() + "' - not registered");
+    uxmpp_log_info (THIS_FILE,
+                    string("Not unregistering XMPP module '") +
+                    module.get_name() + "' - not registered");
 }
 
 
@@ -154,8 +154,8 @@ void Session::reset ()
 {
     xs.reset ();
     features.clear ();
-    stream_xml_obj.setFrom (cfg.user_id);
-    stream_xml_obj.setPart (XmlObjPart::start);
+    stream_xml_obj.set_from (cfg.user_id);
+    stream_xml_obj.set_part (XmlObjPart::start);
     xs.write (stream_xml_obj);
 }
 
@@ -164,12 +164,12 @@ void Session::reset ()
 //------------------------------------------------------------------------------
 void Session::start (const SessionConfig& config)
 {
-    if (!changeState(SessionState::connecting)) {
-        uxmppLogWarning (THIS_FILE, "Unable to connect stream in state ", to_string(state));
+    if (!change_state(SessionState::connecting)) {
+        uxmpp_log_warning (THIS_FILE, "Unable to connect stream in state ", to_string(state));
         return;
     }
 
-    uxmppLogDebug (THIS_FILE, "Starting XMPP session");
+    uxmpp_log_debug (THIS_FILE, "Starting XMPP session");
 
     // Initialize session data
     //
@@ -177,11 +177,11 @@ void Session::start (const SessionConfig& config)
     sess_id   = "";
     sess_from = "";
     jid       = "";
-    stream_error.setErrorName ("");
+    stream_error.set_error_name ("");
 
-    stream_xml_obj.setTo   (cfg.domain);
-    stream_xml_obj.setFrom (string("user@")+cfg.domain);
-    stream_xml_obj.setPart (XmlObjPart::start);
+    stream_xml_obj.set_to    (cfg.domain);
+    stream_xml_obj.set_from (string("user@")+cfg.domain);
+    stream_xml_obj.set_part (XmlObjPart::start);
 
     // Get the list of IP addresses to try to connect to
     //
@@ -189,11 +189,11 @@ void Session::start (const SessionConfig& config)
 
     // Set error 'undefined-condition' if the resolver fails.
     //
-    if (addr_list.size() == 0) {
-        string host = cfg.server.length() ? cfg.server : cfg.domain;
-        uxmppLogWarning (THIS_FILE, "Unable to resolv host ", host);
-        stream_error.setAppError ("resolve-error",
-                                  string("Unable to resolve host ") + host);
+    if (addr_list.empty()) {
+        string host = cfg.server.empty() ? cfg.domain : cfg.server;
+        uxmpp_log_warning (THIS_FILE, "Unable to resolv host ", host);
+        stream_error.set_app_error ("resolve-error",
+                                    string("Unable to resolve host ") + host);
     }
 
     // Try to connect to the addresses the resolver returned.
@@ -202,8 +202,8 @@ void Session::start (const SessionConfig& config)
     for (auto& addr : addr_list) {
         if (cfg.port) // Override port number ?
             addr.port = htons (cfg.port);
-        uxmppLogInfo (THIS_FILE, "Connect to ", to_string(addr));
-        stream_error.setErrorName ("");
+        uxmpp_log_info (THIS_FILE, "Connect to ", to_string(addr));
+        stream_error.set_error_name ("");
         //
         // This is a blocking call. The execution of xs.start() could take quite some time.
         //
@@ -213,21 +213,21 @@ void Session::start (const SessionConfig& config)
             // Don't try next server
             break;
         }
-        uxmppLogInfo (THIS_FILE, "Failed connecting to ", to_string(addr));
-        stream_error.setAppError ("connection-refused",
-                                  string("Unable to connect to ") + to_string(addr));
+        uxmpp_log_info (THIS_FILE, "Failed connecting to ", to_string(addr));
+        stream_error.set_app_error ("connection-refused",
+                                    string("Unable to connect to ") + to_string(addr));
     }
 
     // Session is done, set the state to 'closed'
     //
-    changeState (SessionState::closed);
-    stream_xml_obj.setTo ("");
-    stream_xml_obj.setFrom ("");
+    change_state (SessionState::closed);
+    stream_xml_obj.set_to ("");
+    stream_xml_obj.set_from ("");
     sess_id = "";
     sess_from = "";
     jid = "";
 
-    uxmppLogDebug (THIS_FILE, "XMPP session ended");
+    uxmpp_log_debug (THIS_FILE, "XMPP session ended");
 }
 
 
@@ -235,25 +235,25 @@ void Session::start (const SessionConfig& config)
 //------------------------------------------------------------------------------
 void Session::stop (bool fast)
 {
-    uxmppLogTrace (THIS_FILE, "Stop session in state ", to_string(state));
+    uxmpp_log_trace (THIS_FILE, "Stop session in state ", to_string(state));
 
     if (!fast && (state == SessionState::closed || state==SessionState::closing)) {
-        uxmppLogTrace (THIS_FILE, "Session already ",
-                       (state==SessionState::closing?"closing":"closed"), ", do nothing");
+        uxmpp_log_trace (THIS_FILE, "Session already ",
+                         (state==SessionState::closing?"closing":"closed"), ", do nothing");
         return;
     }
 
     if (state != SessionState::closing) {
-        if (!changeState(SessionState::closing)) {
-            uxmppLogWarning (THIS_FILE, "Unable to stop session in state ", to_string(state));
+        if (!change_state(SessionState::closing)) {
+            uxmpp_log_warning (THIS_FILE, "Unable to stop session in state ", to_string(state));
             return;
         }
     }
 
-    if (xs.isOpen()) {
-        stream_xml_obj.setPart (XmlObjPart::end);
+    if (xs.is_open()) {
+        stream_xml_obj.set_part (XmlObjPart::end);
         if (!fast)
-            xs.setTimeout ("stop_session", 500);
+            xs.set_timeout ("stop_session", 500);
         xs.write (stream_xml_obj);
         if (fast)
             xs.stop ();
@@ -263,7 +263,7 @@ void Session::stop (bool fast)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool Session::changeState (SessionState new_state)
+bool Session::change_state (SessionState new_state)
 {
     SessionState old_state = state;
 
@@ -272,18 +272,18 @@ bool Session::changeState (SessionState new_state)
     if (!valid_session_state_matrix[static_cast<int>(old_state)]
                                    [static_cast<int>(new_state)])
     {
-        uxmppLogWarning (THIS_FILE, "invalid session state: ",
-                         to_string(new_state), ", old state: ", to_string(old_state));
+        uxmpp_log_warning (THIS_FILE, "invalid session state: ",
+                           to_string(new_state), ", old state: ", to_string(old_state));
         return false;
     }
 
     state = new_state;
 
-    uxmppLogTrace (THIS_FILE, "### new session state: ", to_string(state), " ###");
+    uxmpp_log_trace (THIS_FILE, "### new session state: ", to_string(state), " ###");
 
     switch (new_state) {
     case SessionState::closed:
-        xs.setTimeout ("stop_session", 0); // Disable stop_session timer
+        xs.set_timeout ("stop_session", 0); // Disable stop_session timer
         break;
 
     case SessionState::connecting:
@@ -298,7 +298,7 @@ bool Session::changeState (SessionState new_state)
         break;
 
     case SessionState::bound:
-        uxmppLogDebug (THIS_FILE, "Binding is done: ", jid);
+        uxmpp_log_debug (THIS_FILE, "Binding is done: ", jid);
         break;
 
     case SessionState::closing:
@@ -309,7 +309,7 @@ bool Session::changeState (SessionState new_state)
     // Inform listeners
     //
     for (auto& listener : listeners)
-        listener->onStateChange (*this, new_state, old_state);
+        listener->on_state_change (*this, new_state, old_state);
 
     return true;
 }
@@ -317,37 +317,37 @@ bool Session::changeState (SessionState new_state)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::onOpen (XmlStream& stream)
+void Session::on_open (XmlStream& stream)
 {
-    uxmppLogTrace (THIS_FILE, "XML stream is open");
-    changeState (SessionState::negotiating);
+    uxmpp_log_trace (THIS_FILE, "XML stream is open");
+    change_state (SessionState::negotiating);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::onClose (XmlStream& stream)
+void Session::on_close (XmlStream& stream)
 {
-    uxmppLogTrace (THIS_FILE, "XML stream is closed");
-    stream_xml_obj.setTo ("");
-    stream_xml_obj.setFrom ("");
+    uxmpp_log_trace (THIS_FILE, "XML stream is closed");
+    stream_xml_obj.set_to ("");
+    stream_xml_obj.set_from ("");
     stop ();
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
+void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
 {
-    uxmppLogDebug (THIS_FILE, "Got XML obj: ", to_string(xml_obj, true));
+    uxmpp_log_debug (THIS_FILE, "Got XML obj: ", to_string(xml_obj, true));
 
     // Find an XMPP module to handle the XML object.
     //
     bool handled = false;
     for (XmppModule* module : xmpp_modules) {
-        uxmppLogTrace (THIS_FILE, string("Call module ") + module->getName());
-        if (module->proccessXmlObject(*this, xml_obj)) {
-            uxmppLogDebug (THIS_FILE, string("XML object handled by module ") + module->getName());
+        uxmpp_log_trace (THIS_FILE, string("Call module ") + module->get_name());
+        if (module->proccess_xml_object(*this, xml_obj)) {
+            uxmpp_log_debug (THIS_FILE, string("XML object handled by module ") + module->get_name());
             handled = true;
             break;
         }
@@ -360,7 +360,7 @@ void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
         return;
     }
 
-    uxmppLogDebug (THIS_FILE, "XML object not handled by any module ");
+    uxmpp_log_debug (THIS_FILE, "XML object not handled by any module ");
 
     //
     // Handle unhandled XML objects
@@ -368,29 +368,29 @@ void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
 
     // Check for IQ stanza's
     //
-    if (xml_obj.getFullName() == XmlIqStanzaTagFull) {
+    if (xml_obj.get_full_name() == XmlIqStanzaTagFull) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
         //
         // Respond to unknown 'set' and 'get' with an empty result.
         //
-        if (iq.getType()==IqType::set || iq.getType()==IqType::get) {
+        if (iq.get_type()==IqType::set || iq.get_type()==IqType::get) {
             // Send result
-            sendStanza (IqStanza(IqType::result, iq.getFrom(), iq.getTo(), iq.getId()));
+            send_stanza (IqStanza(IqType::result, iq.get_from(), iq.get_to(), iq.get_id()));
         }
     }
 
     // If the XML object was not handled and we have got feature 'bind'
     // then send 'bind' to the server. And yes, only if we are in 'negotiating' state.
     //
-    if (getState() == SessionState::negotiating) {
+    if (get_state() == SessionState::negotiating) {
         for (auto& feature : features) {
-            if (feature.getTagName() == "bind") {
+            if (feature.get_tag_name() == "bind") {
                 IqStanza iq (IqType::set, "", "", "b#1");
                 XmlObject bind_node (XmlBindTag, XmlBindNs, true, true, 1);
-                if (cfg.resource.length() > 0) {
-                    bind_node.addNode (XmlObject("resource", XmlBindNs, false).setContent(cfg.resource));
+                if (!cfg.resource.empty()) {
+                    bind_node.add_node (XmlObject("resource", XmlBindNs, false).set_content(cfg.resource));
                 }
-                iq.addNode (bind_node);
+                iq.add_node (bind_node);
                 xs.write (iq);
                 break;
             }
@@ -401,36 +401,36 @@ void Session::onRxXmlObj (XmlStream& stream, XmlObject& xml_obj)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::onRxXmlError (XmlStream& stream)
+void Session::on_rx_xml_error (XmlStream& stream)
 {
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool Session::proccessXmlObject (Session& session, XmlObject& xml_obj)
+bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
 {
     // Check for stream errors before doing anything else.
     //
-    if (xml_obj.getFullName() == XmlStreamErrorTagFull) {
+    if (xml_obj.get_full_name() == XmlStreamErrorTagFull) {
         stream_error = xml_obj;
-        uxmppLogError (THIS_FILE, "Got stream error: ", stream_error.getErrorName());
+        uxmpp_log_error (THIS_FILE, "Got stream error: ", stream_error.get_error_name());
         stop ();
         return true;
     }
 
     // Check for end-of-stream before doing anything else
     //
-    if (xml_obj.getFullName() == XmlStreamTagFull && xml_obj.getPart() == XmlObjPart::end) {
+    if (xml_obj.get_full_name() == XmlStreamTagFull && xml_obj.get_part() == XmlObjPart::end) {
         if (state==SessionState::closing) {
-            uxmppLogTrace (THIS_FILE, "Session is already closing, stop XML stream");
-            if (xs.isOpen())
+            uxmpp_log_trace (THIS_FILE, "Session is already closing, stop XML stream");
+            if (xs.is_open())
                 xs.stop (); // Close the XML stream
         }else{
-            uxmppLogTrace (THIS_FILE, "Close session");
-            if (changeState(SessionState::closing)) {
-                if (xs.isOpen()) {
-                    stream_xml_obj.setPart (XmlObjPart::end);
+            uxmpp_log_trace (THIS_FILE, "Close session");
+            if (change_state(SessionState::closing)) {
+                if (xs.is_open()) {
+                    stream_xml_obj.set_part (XmlObjPart::end);
                     xs.write (stream_xml_obj);
                     xs.stop ();
                 }
@@ -441,32 +441,32 @@ bool Session::proccessXmlObject (Session& session, XmlObject& xml_obj)
 
     // Store features.
     //
-    if (xml_obj.getFullName() ==  XmlFeaturesTagFull) {
+    if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
         features.clear ();
-        for (auto& node : xml_obj.getNodes()) {
-            uxmppLogTrace (THIS_FILE, "Got feature: ", node.getTagName());
+        for (auto& node : xml_obj.get_nodes()) {
+            uxmpp_log_trace (THIS_FILE, "Got feature: ", node.get_tag_name());
             features.push_back (node);
         }
     }
 
     // Check timer events
     //
-    if (xml_obj.getFullName() == XmlUxmppTimerTagFull) {
+    if (xml_obj.get_full_name() == XmlUxmppTimerTagFull) {
         //
         // Check the close timer
         //
-        if (xml_obj.getAttribute("id") == "close") {
-            uxmppLogInfo (THIS_FILE, "Timeout, close connection");
-            stream_error.setAppError ("timeout", string("Timeout"));
+        if (xml_obj.get_attribute("id") == "close") {
+            uxmpp_log_info (THIS_FILE, "Timeout, close connection");
+            stream_error.set_app_error ("timeout", string("Timeout"));
             stop ();
             return true;
         }
         //
         // Check the stop_session timer
         //
-        else if (xml_obj.getAttribute("id") == "stop_session") {
-            uxmppLogDebug (THIS_FILE, "Timeout while waiting for XML session end tag, close XML stream.");
-            if (xs.isOpen())
+        else if (xml_obj.get_attribute("id") == "stop_session") {
+            uxmpp_log_debug (THIS_FILE, "Timeout while waiting for XML session end tag, close XML stream.");
+            if (xs.is_open())
                 xs.stop ();
             return true;
         }
@@ -475,17 +475,17 @@ bool Session::proccessXmlObject (Session& session, XmlObject& xml_obj)
     //
     // Handle 'stream'
     //
-    if (xml_obj.getFullName() == XmlStreamTagFull) {
-        sess_id = xml_obj.getAttribute ("id");
-        sess_from = xml_obj.getAttribute ("from");
-        uxmppLogTrace (THIS_FILE, "Got session ID: ", sess_id);
+    if (xml_obj.get_full_name() == XmlStreamTagFull) {
+        sess_id = xml_obj.get_attribute ("id");
+        sess_from = xml_obj.get_attribute ("from");
+        uxmpp_log_trace (THIS_FILE, "Got session ID: ", sess_id);
         return true;
     }
 
     //
     // Handle 'bind' and 'session'
     //
-    if (xml_obj.getFullName() ==  XmlIqStanzaTagFull && getState()==SessionState::negotiating) {
+    if (xml_obj.get_full_name() ==  XmlIqStanzaTagFull && get_state()==SessionState::negotiating) {
 
 /*
         // Check for 'session' result
@@ -505,13 +505,13 @@ bool Session::proccessXmlObject (Session& session, XmlObject& xml_obj)
         }
 */
         XmlObject* node_jid  = nullptr;
-        XmlObject* node_bind = getChildNode (xml_obj, "bind");
+        XmlObject* node_bind = get_child_node (xml_obj, "bind");
         if (node_bind)
-            node_jid = getChildNode (*node_bind, "jid");
+            node_jid = get_child_node (*node_bind, "jid");
         if (node_jid)
-            jid = node_jid->getContent ();
-        if (jid.length()) {
-            uxmppLogTrace (THIS_FILE, "Got session JID: ", jid);
+            jid = node_jid->get_content ();
+        if (!jid.empty()) {
+            uxmpp_log_trace (THIS_FILE, "Got session JID: ", jid);
 
 /*
             //
@@ -532,7 +532,7 @@ bool Session::proccessXmlObject (Session& session, XmlObject& xml_obj)
                 changeState(SessionState::bound);
             }
 */
-            changeState(SessionState::bound);
+            change_state (SessionState::bound);
 
             return true;
         }
@@ -548,7 +548,7 @@ static std::vector<IpHostAddr> get_server_address_list (const SessionConfig& cfg
 {
     // Use the configured domain if server is not specified
     //
-    string server = cfg.server.length() ? cfg.server : cfg.domain;
+    string server = cfg.server.empty() ? cfg.domain : cfg.server;
 
     BsdResolver resolver;
     std::vector<IpHostAddr> addr_list;
@@ -572,17 +572,17 @@ static std::vector<IpHostAddr> get_server_address_list (const SessionConfig& cfg
             // Try a DNS SRV query for the specified protocol
             //
             addr_list = resolver.lookup_srv (server, protocol, "xmpp-client", false);
-            if (addr_list.size() != 0) {
+            if (!addr_list.empty()) {
                 break;
             }
         }
     }
-    if (addr_list.size() == 0) {
+    if (addr_list.empty()) {
         //
         // DNS SRV failed(or not used), fallback to normal host resolution
         //
-        uxmppLogDebug (THIS_FILE, std::string("DNS SRV query gave no response, "
-                                              "using normal address resolution for ") + server);
+        uxmpp_log_debug (THIS_FILE, std::string("DNS SRV query gave no response, "
+                                                "using normal address resolution for ") + server);
         addr_list = resolver.lookup_host (server,
                                           cfg.port==0 ? 5222 : cfg.port,
                                           cfg.protocol==AddrProto::any ? AddrProto::tcp : cfg.protocol);

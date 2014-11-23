@@ -51,31 +51,31 @@ static const std::string XmlAuthTagFull = XmlIqAuthNs + string(":") + XmlAuthTag
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
-    XmlStream& xs = session.getXmlStream ();
+    XmlStream& xs = session.get_xml_stream ();
     bool start_auth = false;
     bool have_mechanisms = false;
 
     //
     // Handle 'features'
     //
-    if (xml_obj.getFullName() ==  XmlFeaturesTagFull) {
-        for (auto& node : xml_obj.getNodes()) {
-            if (node.getFullName() == XmlMechanismsTagFull) {
+    if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
+        for (auto& node : xml_obj.get_nodes()) {
+            if (node.get_full_name() == XmlMechanismsTagFull) {
                 mechanisms.clear ();
                 have_mechanisms = true;
                 //
                 // Store authentication methods
                 //
-                for (auto& subnode : node.getNodes()) {
-                    if (subnode.getFullName() == XmlMechanismTagFull) {
-                        uxmppLogTrace (THIS_FILE, "Got authentication mechanism: ", subnode.getContent());
-                        mechanisms.insert (subnode.getContent());
+                for (auto& subnode : node.get_nodes()) {
+                    if (subnode.get_full_name() == XmlMechanismTagFull) {
+                        uxmpp_log_trace (THIS_FILE, "Got authentication mechanism: ", subnode.get_content());
+                        mechanisms.insert (subnode.get_content());
                     }
                 }
             }
-            else if (node.getFullName() == XmlAuthTagFull) {
+            else if (node.get_full_name() == XmlAuthTagFull) {
                 start_auth = true;
                 break;
             }
@@ -87,20 +87,20 @@ bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
         //
         if (mechanisms.find("PLAIN") != mechanisms.end()) {
             XmlObject auth ("auth", XmlSaslNs);
-            auth.setAttribute ("mechanism", "PLAIN");
+            auth.set_attribute ("mechanism", "PLAIN");
 
-            uxmppLogTrace (THIS_FILE, "Authenticate user: ", auth_user);
+            uxmpp_log_trace (THIS_FILE, "Authenticate user: ", auth_user);
             string challange_str = string("_") + auth_user + string("_") + auth_pass;
             challange_str[0] = '\0';
             challange_str[auth_user.length()+1] = '\0';
-            auth.setContent (base64_encode(challange_str));
+            auth.set_content (base64_encode(challange_str));
 
             xs.write (auth);
             return true;
         }else{
-            uxmppLogWarning (THIS_FILE, "No supported authorization mechanism found");
-            session.setAppError ("unsupported-authorization-mechanism",
-                                 "No supported authentication method found");
+            uxmpp_log_warning (THIS_FILE, "No supported authorization mechanism found");
+            session.set_app_error ("unsupported-authorization-mechanism",
+                                   "No supported authentication method found");
             session.stop ();
         }
     }
@@ -108,13 +108,13 @@ bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
     //
     // Handle 'challenge'
     //
-    if (xml_obj.getFullName() == XmlChallengeTagFull) {
+    if (xml_obj.get_full_name() == XmlChallengeTagFull) {
         // If method == PLAIN
         string challange_str = string("_") + auth_user + string("_") + auth_pass;
         challange_str[0] = '\0';
         challange_str[auth_user.length()+1] = '\0';
         XmlObject response ("response", XmlSaslNs);
-        response.setContent (base64_encode(challange_str));
+        response.set_content (base64_encode(challange_str));
         xs.write (response);
         return true;
     }
@@ -122,8 +122,8 @@ bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
     //
     // Handle 'success'
     //
-    if (xml_obj.getFullName() == XmlSuccessTagFull) {
-        uxmppLogInfo (THIS_FILE, "Logged in to ", to_string(xs.getPeerAddr()));
+    if (xml_obj.get_full_name() == XmlSuccessTagFull) {
+        uxmpp_log_info (THIS_FILE, "Logged in to ", to_string(xs.get_peer_addr()));
         session.reset ();
         return true;
     }
@@ -131,11 +131,11 @@ bool AuthModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
     //
     // Handle 'failure'
     //
-    if (xml_obj.getFullName() == XmlFailureTagFull) {
-        uxmppLogWarning (THIS_FILE, "Failure to authenticate: ",
-                         xml_obj.getNodes().size() ? xml_obj.getNodes()[0].getTagName() : "unknown");
-        session.setAppError ("authentication-failure",
-                             "Authentication failed");
+    if (xml_obj.get_full_name() == XmlFailureTagFull) {
+        uxmpp_log_warning (THIS_FILE, "Failure to authenticate: ",
+                           xml_obj.get_nodes().empty() ? "unknown" : xml_obj.get_nodes()[0].get_tag_name());
+        session.set_app_error ("authentication-failure",
+                               "Authentication failed");
         session.stop ();
         return true;
     }

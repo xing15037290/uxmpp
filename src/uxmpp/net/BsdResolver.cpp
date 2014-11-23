@@ -67,7 +67,7 @@ static vector<srv_record> do_srv_query (const string& query)
         u_char buf[4096];
     } response;
 
-    uxmppLogTrace (THIS_FILE, string("DNS SRV query: ") + query);
+    uxmpp_log_trace (THIS_FILE, string("DNS SRV query: ") + query);
 
     // Make the SRV DNS query
     //
@@ -80,7 +80,7 @@ static vector<srv_record> do_srv_query (const string& query)
     // Check if we got an answer
     //
     if (len <= static_cast<int>(sizeof(HEADER)) || ntohs(response.hdr.ancount)==0) {
-        uxmppLogDebug (THIS_FILE, string("No response for DNS SRV query: ") + query);
+        uxmpp_log_debug (THIS_FILE, string("No response for DNS SRV query: ") + query);
         return srv_records;
     }
 
@@ -91,11 +91,11 @@ static vector<srv_record> do_srv_query (const string& query)
 
     // Skip the query record(s)
     //
-    for (short i=0; i<ntohs(response.hdr.qdcount); i++) {
+    for (short i=0; i<ntohs(response.hdr.qdcount); ++i) {
         char tmpbuf[256];
         int c = dn_expand (response.buf, response.buf+len, ptr, tmpbuf, sizeof(tmpbuf));
         if (c < 0) {
-            uxmppLogDebug (THIS_FILE, "Error reading query record from DNS SRV answer");
+            uxmpp_log_debug (THIS_FILE, "Error reading query record from DNS SRV answer");
             return srv_records;
         }
         ptr += c + QFIXEDSZ;
@@ -103,12 +103,12 @@ static vector<srv_record> do_srv_query (const string& query)
 
     // Check the answer records for SRV records
     //
-    for (short i=0; i<ntohs(response.hdr.ancount); i++) {
+    for (short i=0; i<ntohs(response.hdr.ancount); ++i) {
         srv_record record;
         char tmpbuf[256];
         int c = dn_expand (response.buf, response.buf+len, ptr, tmpbuf, sizeof(tmpbuf));
         if (c < 0) {
-            uxmppLogDebug (THIS_FILE, "Error reading answer record from DNS SRV answer");
+            uxmpp_log_debug (THIS_FILE, "Error reading answer record from DNS SRV answer");
             return srv_records;
         }
         ptr += c;
@@ -150,7 +150,7 @@ static vector<srv_record> do_srv_query (const string& query)
         // Get target
         c = dn_expand (response.buf, response.buf+len, ptr, tmpbuf, sizeof(tmpbuf));
         if (c < 0) {
-            uxmppLogDebug (THIS_FILE, "Error reading target from DNS SRV answer");
+            uxmpp_log_debug (THIS_FILE, "Error reading target from DNS SRV answer");
             return srv_records;
         }
         ptr += c;
@@ -184,11 +184,11 @@ vector<IpHostAddr> do_host_query (const std::string& hostname)
 
     result = getaddrinfo (hostname.c_str(), NULL, &hints, &ai_list);
     if (result) {
-        uxmppLogWarning (THIS_FILE,
-                         string("Unable to resolv host ")
-                         + hostname
-                         + string(": ")
-                         + string(gai_strerror(result)));
+        uxmpp_log_warning (THIS_FILE,
+                           string("Unable to resolv host ")
+                           + hostname
+                           + string(": ")
+                           + string(gai_strerror(result)));
         return addr_list;
     }
 
@@ -248,20 +248,20 @@ std::vector<IpHostAddr> BsdResolver::lookup_srv (const std::string& domain,
         srv_records.clear ();
     }
 
-    uxmppLogDebug (THIS_FILE, "DNS SRV query gave ", srv_records.size(), " response(s) for domain: ", domain);
+    uxmpp_log_debug (THIS_FILE, "DNS SRV query gave ", srv_records.size(), " response(s) for domain: ", domain);
 
     // If no SRV records are found, fall back to a normal address lookup.
     //
-    if (srv_records.size() == 0 && dns_fallback) {
-        uxmppLogDebug (THIS_FILE, std::string("DNS SRV query gave no response, "
-                                              "using normal address resolution for ") + domain);
+    if (srv_records.empty() && dns_fallback) {
+        uxmpp_log_debug (THIS_FILE, std::string("DNS SRV query gave no response, "
+                                                "using normal address resolution for ") + domain);
         return lookup_host (domain,
                             service=="xmpp-client" ? xmpp_client_port : xmpp_server_port,
                             proto);
     }
 
     for (auto srv_rec : srv_records) {
-        uxmppLogTrace (THIS_FILE, std::string("Get IP addresses for ") + srv_rec.target);
+        uxmpp_log_trace (THIS_FILE, std::string("Get IP addresses for ") + srv_rec.target);
         vector<IpHostAddr> addresses = do_host_query (srv_rec.target);
         for (auto addr : addresses) {
             addr.hostname = srv_rec.target;

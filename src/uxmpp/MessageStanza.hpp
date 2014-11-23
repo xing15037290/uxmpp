@@ -125,10 +125,10 @@ namespace uxmpp {
                        const std::string& lang="")
             : Stanza (to, from, id)
         {
-            setTagName ("message");
-            setMessageType (type);
-            setChatState (chat_state);
-            setBody (body, lang);
+            set_tag_name ("message");
+            set_message_type (type);
+            set_chat_state (chat_state);
+            set_body (body, lang);
         }
 
         /**
@@ -143,10 +143,10 @@ namespace uxmpp {
                        const std::string& lang="")
             : Stanza (to, from, id)
         {
-            setTagName ("message");
-            setMessageType (type);
-            setChatState (chat_state);
-            setBody (body, lang);
+            set_tag_name ("message");
+            set_message_type (type);
+            set_chat_state (chat_state);
+            set_body (body, lang);
         }
 
         /**
@@ -186,52 +186,52 @@ namespace uxmpp {
         /**
          * Return the message type.
          */
-        MessageType getMessageType ();
+        MessageType get_message_type ();
 
         /**
          * Set the message type.
          */
-        MessageStanza& setMessageType (const MessageType type);
+        MessageStanza& set_message_type (const MessageType type);
 
         /**
          * Return the message thread id.
          */
-        std::string getThread ();
+        std::string get_thread ();
 
         /**
          * Set the message thread id.
          */
-        MessageStanza& setThread (const std::string& thread_id, const std::string& parent_thread_id="");
+        MessageStanza& set_thread (const std::string& thread_id, const std::string& parent_thread_id="");
 
         /**
          * Return the message parent thread id.
          */
-        std::string getParentThread ();
+        std::string get_parent_thread ();
 
         /**
          * Set the message parent thread id.
          */
-        MessageStanza& setParentThread (const std::string& parent_thread_id);
+        MessageStanza& set_parent_thread (const std::string& parent_thread_id);
 
         /**
          * Return the message body.
          */
-        std::string getBody (std::string lang="");
+        std::string get_body (std::string lang="");
 
         /**
          * Set the message body.
          */
-        MessageStanza& setBody (const std::string& body, std::string lang="");
+        MessageStanza& set_body (const std::string& body, std::string lang="");
 
         /**
          * Return the chat state.
          */
-        ChatState getChatState ();
+        ChatState get_chat_state ();
 
         /**
          * Return the chat state.
          */
-        MessageStanza& setChatState (const ChatState state);
+        MessageStanza& set_chat_state (const ChatState state);
     };
 
 

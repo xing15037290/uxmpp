@@ -42,28 +42,28 @@ static const string XmlDiscoItemsQueryTagFull {"http://jabber.org/protocol/disco
 //------------------------------------------------------------------------------
 static void query_server_features (uxmpp::Session& session, string& query_id)
 {
-    for (auto& node : session.getFeatures()) {
-        if (node.getFullName() != "http://jabber.org/protocol/caps:c" || query_id != "")
+    for (auto& node : session.get_features()) {
+        if (node.get_full_name() != "http://jabber.org/protocol/caps:c" || query_id != "")
             continue;
 
-        string node_attr = node.getAttribute ("node");
-        string ver_attr  = node.getAttribute ("ver");
+        string node_attr = node.get_attribute ("node");
+        string ver_attr  = node.get_attribute ("ver");
 
-        query_id = Stanza::makeId ();
+        query_id = Stanza::make_id ();
 
-        if (!node_attr.length() || !ver_attr.length()) {
-            session.sendStanza (IqStanza(IqType::get,
-                                         session.getStreamFromAttr(),
-                                         session.getJid(),
-                                         query_id).
-                                addNode(XmlObject("query", XmlDiscoInfoNS)));
+        if (node_attr.empty() || ver_attr.empty()) {
+            session.send_stanza (IqStanza(IqType::get,
+                                          session.get_stream_from_attr(),
+                                          session.get_jid(),
+                                          query_id).
+                                 add_node(XmlObject("query", XmlDiscoInfoNS)));
         }else{
-            session.sendStanza (IqStanza(IqType::get,
-                                         session.getStreamFromAttr(),
-                                         session.getJid(),
-                                         query_id).
-                                addNode(XmlObject("query", XmlDiscoInfoNS).
-                                        setAttribute("node", node_attr + string("#") + ver_attr)));
+            session.send_stanza (IqStanza(IqType::get,
+                                          session.get_stream_from_attr(),
+                                          session.get_jid(),
+                                          query_id).
+                                 add_node(XmlObject("query", XmlDiscoInfoNS).
+                                          set_attribute("node", node_attr + string("#") + ver_attr)));
         };
         break;
     }
@@ -85,12 +85,12 @@ DiscoModule::DiscoModule ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void DiscoModule::moduleRegistered (uxmpp::Session& session)
+void DiscoModule::module_registered (uxmpp::Session& session)
 {
     sess = &session;
-    sess->addSessionListener (*this);
+    sess->add_session_listener (*this);
 
-    if (sess->getState() == SessionState::bound && !server_features.size()) {
+    if (sess->get_state() == SessionState::bound && server_features.empty()) {
         server_features.clear ();
         query_server_features (session, server_feature_request_id);
     }
@@ -99,9 +99,9 @@ void DiscoModule::moduleRegistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void DiscoModule::moduleUnregistered (uxmpp::Session& session)
+void DiscoModule::module_unregistered (uxmpp::Session& session)
 {
-    sess->delSessionListener (*this);
+    sess->del_session_listener (*this);
     sess = nullptr;
 }
 
@@ -110,21 +110,21 @@ void DiscoModule::moduleUnregistered (uxmpp::Session& session)
 //------------------------------------------------------------------------------
 void DiscoModule::handle_feature_request_result (IqStanza& iq)
 {
-    XmlObject query = iq.getNode (XmlDiscoInfoQueryTagFull, true);
+    XmlObject query = iq.get_node (XmlDiscoInfoQueryTagFull, true);
     if (!query)
         return;
 
     server_info_query_result = query;
 
-    for (auto xml_obj : query.getNodes()) {
-        if (xml_obj.getTagName() == "identity") {
+    for (auto xml_obj : query.get_nodes()) {
+        if (xml_obj.get_tag_name() == "identity") {
             server_identities.push_back (DiscoIdentity(xml_obj));
         }
-        else if (xml_obj.getTagName() == "feature") {
-            string feature = xml_obj.getAttribute ("var");
-            if (feature.length()) {
+        else if (xml_obj.get_tag_name() == "feature") {
+            string feature = xml_obj.get_attribute ("var");
+            if (!feature.empty()) {
                 server_features.push_back (feature);
-                uxmppLogTrace (THIS_FILE, "Added feature ", feature);
+                uxmpp_log_trace (THIS_FILE, "Added feature ", feature);
             }
         }
     }
@@ -133,7 +133,7 @@ void DiscoModule::handle_feature_request_result (IqStanza& iq)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool DiscoModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool DiscoModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Sanity check
     //
@@ -142,21 +142,21 @@ bool DiscoModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& 
 
     // Only handle iq stanzas
     //
-    if (xml_obj.getFullName() != XmlIqStanzaTagFull)
+    if (xml_obj.get_full_name() != XmlIqStanzaTagFull)
         return false;
 
     IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
 
     // Chec for server feature query result
     //
-    if (iq.getId() == server_feature_request_id) {
-        if (iq.getType() == IqType::result) {
+    if (iq.get_id() == server_feature_request_id) {
+        if (iq.get_type() == IqType::result) {
             handle_feature_request_result (iq);
             return true;
         }
-        else if (iq.getType() == IqType::error) {
-            uxmppLogInfo (THIS_FILE, "Got disco query error: ",
-                          iq.getErrorName(), " (", iq.getErrorCode(), ")");
+        else if (iq.get_type() == IqType::error) {
+            uxmpp_log_info (THIS_FILE, "Got disco query error: ",
+                            iq.get_error_name(), " (", iq.get_error_code(), ")");
         }
         server_feature_request_id = "";
         return true;
@@ -164,7 +164,7 @@ bool DiscoModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& 
 
     // Handle query results
     //
-    auto id_iter = query_ids.find (iq.getId());
+    auto id_iter = query_ids.find (iq.get_id());
     if (id_iter != query_ids.end()) {
         // handle query result
 
@@ -174,7 +174,7 @@ bool DiscoModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& 
 
     // Check for incoming info request
     //
-    if (iq.getType() == IqType::get) {
+    if (iq.get_type() == IqType::get) {
     }else{
         //
         // Check for result
@@ -187,9 +187,9 @@ bool DiscoModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void DiscoModule::onStateChange (uxmpp::Session& session,
-                                 uxmpp::SessionState new_state,
-                                 uxmpp::SessionState old_state)
+void DiscoModule::on_state_change (uxmpp::Session& session,
+                                   uxmpp::SessionState new_state,
+                                   uxmpp::SessionState old_state)
 {
     if (new_state==SessionState::bound && old_state!=SessionState::bound) {
         server_features.clear ();
@@ -200,7 +200,7 @@ void DiscoModule::onStateChange (uxmpp::Session& session,
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string DiscoModule::queryInfo (const uxmpp::Jid& jid, const std::string& query_id)
+std::string DiscoModule::query_info (const uxmpp::Jid& jid, const std::string& query_id)
 {
     // Sanity check
     //
@@ -209,13 +209,13 @@ std::string DiscoModule::queryInfo (const uxmpp::Jid& jid, const std::string& qu
 
     // Save the query id
     //
-    string qid = query_id=="" ? Stanza::makeId() : query_id;
+    string qid = query_id=="" ? Stanza::make_id() : query_id;
     query_ids.insert (qid);
 
     // Send the query
     //
-    sess->sendStanza (IqStanza(IqType::get, jid, sess->getJid(), qid).
-                      addNode(XmlObject(XmlDiscoQueryTag, "http://jabber.org/protocol/disco#info")));
+    sess->send_stanza (IqStanza(IqType::get, jid, sess->get_jid(), qid).
+                       add_node(XmlObject(XmlDiscoQueryTag, "http://jabber.org/protocol/disco#info")));
 //                      addNode(XmlObject(XmlDiscoQueryTag, XmlDiscoInfoNS)));
 
     return qid;

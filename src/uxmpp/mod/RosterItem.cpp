@@ -31,12 +31,12 @@ using namespace uxmpp;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::vector<std::string> RosterItem::getGroups ()
+std::vector<std::string> RosterItem::get_groups ()
 {
     std::vector<std::string> g;
-    for (auto& node : getNodes()) {
-        if (node.getFullName() == XmlRosterGroupTagFull) {
-            string group_name = node.getContent ();
+    for (auto& node : get_nodes()) {
+        if (node.get_full_name() == XmlRosterGroupTagFull) {
+            string group_name = node.get_content ();
             if (group_name.length())
                 g.push_back (group_name);
         }

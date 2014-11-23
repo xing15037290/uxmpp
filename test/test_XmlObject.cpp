@@ -58,50 +58,50 @@ int main (int argc, char* argv[])
     cout << "Constructor: XmlObject(\"name\", \"namespace\")" << endl;
     XmlObject tc7 ("name", "namespace");
     cout << "to_string(): " << to_string(tc7) << endl;
-    cout << "setDefaultNamespaceAttr(\"nsattr\")" << endl;
-    tc7.setDefaultNamespaceAttr ("def_ns");
+    cout << "set_default_namespace_attr(\"nsattr\")" << endl;
+    tc7.set_default_namespace_attr ("def_ns");
     cout << "to_string(): " << to_string(tc7) << endl;
-    cout << "isNamespaceDefault(false)" << endl;
-    tc7.isNamespaceDefault (false);
+    cout << "is_namespace_default(false)" << endl;
+    tc7.is_namespace_default (false);
     cout << "to_string(): " << to_string(tc7) << endl;
 
     cout << endl;
     cout << "Constructor: XmlObject(\"name\", \"a\", false, false)" << endl;
-    cout << "addNamespaceAlias (\"a\", \"namespace\")" << endl;
+    cout << "add_namespace_alias (\"a\", \"namespace\")" << endl;
     XmlObject tc8 ("name", "a", false, false);
-    tc8.addNamespaceAlias ("a", "namespace");
+    tc8.add_namespace_alias ("a", "namespace");
     cout << "to_string(): " << to_string(tc8) << endl;
 
     cout << endl;
     cout << "Constructor: XmlObject(\"name\", \"namespace\")" << endl;
     XmlObject tc9 ("name", "namespace");
-    cout << "setAttribute(\"attrname\", \"attrvalue\")" << endl;
-    tc9.setAttribute ("attrname", "attrvalue");
+    cout << "set_attribute(\"attrname\", \"attrvalue\")" << endl;
+    tc9.set_attribute ("attrname", "attrvalue");
     cout << "to_string(): " << to_string(tc9) << endl;
 
-    cout << "addNode(XmlObject(\"<element>\", \"namespace\", false).setAttribute(\"some_attr\", \"some_value\"))" << endl;
-    tc9.addNode (XmlObject("<element>", "namespace", false).setAttribute("some_attr", "some_value"));
-    cout << "to_string(): " << to_string(tc9) << endl;
-    cout << "to_string(true): " << to_string(tc9, true) << endl;
-
-    cout << "addNode(XmlObject(\"child\", \"namespace\", false).setAttribute(\"num\", \"two\").addNode(XmlObject(\"body\", \"namespace\", false).setAttribute(\"att\", \"val\").setContent(\"A message\")))" << endl;
-
-    tc9.addNode (XmlObject("child", "namespace", false).setAttribute("num", "two")
-                 .addNode(XmlObject("body", "namespace", false)
-                          .setAttribute("att", "val").setContent("A message")));
+    cout << "add_node(XmlObject(\"<element>\", \"namespace\", false).set_attribute(\"some_attr\", \"some_value\"))" << endl;
+    tc9.add_node (XmlObject("<element>", "namespace", false).set_attribute("some_attr", "some_value"));
     cout << "to_string(): " << to_string(tc9) << endl;
     cout << "to_string(true): " << to_string(tc9, true) << endl;
 
-    cout << "setPart(XmlObjPart::start)" << endl;
-    tc9.setPart (XmlObjPart::start);
+    cout << "add_node(XmlObject(\"child\", \"namespace\", false).set_attribute(\"num\", \"two\").add_node(XmlObject(\"body\", \"namespace\", false).set_attribute(\"att\", \"val\").set_content(\"A message\")))" << endl;
+
+    tc9.add_node (XmlObject("child", "namespace", false).set_attribute("num", "two")
+                  .add_node(XmlObject("body", "namespace", false)
+                            .set_attribute("att", "val").set_content("A message")));
+    cout << "to_string(): " << to_string(tc9) << endl;
+    cout << "to_string(true): " << to_string(tc9, true) << endl;
+
+    cout << "set_part(XmlObjPart::start)" << endl;
+    tc9.set_part (XmlObjPart::start);
     cout << "to_string(): " << to_string(tc9) << endl;
 
-    cout << "setPart(XmlObjPart::body)" << endl;
-    tc9.setPart (XmlObjPart::body);
+    cout << "set_part(XmlObjPart::body)" << endl;
+    tc9.set_part (XmlObjPart::body);
     cout << "to_string(): " << to_string(tc9) << endl;
 
-    cout << "setPart(XmlObjPart::end)" << endl;
-    tc9.setPart (XmlObjPart::end);
+    cout << "set_part(XmlObjPart::end)" << endl;
+    tc9.set_part (XmlObjPart::end);
     cout << "to_string(): " << to_string(tc9) << endl;
 
     cout << endl;
@@ -109,8 +109,8 @@ int main (int argc, char* argv[])
     XmlObject xobj;
     cout << "xobj == true : " << (xobj==true) << endl;
     cout << "xobj == false: " << (xobj==false) << endl;
-    cout << "xobj.setName(\"name\") " << endl;
-    xobj.setTagName ("name");
+    cout << "xobj.set_tag_name(\"name\") " << endl;
+    xobj.set_tag_name ("name");
     cout << "xobj == true : " << (xobj==true) << endl;
     cout << "xobj == false: " << (xobj==false) << endl;
 

@@ -48,7 +48,7 @@ PingModule::PingModule ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PingModule::moduleRegistered (uxmpp::Session& session)
+void PingModule::module_registered (uxmpp::Session& session)
 {
     sess = &session;
 }
@@ -56,7 +56,7 @@ void PingModule::moduleRegistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PingModule::moduleUnregistered (uxmpp::Session& session)
+void PingModule::module_unregistered (uxmpp::Session& session)
 {
     sess = nullptr;
 }
@@ -64,7 +64,7 @@ void PingModule::moduleUnregistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool PingModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool PingModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Sanity check
     //
@@ -73,35 +73,35 @@ bool PingModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& x
 
     // Handle iq stanzas
     //
-    if (xml_obj.getFullName() ==  XmlIqStanzaTagFull) {
+    if (xml_obj.get_full_name() ==  XmlIqStanzaTagFull) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
 
         // Check for incoming ping
         //
-        if (iq.getType() == IqType::get) {
-            XmlObject ping = xml_obj.getNode (XmlPingTagFull, true);
+        if (iq.get_type() == IqType::get) {
+            XmlObject ping = xml_obj.get_node (XmlPingTagFull, true);
             if (ping) {
-                uxmppLogDebug (THIS_FILE, "Got ping from ", to_string(iq.getFrom()));
-                sess->sendStanza (IqStanza(IqType::result, iq.getFrom(), sess->getJid(), iq.getId()));
+                uxmpp_log_debug (THIS_FILE, "Got ping from ", to_string(iq.get_from()));
+                sess->send_stanza (IqStanza(IqType::result, iq.get_from(), sess->get_jid(), iq.get_id()));
                 return true;
             }
         }else{
             //
             // Check for ping result
             //
-            auto i = ping_map.find (iq.getId());
+            auto i = ping_map.find (iq.get_id());
             if (i != ping_map.end()) {
                 auto now = chrono::duration_cast<chrono::milliseconds> (chrono::system_clock::now().
                                                                         time_since_epoch()).count();
-                if (iq.getType() == IqType::result) {
-                    uxmppLogDebug (THIS_FILE, "Got ping result from ",
-                                   to_string(i->second.first),
-                                   ", rtt: ", (now - i->second.second), "ms");
+                if (iq.get_type() == IqType::result) {
+                    uxmpp_log_debug (THIS_FILE, "Got ping result from ",
+                                     to_string(i->second.first),
+                                     ", rtt: ", (now - i->second.second), "ms");
                 }
-                else if (iq.getType() == IqType::error) {
-                    uxmppLogInfo (THIS_FILE, "Got ping error from ",
-                                  to_string(i->second.first), ": ",
-                                  iq.getErrorName(), " (", iq.getErrorCode(), ")");
+                else if (iq.get_type() == IqType::error) {
+                    uxmpp_log_info (THIS_FILE, "Got ping error from ",
+                                    to_string(i->second.first), ": ",
+                                    iq.get_error_name(), " (", iq.get_error_code(), ")");
                 }
 
                 ping_map.erase (i);
@@ -120,17 +120,17 @@ static void do_ping (const uxmpp::Jid& target,
                      uxmpp::Session* sess,
                      std::map<std::string, std::pair<uxmpp::Jid, unsigned long> >& ping_map)
 {
-    string ping_id = Stanza::makeId ();
+    string ping_id = Stanza::make_id ();
 
-    uxmppLogDebug (THIS_FILE, "Send ping to ", to_string(target));
+    uxmpp_log_debug (THIS_FILE, "Send ping to ", to_string(target));
 
     auto now = chrono::duration_cast<chrono::milliseconds> (chrono::system_clock::now().
                                                             time_since_epoch()).count();
 
     ping_map[ping_id] = std::pair<uxmpp::Jid, unsigned long> (target, now);
 
-    sess->sendStanza (IqStanza(IqType::get, target, sess->getJid(), ping_id).
-                      addNode(XmlObject(XmlPingTag, XmlPingNs)));
+    sess->send_stanza (IqStanza(IqType::get, target, sess->get_jid(), ping_id).
+                       add_node(XmlObject(XmlPingTag, XmlPingNs)));
 }
 
 
@@ -140,9 +140,9 @@ void PingModule::ping ()
 {
     // Sanity check
     //
-    if (!sess || sess->getState() != SessionState::bound)
+    if (!sess || sess->get_state() != SessionState::bound)
         return;
-    do_ping (sess->getDomain(), sess, ping_map);
+    do_ping (sess->get_domain(), sess, ping_map);
 }
 
 
@@ -152,7 +152,7 @@ void PingModule::ping (const uxmpp::Jid& jid)
 {
     // Sanity check
     //
-    if (!sess || sess->getState() != SessionState::bound)
+    if (!sess || sess->get_state() != SessionState::bound)
         return;
     do_ping (jid, sess, ping_map);
 }

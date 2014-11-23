@@ -94,8 +94,8 @@ std::string to_string (const XmlObject& xml_obj, bool pretty, const std::string&
     stringstream ss;
 
     string tag_name;
-    string ns         = xml_escape (xml_obj.getNamespace());
-    string default_ns = xml_escape (xml_obj.getDefaultNamespaceAttr());
+    string ns         = xml_escape (xml_obj.get_namespace());
+    string default_ns = xml_escape (xml_obj.get_default_namespace_attr());
 
     // Don't print anything if the xml object is invalid (doesn't hava a tag name).
     //
@@ -109,22 +109,22 @@ std::string to_string (const XmlObject& xml_obj, bool pretty, const std::string&
 
     // Check if we should only print the body (content).
     //
-    if (xml_obj.getPart() == XmlObjPart::body) {
+    if (xml_obj.get_part() == XmlObjPart::body) {
         return xml_escape (xml_obj.content);
     }
 
     // Get the name of the tag to print.
     //
-    if (ns.length() && !xml_obj.isNamespaceDefault()) {
-        tag_name = xml_escape (ns + string(":") + xml_escape(xml_obj.getTagName()));
+    if (ns.length() && !xml_obj.is_namespace_default()) {
+        tag_name = xml_escape (ns + string(":") + xml_escape(xml_obj.get_tag_name()));
     }
     else {
-        tag_name = xml_escape (xml_obj.getTagName());
+        tag_name = xml_escape (xml_obj.get_tag_name());
     }
 
     // Check if we should only print the end tag.
     //
-    if (xml_obj.getPart() == XmlObjPart::end) {
+    if (xml_obj.get_part() == XmlObjPart::end) {
         ss << "</" << tag_name << ">";
         return ss.str ();
     }
@@ -135,25 +135,25 @@ std::string to_string (const XmlObject& xml_obj, bool pretty, const std::string&
 
     // Print the attributes.
     //
-    for (auto& alias : xml_obj.getNamespaceAlias()) {
+    for (auto& alias : xml_obj.get_namespace_alias()) {
         ss << " xmlns:" << xml_escape(alias.first) << "=" << "'" << xml_escape(alias.second) << "'";
     }
     if (default_ns.length())
         ss << " xmlns=" << "'" << default_ns << "'";
-    //for (auto attr=xml_obj.attributes.rbegin(); attr!=xml_obj.attributes.rend(); attr++)
-    for (auto attr=xml_obj.attributes.begin(); attr!=xml_obj.attributes.end(); attr++)
+    //for (auto attr=xml_obj.attributes.rbegin(); attr!=xml_obj.attributes.rend(); ++attr)
+    for (auto attr=xml_obj.attributes.begin(); attr!=xml_obj.attributes.end(); ++attr)
         ss << ' ' << xml_escape(attr->first) << "='" << xml_escape(attr->second) << "'";
 
     // Check if we should only write the start tag.
     //
-    if (xml_obj.getPart() == XmlObjPart::start) {
+    if (xml_obj.get_part() == XmlObjPart::start) {
         ss << ">";
         return ss.str ();
     }
 
     // End if no children or content.
     //
-    if (xml_obj.nodes.size()==0 && xml_obj.content.length()==0) {
+    if (xml_obj.nodes.empty() && xml_obj.content.length()==0) {
         ss << "/>";
         return ss.str ();
     }

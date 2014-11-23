@@ -51,7 +51,7 @@ MessageModule::MessageModule ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void MessageModule::moduleRegistered (uxmpp::Session& session)
+void MessageModule::module_registered (uxmpp::Session& session)
 {
     sess = &session;
     //sess->addSessionListener (*this);
@@ -60,7 +60,7 @@ void MessageModule::moduleRegistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void MessageModule::moduleUnregistered (uxmpp::Session& session)
+void MessageModule::module_unregistered (uxmpp::Session& session)
 {
     //sess->delSessionListener (*this);
     sess = nullptr;
@@ -72,35 +72,35 @@ void MessageModule::moduleUnregistered (uxmpp::Session& session)
 //------------------------------------------------------------------------------
 static bool is_jid_authorized (uxmpp::Session& session, uxmpp::Jid jid)
 {
-    for (auto mod : session.getModules()) {
+    for (auto mod : session.get_modules()) {
         if (!mod) // Sanity check
             continue;
         if (RosterModule* rm = dynamic_cast<RosterModule*>(mod)) {
-            for (auto& item : rm->getRoster().getItems()) {
-                if (item.getJid().bare() != jid)
+            for (auto& item : rm->get_roster().get_items()) {
+                if (item.get_jid().bare() != jid)
                     continue;
                 //
                 // Jid found.
                 //
-                string s = item.getSubscription ();
+                string s = item.get_subscription ();
                 if (s=="from" || s=="both") {
                     return true;  // Authorized
                 }else{
-                    uxmppLogDebug (THIS_FILE, to_string(jid),
-                                   " is not authorized to view our presence, don't send a message receipt");
+                    uxmpp_log_debug (THIS_FILE, to_string(jid),
+                                     " is not authorized to view our presence, don't send a message receipt");
                     return false; // Not authorized
                 }
             }
         }
     }
-    uxmppLogDebug (THIS_FILE, to_string(jid), " is not found in our roster, don't send a message receipt");
+    uxmpp_log_debug (THIS_FILE, to_string(jid), " is not found in our roster, don't send a message receipt");
     return false;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool MessageModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Sanity check
     //
@@ -109,20 +109,20 @@ bool MessageModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject
 
     // Handle message stanzas
     //
-    if (xml_obj.getFullName() == XmlMessageTagFull) {
+    if (xml_obj.get_full_name() == XmlMessageTagFull) {
         MessageStanza& msg = reinterpret_cast<MessageStanza&> (xml_obj);
 
         // Check if this is a receipt
         //
-        XmlObject receipt = msg.getNode ("urn:xmpp:receipts:received", true);
+        XmlObject receipt = msg.get_node ("urn:xmpp:receipts:received", true);
         if (receipt) {
             // Call registered receipt handler
             if (receipt_handler)
-                receipt_handler (*this, msg.getFrom(), receipt.getAttribute("id"));
+                receipt_handler (*this, msg.get_from(), receipt.get_attribute("id"));
 
             // The receipt should not include a message body, but if it does we
             // call the registered message handler
-            if (msg.getNode("body")) {
+            if (msg.get_node("body")) {
                 if (message_handler)
                     message_handler (*this, msg);
             }
@@ -135,12 +135,12 @@ bool MessageModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject
         // Check for requested receipt (XEP-0184)
         // Don't send a receipt if the sender is not authorized to view our presence (XEP-0184, section 8).
         //
-        XmlObject request = msg.getNode ("urn:xmpp:receipts:request", true);
-        if (request && is_jid_authorized(session, msg.getFrom().bare())) {
-            sess->sendStanza (MessageStanza(msg.getFrom(), sess->getJid()).
-                              removeAttribute("type").
-                              addNode(XmlObject("received", "urn:xmpp:receipts").
-                                      setAttribute("id", msg.getId())));
+        XmlObject request = msg.get_node ("urn:xmpp:receipts:request", true);
+        if (request && is_jid_authorized(session, msg.get_from().bare())) {
+            sess->send_stanza (MessageStanza(msg.get_from(), sess->get_jid()).
+                               remove_attribute("type").
+                               add_node(XmlObject("received", "urn:xmpp:receipts").
+                                        set_attribute("id", msg.get_id())));
         }
 
         return true;
@@ -152,7 +152,7 @@ bool MessageModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void MessageModule::sendMessage (const MessageStanza& msg, bool want_receipt)
+void MessageModule::send_message (const MessageStanza& msg, bool want_receipt)
 {
     // Sanity check
     //
@@ -164,40 +164,40 @@ void MessageModule::sendMessage (const MessageStanza& msg, bool want_receipt)
         //
         // Add a receipt request if not already added
         //
-        if (!ms.getNode("urn:xmpp:receipts:request", true))
-            ms.addNode (XmlObject("request", "urn:xmpp:receipts"));
+        if (!ms.get_node("urn:xmpp:receipts:request", true))
+            ms.add_node (XmlObject("request", "urn:xmpp:receipts"));
     }else{
         //
         // Remove any receipt request
         //
-        auto& nodes = ms.getNodes ();
-        for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-            if (i->getFullName() == "urn:xmpp:receipts:request")
+        auto& nodes = ms.get_nodes ();
+        for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+            if (i->get_full_name() == "urn:xmpp:receipts:request")
                 nodes.erase (i);
         }
     }
 
     // Send the message
-    sess->sendStanza (std::move(ms));
+    sess->send_stanza (std::move(ms));
     return;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void MessageModule::sendMessage (const uxmpp::Jid& to, const std::string& body, bool want_receipt)
+void MessageModule::send_message (const uxmpp::Jid& to, const std::string& body, bool want_receipt)
 {
     // Sanity check
     //
     if (!sess)
         return;
 
-    MessageStanza ms (to, sess->getJid(), body);
+    MessageStanza ms (to, sess->get_jid(), body);
     if (want_receipt)
-        ms.addNode (XmlObject("request", "urn:xmpp:receipts"));
+        ms.add_node (XmlObject("request", "urn:xmpp:receipts"));
 
     // Send the message
-    sess->sendStanza (std::move(ms));
+    sess->send_stanza (std::move(ms));
     return;
 }
 

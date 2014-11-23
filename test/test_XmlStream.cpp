@@ -28,36 +28,36 @@ using namespace uxmpp::net;
 
 class XmlHandler : public XmlStreamListener {
 public:
-    virtual void onRxXmlObj (XmlStream& stream, XmlObject& xml_obj) override {
+    virtual void on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj) override {
         cout << endl << "Got RX: ";
-        if (xml_obj.getPart() == XmlObjPart::start) {
+        if (xml_obj.get_part() == XmlObjPart::start) {
             cout << "(start-tag) ";
         }
-        else if (xml_obj.getPart() == XmlObjPart::end) {
+        else if (xml_obj.get_part() == XmlObjPart::end) {
             cout << "(end-tag) ";
         }
 
-        cout << xml_obj.getTagName() << endl;
+        cout << xml_obj.get_tag_name() << endl;
 
 
-        if (xml_obj.getTagName() == "error") {
+        if (xml_obj.get_tag_name() == "error") {
             cout << "Got error, close stream" << endl;
             stream.stop ();
         }
 
-        if (xml_obj.getTagName()=="stream" && xml_obj.getPart() == XmlObjPart::end) {
+        if (xml_obj.get_tag_name()=="stream" && xml_obj.get_part() == XmlObjPart::end) {
             cout << "Got EOS, close stream" << endl;
             stream.stop ();
         }
 
-        if (xml_obj.getTagName() == "features") {
+        if (xml_obj.get_tag_name() == "features") {
             cout << "Got features, close stream" << endl;
             stream.stop ();
         }
 
     }
 
-    virtual void onOpen (XmlStream& xs) override {
+    virtual void on_open (XmlStream& xs) override {
         cout << "Stream opened" << endl;
         //StreamXmlObj stream_start ("ultramarin.se", "dan@ultramarin.se");
 /*
@@ -79,7 +79,7 @@ public:
             }).detach ();
     }
 
-    virtual void onClose (XmlStream& stream) override {
+    virtual void on_close (XmlStream& stream) override {
         cout << "Stream closed" << endl;
 /*
         BsdResolver resolver;
@@ -96,14 +96,14 @@ public:
 */
     }
 
-    virtual void onRxXmlError (XmlStream& stream) override {
+    virtual void on_rx_xml_error (XmlStream& stream) override {
     }
 };
 
 
 int main (int argc, char* argv[])
 {
-    uxmppSetLogLevel (LogLevel::trace);
+    uxmpp_set_log_level (LogLevel::trace);
 
     if (argc < 2) {
         cerr << "Usage: test_Resolver <domain>" << endl;
@@ -117,7 +117,7 @@ int main (int argc, char* argv[])
     XmlStream xs (XmlObject("stream", "http://etherx.jabber.org/streams", false, false));
     XmlHandler xh;
 
-    xs.addListener (xh);
+    xs.add_listener (xh);
 
     for (int i=0; i<128; i++) {
         bool connected = false;

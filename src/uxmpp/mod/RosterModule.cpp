@@ -46,7 +46,7 @@ RosterModule::RosterModule ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void RosterModule::moduleRegistered (uxmpp::Session& session)
+void RosterModule::module_registered (uxmpp::Session& session)
 {
     sess = &session;
     //sess->addSessionListener (*this);
@@ -55,7 +55,7 @@ void RosterModule::moduleRegistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void RosterModule::moduleUnregistered (uxmpp::Session& session)
+void RosterModule::module_unregistered (uxmpp::Session& session)
 {
     //sess->delSessionListener (*this);
     sess = nullptr;
@@ -64,7 +64,7 @@ void RosterModule::moduleUnregistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool RosterModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Sanity check
     //
@@ -73,15 +73,15 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
 
     // Handle iq stanzas
     //
-    if (xml_obj.getFullName() == "jabber:client:iq") {
+    if (xml_obj.get_full_name() == "jabber:client:iq") {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
 
         // Check for roster query result
         //
-        if (iq.getId()==roster_query_id && iq.getType()==IqType::result) {
-            XmlObject node = iq.getNode ("jabber:iq:roster:query", true);
+        if (iq.get_id()==roster_query_id && iq.get_type()==IqType::result) {
+            XmlObject node = iq.get_node ("jabber:iq:roster:query", true);
             if (node) {
-                uxmppLogTrace (THIS_FILE, "Got roster query result");
+                uxmpp_log_trace (THIS_FILE, "Got roster query result");
                 roster = std::move (node);
                 // Call registered roster handler
                 if (roster_handler != nullptr)
@@ -93,8 +93,8 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
         //
         // Check for roster query error
         //
-        else if (iq.getId()==roster_query_id && iq.getType()==IqType::error) {
-            uxmppLogDebug (THIS_FILE, "Got roster result - roster not found");
+        else if (iq.get_id()==roster_query_id && iq.get_type()==IqType::error) {
+            uxmpp_log_debug (THIS_FILE, "Got roster result - roster not found");
             roster = Roster ();
             // Call registered roster handler
             if (roster_handler != nullptr)
@@ -105,40 +105,40 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
         //
         // Check for iq 'set'
         //
-        else if (iq.getType()==IqType::set) {
+        else if (iq.get_type()==IqType::set) {
             //
             // Check for roster query push
             //
-            XmlObject query = iq.getNode ("jabber:iq:roster:query", true);
+            XmlObject query = iq.get_node ("jabber:iq:roster:query", true);
             //XmlObject node = iq.getNode ("jabber:iq:roster", true);
-            XmlObject item = query.getNode ("jabber:iq:roster:item", true);
+            XmlObject item = query.get_node ("jabber:iq:roster:item", true);
             if (query && item) {
                 //
                 // Check 'from' (RFC 6121, section 2.1.6)
                 //
-                if (to_string(iq.getFrom()).length()!=0 &&
-                    iq.getFrom().bare() != sess->getJid().bare())
+                if (to_string(iq.get_from()).empty()!=false &&
+                    iq.get_from().bare() != sess->get_jid().bare())
                 {
-                    uxmppLogInfo (THIS_FILE, "Got roster push with faulty 'from' attribute: ",
-                                  to_string(query, true));
+                    uxmpp_log_info (THIS_FILE, "Got roster push with faulty 'from' attribute: ",
+                                    to_string(query, true));
                     // Return an empty result stanza
-                    sess->sendStanza (IqStanza(IqType::result,
-                                               "",
-                                               to_string(sess->getJid()),
-                                               iq.getId()));
+                    sess->send_stanza (IqStanza(IqType::result,
+                                                "",
+                                                to_string(sess->get_jid()),
+                                                iq.get_id()));
                     return true;
                 }
 
                 //
                 // We got a roster push, deal with it!
                 //
-                handleRosterPush (reinterpret_cast<RosterItem&>(item));
+                handle_roster_push (reinterpret_cast<RosterItem&>(item));
 
                 // Return an empty result stanza
-                sess->sendStanza (IqStanza(IqType::result,
-                                           "",
-                                           to_string(sess->getJid()),
-                                           iq.getId()));
+                sess->send_stanza (IqStanza(IqType::result,
+                                            "",
+                                            to_string(sess->get_jid()),
+                                            iq.get_id()));
                 return true;
             }
         }
@@ -150,31 +150,31 @@ bool RosterModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject&
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void RosterModule::handleRosterPush (RosterItem& item)
+void RosterModule::handle_roster_push (RosterItem& item)
 {
     bool roster_updated = false;
 
-    uxmppLogDebug (THIS_FILE, "Got roster push: ", to_string(item, true));
+    uxmpp_log_debug (THIS_FILE, "Got roster push: ", to_string(item, true));
 
     //for (auto& roster_item : roster.getItems()) {
-    auto& items = roster.getItems ();
+    auto& items = roster.get_items ();
     for (auto i=items.begin(); i!=items.end(); ++i) {
-        if ((*i).getJid() == item.getJid()) {
+        if ((*i).get_jid() == item.get_jid()) {
             roster_updated = true;
             // Check if the item is removed
-            if (item.getSubscription() == "remove") {
+            if (item.get_subscription() == "remove") {
                 items.erase (i);
-                uxmppLogDebug (THIS_FILE, "Roster item removed");
+                uxmpp_log_debug (THIS_FILE, "Roster item removed");
             }else{
                 (*i) = item;
-                uxmppLogDebug (THIS_FILE, "Roster item updated");
+                uxmpp_log_debug (THIS_FILE, "Roster item updated");
             }
             break;
         }
     }
     if (!roster_updated) {
-        roster.addNode (item);
-        uxmppLogDebug (THIS_FILE, "Roster item added");
+        roster.add_node (item);
+        uxmpp_log_debug (THIS_FILE, "Roster item added");
     }
 
     // Call roster push handler
@@ -188,13 +188,13 @@ void RosterModule::handleRosterPush (RosterItem& item)
 //------------------------------------------------------------------------------
 void RosterModule::refresh ()
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogDebug (THIS_FILE, "Can't query roster, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (THIS_FILE, "Can't query roster, no session or session not bound");
         return;
     }
-    roster_query_id = string("rq") + sess->getId();
-    sess->sendStanza (IqStanza(IqType::get, "", to_string(sess->getJid()), roster_query_id).
-                      addNode(XmlObject("query", "jabber:iq:roster")));
+    roster_query_id = string("rq") + sess->get_id();
+    sess->send_stanza (IqStanza(IqType::get, "", to_string(sess->get_jid()), roster_query_id).
+                       add_node(XmlObject("query", "jabber:iq:roster")));
 }
 
 
@@ -202,36 +202,36 @@ void RosterModule::refresh ()
 // RFC 6121 Section 2.1.5/2.3/2.4/2.5
 // Roster Set / Adding a Roster Item / Updating a Roster Item / Deleting a Roster Item
 //------------------------------------------------------------------------------
-void RosterModule::rosterSet (const RosterItem& item, bool remove)
+void RosterModule::roster_set (const RosterItem& item, bool remove)
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogDebug (THIS_FILE, "Can't ",
-                       (remove?"remove":"add/update") ,
-                       " roster item, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (THIS_FILE, "Can't ",
+                         (remove?"remove":"add/update") ,
+                         " roster item, no session or session not bound");
         return;
     }
     RosterItem roster_item (item);
 
     // RFC6121 section 2.1.2.1 - A client MUST NOT include the 'approved' attribute
-    roster_item.removeAttribute ("approved");
+    roster_item.remove_attribute ("approved");
 
     // RFC6121 section 2.1.2.2 - A client MUST NOT include the 'ask' attribute
-    roster_item.removeAttribute ("ask");
+    roster_item.remove_attribute ("ask");
 
     if (remove) {
         // RFC6121 section 2.1.5 - The server MUST ignore any value of
         //                         the 'subscription' attribute other than "remove"
-        roster_item.setAttribute ("subscription", "remove");
+        roster_item.set_attribute ("subscription", "remove");
     }else{
         // RFC6121 section 2.1.2.5 - Inclusion of the 'subscription' attribute is OPTIONAL
-        roster_item.removeAttribute ("subscription");
+        roster_item.remove_attribute ("subscription");
     }
 
     // Send the stanza
     //
-    sess->sendStanza (IqStanza(IqType::set, "", to_string(sess->getJid()), (remove?"itemremove":"itemupdate")).
-                      addNode(XmlObject("query", "jabber:iq:roster", true, true, 1).
-                              addNode(roster_item)));
+    sess->send_stanza (IqStanza(IqType::set, "", to_string(sess->get_jid()), (remove?"itemremove":"itemupdate")).
+                       add_node(XmlObject("query", "jabber:iq:roster", true, true, 1).
+                                add_node(roster_item)));
 }
 
 

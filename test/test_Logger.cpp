@@ -25,13 +25,13 @@ using namespace uxmpp;
 
 static void log_messages ()
 {
-    uxmppLog (LogLevel::silent, "test", "Silent message, this should not be visisble.");
-    uxmppLogFatal   ("test", "Fatal message.");
-    uxmppLogError   ("test", "Error message.");
-    uxmppLogWarning ("test", "Warning message.");
-    uxmppLogInfo    ("test", "Info message.");
-    uxmppLogDebug   ("test", "Debug message.");
-    uxmppLogTrace   ("test", "Trace message.");
+    uxmpp_log (LogLevel::silent, "test", "Silent message, this should not be visisble.");
+    uxmpp_log_fatal   ("test", "Fatal message.");
+    uxmpp_log_error   ("test", "Error message.");
+    uxmpp_log_warning ("test", "Warning message.");
+    uxmpp_log_info    ("test", "Info message.");
+    uxmpp_log_debug   ("test", "Debug message.");
+    uxmpp_log_trace   ("test", "Trace message.");
 }
 
 
@@ -39,31 +39,31 @@ static void log_messages ()
 int main (int argc, char* argv[])
 {
     cout << "Set log level to 'trace' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::trace);
+    uxmpp_set_log_level (LogLevel::trace);
     log_messages ();
 
     cout << endl << "Set log level to 'debug' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::debug);
+    uxmpp_set_log_level (LogLevel::debug);
     log_messages ();
 
     cout << endl << "Set log level to 'info' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::info);
+    uxmpp_set_log_level (LogLevel::info);
     log_messages ();
 
     cout << endl << "Set log level to 'warning' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::warning);
+    uxmpp_set_log_level (LogLevel::warning);
     log_messages ();
 
     cout << endl << "Set log level to 'error' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::error);
+    uxmpp_set_log_level (LogLevel::error);
     log_messages ();
 
     cout << endl << "Set log level to 'fatal' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::fatal);
+    uxmpp_set_log_level (LogLevel::fatal);
     log_messages ();
 
     cout << endl << "Set log level to 'silent' and log with all log levels:" << endl;
-    uxmppSetLogLevel (LogLevel::silent);
+    uxmpp_set_log_level (LogLevel::silent);
     log_messages ();
 
     return 0;

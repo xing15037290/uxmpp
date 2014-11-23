@@ -64,7 +64,7 @@ namespace uxmpp {
          *                       that will be added to the XML object this can be used
          *                       to optimize memory allocation a bit.
          */
-        XmlObject (int reserved_nodes=4) : is_namespace_default{false}, part{XmlObjPart::all} {
+        XmlObject (int reserved_nodes=4) : namespace_is_default{false}, part{XmlObjPart::all} {
             nodes.reserve (reserved_nodes);
         }
 
@@ -104,12 +104,12 @@ namespace uxmpp {
             :
             tag_name             {the_name},
             xml_namespace        {the_namespace},
-            is_namespace_default {namespace_is_default},
+            namespace_is_default {namespace_is_default},
             part                 {XmlObjPart::all}
         {
             nodes.reserve (reserved_nodes);
             if (set_namespace_attr)
-                setDefaultNamespaceAttr (the_namespace);
+                set_default_namespace_attr (the_namespace);
         }
 
         /**
@@ -119,7 +119,7 @@ namespace uxmpp {
         XmlObject (const XmlObject& xml_obj) {
             tag_name             = xml_obj.tag_name;
             xml_namespace        = xml_obj.xml_namespace;
-            is_namespace_default = xml_obj.is_namespace_default;
+            namespace_is_default = xml_obj.namespace_is_default;
             namespace_alias      = xml_obj.namespace_alias;
             default_namespace    = xml_obj.default_namespace;
             attributes           = xml_obj.attributes;
@@ -138,14 +138,14 @@ namespace uxmpp {
         XmlObject (XmlObject&& xml_obj) {
             tag_name             = std::move (xml_obj.tag_name);
             xml_namespace        = std::move (xml_obj.xml_namespace);
-            is_namespace_default = xml_obj.is_namespace_default;
+            namespace_is_default = xml_obj.namespace_is_default;
             namespace_alias      = std::move (xml_obj.namespace_alias);
             default_namespace    = std::move (xml_obj.default_namespace);
             attributes           = std::move (xml_obj.attributes);
             nodes                = std::move (xml_obj.nodes);
             content              = std::move (xml_obj.content);
             part                 = xml_obj.part;
-            xml_obj.is_namespace_default = false;
+            xml_obj.namespace_is_default = false;
             xml_obj.part                 = XmlObjPart::all;
         }
 
@@ -163,7 +163,7 @@ namespace uxmpp {
             if (&xml_obj != this) {
                 tag_name             = xml_obj.tag_name;
                 xml_namespace        = xml_obj.xml_namespace;
-                is_namespace_default = xml_obj.is_namespace_default;
+                namespace_is_default = xml_obj.namespace_is_default;
                 namespace_alias      = xml_obj.namespace_alias;
                 default_namespace    = xml_obj.default_namespace;
                 attributes           = xml_obj.attributes;
@@ -185,14 +185,14 @@ namespace uxmpp {
         XmlObject& operator= (XmlObject&& xml_obj) {
             tag_name             = std::move (xml_obj.tag_name);
             xml_namespace        = std::move (xml_obj.xml_namespace);
-            is_namespace_default = xml_obj.is_namespace_default;
+            namespace_is_default = xml_obj.namespace_is_default;
             namespace_alias      = std::move (xml_obj.namespace_alias);
             default_namespace    = std::move (xml_obj.default_namespace);
             attributes           = std::move (xml_obj.attributes);
             nodes                = std::move (xml_obj.nodes);
             content              = std::move (xml_obj.content);
             part                 = xml_obj.part;
-            xml_obj.is_namespace_default = false;
+            xml_obj.namespace_is_default = false;
             xml_obj.part                 = XmlObjPart::all;
             return *this;
         }
@@ -210,7 +210,7 @@ namespace uxmpp {
          * Get the tag name of the XML object without the namespace prefix.
          * @return The tag name of the XML object.
          */
-        std::string getTagName () const {
+        std::string get_tag_name () const {
             return tag_name;
         }
 
@@ -229,7 +229,7 @@ namespace uxmpp {
          *             XML tag name.
          * @return A reference to this object.
          */
-        XmlObject& setTagName (const std::string& name) {
+        XmlObject& set_tag_name (const std::string& name) {
             tag_name = name;
             return *this;
         }
@@ -238,7 +238,7 @@ namespace uxmpp {
          * Get the namespace of the XML object.
          * @return The namespace this XML object belongs to.
          */
-        std::string getNamespace () const {
+        std::string get_namespace () const {
             return xml_namespace;
         }
 
@@ -249,7 +249,7 @@ namespace uxmpp {
          *                      for a valid XML name.
          * @return A reference to this object.
          */
-        XmlObject& setNamespace (const std::string& xml_namespace) {
+        XmlObject& set_namespace (const std::string& xml_namespace) {
             this->xml_namespace = xml_namespace;
             return *this;
         }
@@ -262,9 +262,9 @@ namespace uxmpp {
          * @param is_default True if this should be the current default namespace.
          * @return A reference to this object.
          */
-        XmlObject& setNamespace (const std::string& xml_namespace, bool is_default) {
+        XmlObject& set_namespace (const std::string& xml_namespace, bool is_default) {
             this->xml_namespace = xml_namespace;
-            isNamespaceDefault (is_default);
+            is_namespace_default (is_default);
             return *this;
         }
 
@@ -272,8 +272,8 @@ namespace uxmpp {
          * Check if the namespace is also the default namespace.
          * @return true if the namespace is also the default namespace.
          */
-        bool isNamespaceDefault () const {
-            return is_namespace_default;
+        bool is_namespace_default () const {
+            return namespace_is_default;
         }
 
         /**
@@ -281,8 +281,8 @@ namespace uxmpp {
          * @param is_default True if this should be the current default namespace.
          * @return A reference to this object.
          */
-        XmlObject& isNamespaceDefault (const bool is_default) {
-            is_namespace_default = is_default;
+        XmlObject& is_namespace_default (const bool is_default) {
+            namespace_is_default = is_default;
             return *this;
         }
 
@@ -292,7 +292,7 @@ namespace uxmpp {
          * This method will return a map of all aliases and their respective namespace.
          * @return A map with aliases and the namespaces they represent.
          */
-        const std::unordered_map<std::string, std::string>& getNamespaceAlias () const {
+        const std::unordered_map<std::string, std::string>& get_namespace_alias () const {
             return namespace_alias;
         }
 
@@ -304,7 +304,7 @@ namespace uxmpp {
          * @return The namespace the alias represent,
          *         or an empty string if no such alias exist.
          */
-        std::string getNamespaceAlias (const std::string& alias) const {
+        std::string get_namespace_alias (const std::string& alias) const {
             auto element = namespace_alias.find (alias);
             return element==namespace_alias.end() ? "" : (*element).second;
         }
@@ -319,7 +319,7 @@ namespace uxmpp {
          * @param xml_namespace The namespace that the alias represent.
          * @return A reference to this object.
          */
-        XmlObject& addNamespaceAlias (const std::string& alias, const std::string& xml_namespace) {
+        XmlObject& add_namespace_alias (const std::string& alias, const std::string& xml_namespace) {
             namespace_alias[alias] = xml_namespace;
             return *this;
         }
@@ -329,7 +329,7 @@ namespace uxmpp {
          * @param alias The name of the alias to be removed from the XML object.
          * @return A reference to this object.
          */
-        XmlObject& removeNamespaceAlias (const std::string& alias) {
+        XmlObject& remove_namespace_alias (const std::string& alias) {
             namespace_alias.erase (alias);
             return *this;
         }
@@ -341,7 +341,7 @@ namespace uxmpp {
          * @return The value of the xmlns attribute,
          *         or an empty string if it isn't present.
          */
-        std::string getDefaultNamespaceAttr () const {
+        std::string get_default_namespace_attr () const {
             return default_namespace;
         }
 
@@ -349,7 +349,7 @@ namespace uxmpp {
          * Get default namespace attribute of the XML object.
          * @return A reference to this object.
          */
-        XmlObject& setDefaultNamespaceAttr (const std::string& default_namespace) {
+        XmlObject& set_default_namespace_attr (const std::string& default_namespace) {
             this->default_namespace = default_namespace;
             return *this;
         }
@@ -360,7 +360,7 @@ namespace uxmpp {
          * It will not, however, translate namespace aliases into namespaces.
          * @return The complete XML tag name.
          */
-        std::string getFullName () const {
+        std::string get_full_name () const {
             if (xml_namespace.length())
                 return xml_namespace + std::string(":") + tag_name;
             /*
@@ -378,7 +378,7 @@ namespace uxmpp {
          * @return The value of an attribute, or an empty
          *         string if the attribute doesn't exits.
          */
-        const std::string getAttribute (const std::string& name) const {
+        const std::string get_attribute (const std::string& name) const {
             auto value = attributes.find (name);
             return value == attributes.end() ? "" : (*value).second;
         }
@@ -389,7 +389,7 @@ namespace uxmpp {
          * attribute values.
          * @return A map of attribute names and attribute values.
          */
-        std::unordered_map<std::string, std::string>& getAttributes () {
+        std::unordered_map<std::string, std::string>& get_attributes () {
             return attributes;
         }
 
@@ -401,7 +401,7 @@ namespace uxmpp {
          * @param value The value of the attribute. This can be an empty string.
          * @return A reference to this object.
          */
-        XmlObject& setAttribute (const std::string& name, const std::string& value="") {
+        XmlObject& set_attribute (const std::string& name, const std::string& value="") {
             attributes[name] = value;
             return *this;
         }
@@ -411,7 +411,7 @@ namespace uxmpp {
          * @param name The name of the attribute to remove.
          * @return A reference to this object.
          */
-        XmlObject& removeAttribute (const std::string& name) {
+        XmlObject& remove_attribute (const std::string& name) {
             attributes.erase (name);
             return *this;
         }
@@ -422,7 +422,7 @@ namespace uxmpp {
          * @param xml_obj The XML object to be added.
          * @return A reference to this object.
          */
-        XmlObject& addNode (const XmlObject& xml_obj) {
+        XmlObject& add_node (const XmlObject& xml_obj) {
             nodes.push_back (xml_obj);
             return *this;
         }
@@ -433,7 +433,7 @@ namespace uxmpp {
          * @param xml_obj The XML object to be moved to as a child of this object.
          * @return A reference to this object.
          */
-        XmlObject& addNode (XmlObject&& xml_obj) {
+        XmlObject& add_node (XmlObject&& xml_obj) {
             nodes.push_back (std::move(xml_obj));
             return *this;
         }
@@ -442,7 +442,7 @@ namespace uxmpp {
          * Return all child nodes.
          * @return A reference to the list of all child elements.
          */
-        std::vector<XmlObject>& getNodes () {
+        std::vector<XmlObject>& get_nodes () {
             return nodes;
         }
 
@@ -457,9 +457,9 @@ namespace uxmpp {
          *         XML object. The resulting object can be tested in a
          *         boolean expression and if false, no child node was found.
          */
-        XmlObject getNode (const std::string& name, bool full_name=false) {
-            for (auto& node : getNodes()) {
-                std::string node_name = full_name ? node.getFullName() : node.getTagName();
+        XmlObject get_node (const std::string& name, bool full_name=false) {
+            for (auto& node : get_nodes()) {
+                std::string node_name = full_name ? node.get_full_name() : node.get_tag_name();
                 if (node_name == name)
                     return node;
             }
@@ -476,8 +476,8 @@ namespace uxmpp {
          *         The result can be tested in a boolean expression
          *         and if false, no element was found.
          */
-        XmlObject getNsNode (const std::string& name_space) {
-            for (auto& node : getNodes()) {
+        XmlObject get_ns_node (const std::string& name_space) {
+            for (auto& node : get_nodes()) {
                 if (name_space == xml_namespace)
                     return node;
             }
@@ -488,7 +488,7 @@ namespace uxmpp {
          * Set the content of the XML object.
          * @return The content of the XML object.
          */
-        const std::string& getContent () const {
+        const std::string& get_content () const {
             return content;
         }
 
@@ -498,7 +498,7 @@ namespace uxmpp {
          * @param content The content to be set.
          * @return A reference to this object.
          */
-        XmlObject& setContent (const std::string& content) {
+        XmlObject& set_content (const std::string& content) {
             this->content = content;
             return *this;
         }
@@ -509,7 +509,7 @@ namespace uxmpp {
          * @param content The content to be move to this object.
          * @return A reference to this object.
          */
-        XmlObject& setContent (std::string&& content) {
+        XmlObject& set_content (std::string&& content) {
             this->content = std::move (content);
             return *this;
         }
@@ -521,7 +521,7 @@ namespace uxmpp {
          *                 that will be written to a string whenever
          *                 <code>to_string()</code> is called.
          */
-        XmlObject& setPart (const XmlObjPart obj_part) {
+        XmlObject& set_part (const XmlObjPart obj_part) {
             part = obj_part;
             return *this;
         }
@@ -532,7 +532,7 @@ namespace uxmpp {
          *         that will be written to a string whenever
          *         <code>to_string()</code> is called.
          */
-        XmlObjPart getPart () const {
+        XmlObjPart get_part () const {
             return part;
         }
 
@@ -553,7 +553,7 @@ namespace uxmpp {
          * True is the namespace in 'xml_namespace' is the current default namespace.
          * If it is, then the namespace can be omitted when printing the tag name.
          */
-        bool is_namespace_default;
+        bool namespace_is_default;
 
         /**
          * Namespace alias(es).

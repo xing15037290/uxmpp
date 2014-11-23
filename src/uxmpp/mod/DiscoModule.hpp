@@ -51,37 +51,37 @@ namespace uxmpp { namespace mod {
         /**
          * Called when the module is registered to a session.
          */
-        virtual void moduleRegistered (uxmpp::Session& session);
+        virtual void module_registered (uxmpp::Session& session) override;
 
         /**
          * Called when the module is unregistered from a session.
          */
-        virtual void moduleUnregistered (uxmpp::Session& session);
+        virtual void module_unregistered (uxmpp::Session& session) override;
 
         /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj);
+        virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
 
         /**
          * Called when the state if the session changes.
          */
-        virtual void onStateChange (uxmpp::Session& session,
-                                    uxmpp::SessionState new_state,
-                                    uxmpp::SessionState old_state);
+        virtual void on_state_change (uxmpp::Session& session,
+                                      uxmpp::SessionState new_state,
+                                      uxmpp::SessionState old_state) override;
 
         /**
          * Return the identities received from the server.
          */
-        std::vector<DiscoIdentity>& getServerIdentities () {
+        std::vector<DiscoIdentity>& get_server_identities () {
             return server_identities;
         }
 
         /**
          * Return the features received from the server.
          */
-        std::vector<std::string>& getServerFeatures () {
+        std::vector<std::string>& get_server_features () {
             return server_features;
         }
 
@@ -93,7 +93,7 @@ namespace uxmpp { namespace mod {
          *                 <code>uxmpp::Stanza::makeId()</code> will be used.
          *                 The identifier should be unique.
          */
-        std::string queryInfo (const uxmpp::Jid& jid, const std::string& query_id="");
+        std::string query_info (const uxmpp::Jid& jid, const std::string& query_id="");
 
 
     protected:

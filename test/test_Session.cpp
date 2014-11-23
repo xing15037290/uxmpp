@@ -45,7 +45,7 @@ public:
     }
     virtual ~StateListener () = default;
 
-    virtual void onStateChange (Session& session, SessionState new_state, SessionState old_state) {
+    virtual void on_state_change (Session& session, SessionState new_state, SessionState old_state) {
         cout << "##" << endl;
         cout << "##" << endl;
         cout << "##" << endl;
@@ -57,8 +57,8 @@ public:
 
             // Unregister modules that we don't need anymore
             //
-            session.unregisterModule (tls_module);
-            session.unregisterModule (auth_module);
+            session.unregister_module (tls_module);
+            session.unregister_module (auth_module);
 
             // Register new modules
             //
@@ -66,9 +66,9 @@ public:
             //pr_module.addPresenceListener (*this);
             //msg_module.addMessageListener (*this);
 
-            session.registerModule (roster_module);
-            session.registerModule (pr_module);
-            session.registerModule (msg_module);
+            session.register_module (roster_module);
+            session.register_module (pr_module);
+            session.register_module (msg_module);
 
             // Send stanzas
             //
@@ -80,7 +80,7 @@ public:
     /**
      * Called when the roster module receives a roster.
      */
-    virtual void onRoster (RosterModule& module, Roster& roster) {
+    virtual void on_roster (RosterModule& module, Roster& roster) {
         cout << "**" << endl;
         cout << "** Got roster:" << to_string(roster) << endl;
         cout << "**" << endl;
@@ -89,7 +89,7 @@ public:
     /**
      * Called when the roster module receives a roster.
      */
-    virtual void onRosterPush (RosterModule& module, RosterItem& item) {
+    virtual void on_roster_push (RosterModule& module, RosterItem& item) {
         cout << "**" << endl;
         cout << "** Got roster push:" << to_string(item) << endl;
         cout << "**" << endl;
@@ -98,14 +98,14 @@ public:
     /**
      * Called when the presence module receives a presence stanza.
      */
-    virtual void onPresence (PresenceModule& module, uxmpp::PresenceStanza& presence) {
-        string type = presence.getType ();
+    virtual void on_presence (PresenceModule& module, uxmpp::PresenceStanza& presence) {
+        string type = presence.get_type ();
 
         cout << "**" << endl;
-        cout << "** Got presence '" << type << "' from " << to_string(presence.getFrom()) << endl;
+        cout << "** Got presence '" << type << "' from " << to_string(presence.get_from()) << endl;
         cout << "**" << endl;
         if (type == "subscribe") {
-            roster_module.addItem (presence.getFrom());
+            roster_module.add_item (presence.get_from());
         }
         else if (type == "") {
         }
@@ -114,12 +114,12 @@ public:
     /**
      * Called when the presence module receives a presence stanza.
      */
-    virtual void onMessage (MessageModule& module, uxmpp::MessageStanza& presence) {
-        string content = presence.getBody ();
+    virtual void on_message (MessageModule& module, uxmpp::MessageStanza& presence) {
+        string content = presence.get_body ();
         if (content.length() == 0)
             return;
 
-        cout << "Got message from " << to_string(presence.getFrom().bare()) << ": " << content << endl;
+        cout << "Got message from " << to_string(presence.get_from().bare()) << ": " << content << endl;
     }
 
 private:
@@ -134,9 +134,9 @@ private:
 
 int main (int argc, char* argv[])
 {
-    //uxmppSetLogLevel (LogLevel::debug);
-    //uxmppSetLogLevel (LogLevel::info);
-    uxmppSetLogLevel (LogLevel::trace);
+    //uxmpp_set_log_level (LogLevel::debug);
+    //uxmpp_set_log_level (LogLevel::info);
+    uxmpp_set_log_level (LogLevel::trace);
 
     if (argc < 2) {
         cerr << "Usage: test_Session <user@domain> [passphrase]" << endl;
@@ -155,27 +155,27 @@ int main (int argc, char* argv[])
     Jid user (argv[1]);
     Session sess;
     SessionConfig cfg;
-    sess.addSessionListener (sl);
+    sess.add_session_listener (sl);
 
 
     // Configure modules
     //
     tls_module.tls_cfg.method        = TlsMethod::tlsv1_2;
     tls_module.tls_cfg.verify_server = false;
-    auth_module.auth_user  = user.getLocal ();
+    auth_module.auth_user  = user.get_local ();
     auth_module.auth_pass  = argc>2 ? argv[2] : "";
-    alive_module.setInterval (300);
+    alive_module.set_interval (300);
 
     // Add XMPP modules
     //
-    sess.registerModule (tls_module);
-    sess.registerModule (auth_module);
-    sess.registerModule (alive_module);
+    sess.register_module (tls_module);
+    sess.register_module (auth_module);
+    sess.register_module (alive_module);
     //sess.registerModule (roster_module);
 
-    cfg.domain     = user.getDomain ();
+    cfg.domain     = user.get_domain ();
     cfg.user_id    = to_string (user.bare());
-    cfg.resource   = user.getResource ();
+    cfg.resource   = user.get_resource ();
 
 //    cfg.auth_user  = user.getLocal ();
 //    cfg.auth_pass  = argc>2 ? argv[2] : "";
@@ -191,13 +191,13 @@ int main (int argc, char* argv[])
             //
             // If TLS v1.2 is not supported, try TLS v1.1
             //
-            if (sess.getError().getAppError() == "tls-error") {
+            if (sess.get_error().get_app_error() == "tls-error") {
                 tls_module.tls_cfg.method = TlsMethod::tlsv1_1;
                 sess.start (cfg);
                 //
                 // If TLS v1.1 is not supported, try TLS v1.0
                 //
-                if (sess.getError().getAppError() == "tls-error") {
+                if (sess.get_error().get_app_error() == "tls-error") {
                     tls_module.tls_cfg.method = TlsMethod::tlsv1;
                     sess.start (cfg);
                 }
@@ -223,12 +223,12 @@ int main (int argc, char* argv[])
 
     // Check for errors
     //
-    StreamError& err = sess.getError ();
-    if (err.getErrorName() != "") {
-        string err_name = err.getAppError ();
-        string err_text = err.getText ();
+    StreamError& err = sess.get_error ();
+    if (err.get_error_name() != "") {
+        string err_name = err.get_app_error ();
+        string err_text = err.get_text ();
         if (err_name.length() == 0)
-            err_name = err.getErrorName ();
+            err_name = err.get_error_name ();
 
         cerr << "Error: " << err_name;
         if (err_text.length())

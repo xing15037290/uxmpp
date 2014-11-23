@@ -42,8 +42,8 @@ namespace uxmpp { namespace mod {
         Roster (const std::string& version="")
             : uxmpp::XmlObject ("query", XmlIqRosterNs, true, true, 1)
         {
-            if (version.length())
-                setAttribute ("ver", version);
+            if (!version.empty())
+                set_attribute ("ver", version);
         }
 
         /**
@@ -94,8 +94,8 @@ namespace uxmpp { namespace mod {
         /**
          * Return the roster items.
          */
-        std::vector<RosterItem>& getItems () {
-            return reinterpret_cast<std::vector<RosterItem>&> (getNodes());
+        std::vector<RosterItem>& get_items () {
+            return reinterpret_cast<std::vector<RosterItem>&> (get_nodes());
         }
     };
 

@@ -43,10 +43,10 @@ namespace uxmpp {
          * Construct a stream error from an XmlObject.
          */
         StreamError (XmlObject& xml_obj) : XmlObject ("error", XmlStreamNsAlias, false, false, 2) {
-            setErrorName (xml_obj.getNodes().size() ? xml_obj.getNodes()[0].getTagName() : "");
-            for (auto& node : xml_obj.getNodes()) {
-                if (node.getTagName() == "text") {
-                    setText (node.getContent());
+            set_error_name (xml_obj.get_nodes().empty() ? "" : xml_obj.get_nodes().begin()->get_tag_name());
+            for (auto& node : xml_obj.get_nodes()) {
+                if (node.get_tag_name() == "text") {
+                    set_text (node.get_content());
                     break;
                 }
             }
@@ -56,7 +56,7 @@ namespace uxmpp {
          * Constructor.
          */
         StreamError (const std::string& error) : XmlObject ("error", XmlStreamNsAlias, false, false, 2) {
-            setErrorName (error);
+            set_error_name (error);
         }
 
         /**
@@ -72,10 +72,10 @@ namespace uxmpp {
                 return *this;
 
             XmlObject& obj = const_cast<XmlObject&> (xml_obj);
-            setErrorName (obj.getNodes().size() ? obj.getNodes()[0].getTagName() : "");
-            for (auto& node : obj.getNodes()) {
-                if (node.getTagName() == "text") {
-                    setText (node.getContent());
+            set_error_name (obj.get_nodes().empty() ? "": obj.get_nodes().begin()->get_tag_name());
+            for (auto& node : obj.get_nodes()) {
+                if (node.get_tag_name() == "text") {
+                    set_text (node.get_content());
                     break;
                 }
             }
@@ -85,43 +85,43 @@ namespace uxmpp {
         /**
          * Is there an error message available.
          */
-        const bool haveError () {
-            return getNodes().size() != 0;
+        const bool have_error () {
+            return get_nodes().size() != 0;
         }
 
         /**
          * Set the error condition.
          */
-        void setErrorName (const std::string& error) {
-            getNodes().clear ();
+        void set_error_name (const std::string& error) {
+            get_nodes().clear ();
             if (error.length())
-                addNode (XmlObject(error, XmlStreamErrortypeNs));
+                add_node (XmlObject(error, XmlStreamErrortypeNs));
         }
 
         /**
          * Return the error condition.
          */
-        std::string getErrorName () {
-            return getNodes().size() ? getNodes()[0].getTagName() : "";
+        std::string get_error_name () {
+            return get_nodes().empty() ? "": get_nodes().begin()->get_tag_name();
         }
 
         /**
          * Set the application specific condition.
          */
-        void setAppError (const std::string& app_error, const std::string& text="") {
-            setErrorName ("undefined-condition");
-            addNode (XmlObject(app_error, XmlUxmppErrorNs));
-            setText (text);
+        void set_app_error (const std::string& app_error, const std::string& text="") {
+            set_error_name ("undefined-condition");
+            add_node (XmlObject(app_error, XmlUxmppErrorNs));
+            set_text (text);
         }
 
         /**
          * Return the application specific error condition, if any.
          */
-        std::string getAppError () {
-            auto& nodes = getNodes ();
-            for (unsigned i=1; i<nodes.size(); i++) {
-                if (nodes[i].getTagName() != "text")
-                    return nodes[i].getTagName ();
+        std::string get_app_error () {
+            auto& nodes = get_nodes ();
+            for (unsigned i=1; i<nodes.size(); ++i) {
+                if (nodes[i].get_tag_name() != "text")
+                    return nodes[i].get_tag_name ();
             }
             return "";
         }
@@ -129,10 +129,10 @@ namespace uxmpp {
         /**
          * Return a descriptive error text (if any).
          */
-        std::string getText () {
-            for (auto& node : getNodes()) {
-                if (node.getTagName() == "text")
-                    return node.getContent ();
+        std::string get_text () {
+            for (auto& node : get_nodes()) {
+                if (node.get_tag_name() == "text")
+                    return node.get_content ();
             }
             return "";
         }
@@ -141,16 +141,16 @@ namespace uxmpp {
         /**
          * Set a descriptive error text.
          */
-        void setText (const std::string& text) {
-            for (auto& node : getNodes()) {
-                if (node.getTagName() == "text") {
-                    node.setContent (text);
+        void set_text (const std::string& text) {
+            for (auto& node : get_nodes()) {
+                if (node.get_tag_name() == "text") {
+                    node.set_content (text);
                     return;
                 }
             }
             XmlObject text_node ("text", XmlStreamErrortypeNs);
-            text_node.setContent (text);
-            addNode (text_node);
+            text_node.set_content (text);
+            add_node (text_node);
         }
 
     };

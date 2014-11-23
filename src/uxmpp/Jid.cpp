@@ -47,13 +47,13 @@ Jid::Jid (const std::string& jid)
     //
     auto pos = jid.find ('@');
     if (pos == std::string::npos) {
-        setLocal (jid);
+        set_local (jid);
         return;
     }
     if (pos==0) {
         local = "";
     }else{
-        setLocal (jid.substr(0, pos));
+        set_local (jid.substr(0, pos));
     }
 
     if (++pos >= jid.length()-1)
@@ -65,18 +65,18 @@ Jid::Jid (const std::string& jid)
     pos = jid.find ('/', pos);
     if (pos == std::string::npos) {
         // set domain
-        setDomain (jid.substr(domain_pos));
+        set_domain (jid.substr(domain_pos));
     }
     else if (pos == domain_pos) {
         // Set resource
         if (pos < jid.length()-1) {
-            setResource (jid.substr(pos+1));
+            set_resource (jid.substr(pos+1));
         }
     }
     else {
         // Set domain and resource
-        setDomain (jid.substr(domain_pos, pos-domain_pos));
-        setResource (jid.substr(pos+1));
+        set_domain (jid.substr(domain_pos, pos-domain_pos));
+        set_resource (jid.substr(pos+1));
     }
 }
 
@@ -85,19 +85,19 @@ Jid::Jid (const std::string& jid)
 //------------------------------------------------------------------------------
 Jid::Jid (const std::string& localpart, const std::string& domainpart, const std::string& resourcepart)
 {
-    setLocal    (localpart);
-    setDomain   (domainpart);
-    setResource (resourcepart);
+    set_local    (localpart);
+    set_domain   (domainpart);
+    set_resource (resourcepart);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Jid::setLocal (const std::string& localpart)
+void Jid::set_local (const std::string& localpart)
 {
     if (localpart.length() > 1023) {
-        uxmppLogInfo (THIS_FILE, "localpart longer than 1023 bytes, truncate it");
-        local = std::string(localpart, 1023);
+        uxmpp_log_info (THIS_FILE, "localpart longer than 1023 bytes, truncate it");
+        local = std::string (localpart, 1023);
     }else{
         local = localpart;
     }
@@ -106,11 +106,11 @@ void Jid::setLocal (const std::string& localpart)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Jid::setDomain (const std::string& domainpart)
+void Jid::set_domain (const std::string& domainpart)
 {
     if (domainpart.length() > 1023) {
-        uxmppLogInfo (THIS_FILE, "domainpart longer than 1023 bytes, truncate it");
-        domain = std::string(domainpart, 1023);
+        uxmpp_log_info (THIS_FILE, "domainpart longer than 1023 bytes, truncate it");
+        domain = std::string (domainpart, 1023);
     }else{
         domain = domainpart;
     }
@@ -119,11 +119,11 @@ void Jid::setDomain (const std::string& domainpart)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Jid::setResource (const std::string& resourcepart)
+void Jid::set_resource (const std::string& resourcepart)
 {
     if (resourcepart.length() > 1023) {
-        uxmppLogInfo (THIS_FILE, "resourcepart longer than 1023 bytes, truncate it");
-        resource = std::string(resourcepart, 1023);
+        uxmpp_log_info (THIS_FILE, "resourcepart longer than 1023 bytes, truncate it");
+        resource = std::string (resourcepart, 1023);
     }else{
         resource = resourcepart;
     }
@@ -137,17 +137,17 @@ std::string to_string (const Jid& jid)
 {
     string result {""};
 
-    if (jid.getLocal().length())
-        result += jid.getLocal();
+    if (jid.get_local().length())
+        result += jid.get_local();
 
-    if (jid.getDomain().length()) {
-        result += string("@") + jid.getDomain ();
+    if (jid.get_domain().length()) {
+        result += string("@") + jid.get_domain ();
     }
 
-    if (jid.getResource().length()) {
-        if (!jid.getDomain().length())
+    if (jid.get_resource().length()) {
+        if (!jid.get_domain().length())
             result += string("@");
-        result += string("/") + jid.getResource();
+        result += string("/") + jid.get_resource();
     }
 
     return result;

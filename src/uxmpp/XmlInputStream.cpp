@@ -122,14 +122,14 @@ void XmlInputStream::XmlParseData::parse_xml_attributes (const XML_Char** attrib
                                                          string& default_namespace,
                                                          map<string, string>& namespace_aliases)
 {
-    string xml_namespace = xml_obj.getNamespace ();
+    string xml_namespace = xml_obj.get_namespace ();
     string name;
     string value;
 
     default_namespace = "";
     namespace_aliases.clear ();
 
-    for (const XML_Char** i=attributes; *i!=NULL; i++) {
+    for (const XML_Char** i=attributes; *i!=NULL; ++i) {
         name  = string (*i);
         if (++i != NULL)
             value = string (*i);
@@ -139,28 +139,28 @@ void XmlInputStream::XmlParseData::parse_xml_attributes (const XML_Char** attrib
         // Handle default namespace attribute
         //
         if (name == "xmlns") {
-            if (value.length() == 0)
+            if (value.empty())
                 continue;
 
             TRACE (THIS_FILE, "parse_xml_attributes - set default namespace: ", value);
 
             default_namespace = value;
-            xml_obj.setDefaultNamespaceAttr (default_namespace);
-            if (xml_namespace.length() == 0) {
+            xml_obj.set_default_namespace_attr (default_namespace);
+            if (xml_namespace.empty()) {
                 xml_namespace = default_namespace;
-                xml_obj.setNamespace (xml_namespace);
+                xml_obj.set_namespace (xml_namespace);
             }
             if (default_namespace == xml_namespace)
-                xml_obj.isNamespaceDefault (true);
+                xml_obj.is_namespace_default (true);
         }
         //
         // Handle namespace alias attribute
         //
         else if (name.find("xmlns:") == 0) {
-            if (value.length() == 0)
+            if (value.empty())
                 continue;
             string alias = name.substr (6);
-            if (alias.length()) {
+            if (!alias.empty()) {
 
                 TRACE (THIS_FILE, "parse_xml_attributes - add namespace alias: ", alias, "=", value);
 
@@ -179,7 +179,7 @@ void XmlInputStream::XmlParseData::parse_xml_attributes (const XML_Char** attrib
         // Handle 'normal' attribute
         //
         else{
-            xml_obj.setAttribute (name, value);
+            xml_obj.set_attribute (name, value);
         }
     }
 }
@@ -190,9 +190,9 @@ void XmlInputStream::XmlParseData::parse_xml_attributes (const XML_Char** attrib
 void XmlInputStream::XmlParseData::normalize_namespace (XmlInputStream::XmlParseData& pd,
                                                         XmlObject& xml_obj)
 {
-    string xml_namespace = xml_obj.getNamespace ();
+    string xml_namespace = xml_obj.get_namespace ();
 
-    if (xml_namespace.length() == 0) {
+    if (xml_namespace.empty()) {
         //
         // Find the default namespace
         //
@@ -201,15 +201,15 @@ void XmlInputStream::XmlParseData::normalize_namespace (XmlInputStream::XmlParse
         TRACE (THIS_FILE, "normalize_namespace - top level default namespace is: ", xml_namespace);
         for (auto element : pd.element_stack) {
             TRACE (THIS_FILE, "normalize_namespace - peek namespace in stack: ", element->default_namespace);
-            if (element->default_namespace.length() > 0) {
+            if (element->default_namespace.empty() != true) {
                 xml_namespace = element->default_namespace;
                 break;
             }
         }
-        if (xml_namespace.length() != 0) {
+        if (!xml_namespace.empty()) {
             TRACE (THIS_FILE, "normalize_namespace - found default namespace: ", xml_namespace);
-            xml_obj.setNamespace (xml_namespace);
-            xml_obj.isNamespaceDefault (true);
+            xml_obj.set_namespace (xml_namespace);
+            xml_obj.is_namespace_default (true);
         }
     }else{
         //
@@ -219,24 +219,24 @@ void XmlInputStream::XmlParseData::normalize_namespace (XmlInputStream::XmlParse
         string alias_value = "";
         for (auto element : pd.element_stack) {
             alias_value = element->namespace_aliases[xml_namespace];
-            if (alias_value.length() > 0)
+            if (!alias_value.empty())
                 break;
         }
-        if (alias_value.length() == 0)
+        if (alias_value.empty())
             alias_value = pd.namespace_aliases[xml_namespace];
 
-        if (alias_value.length()) {
-            xml_obj.setNamespace (alias_value);
+        if (!alias_value.empty()) {
+            xml_obj.set_namespace (alias_value);
             // See if this is also the default namespace
             string default_namespace = pd.default_namespace;
             for (auto element : pd.element_stack) {
-                if (element->default_namespace.length() > 0) {
+                if ( ! element->default_namespace.empty()) {
                     default_namespace = element->default_namespace;
                     break;
                 }
             }
-            if (default_namespace.length() && default_namespace == xml_obj.getDefaultNamespaceAttr())
-                xml_obj.isNamespaceDefault (true);
+            if (!default_namespace.empty() && default_namespace == xml_obj.get_default_namespace_attr())
+                xml_obj.is_namespace_default (true);
         }
     }
 }
@@ -257,13 +257,13 @@ XmlInputStream::XmlInputStream (const XmlObject& top_element)
 //------------------------------------------------------------------------------
 XmlInputStream::~XmlInputStream ()
 {
-    freeResources ();
+    free_resources ();
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlInputStream::setXmlHandler (std::function<void (XmlInputStream&, XmlObject&)> xml_handler)
+void XmlInputStream::set_xml_handler (std::function<void (XmlInputStream&, XmlObject&)> xml_handler)
 {
     std::lock_guard<std::mutex> lock (mutex);
     rx_func = xml_handler;
@@ -272,7 +272,7 @@ void XmlInputStream::setXmlHandler (std::function<void (XmlInputStream&, XmlObje
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlInputStream::setErrorHandler (std::function<void (XmlInputStream&)> err_handler)
+void XmlInputStream::set_error_handler (std::function<void (XmlInputStream&)> err_handler)
 {
     std::lock_guard<std::mutex> lock (mutex);
     err_func = err_handler;
@@ -293,7 +293,7 @@ void XmlInputStream::XmlParseData::end_xml_node (void* user_data,
         if (pd->top_element_found) {
             pd->top_element_found = false;
             XmlObject xml_obj (stream.top_node);//XmlInputStreamTag, XmlInputStreamNs, false);
-            xml_obj.setPart (XmlObjPart::end);
+            xml_obj.set_part (XmlObjPart::end);
 
             XML_SetElementHandler (pd->xml_parser,
                                    XmlInputStream::XmlParseData::start_stream_element,
@@ -311,10 +311,10 @@ void XmlInputStream::XmlParseData::end_xml_node (void* user_data,
     //
     XmlStreamParseElement* element = pd->element_stack.front ();
     pd->element_stack.pop_front ();
-    TRACE (THIS_FILE, "end_xml_node - popping element from stack (", element->xml_obj.getName(), ")");
+    TRACE (THIS_FILE, "end_xml_node - popping element from stack (", element->xml_obj.get_name(), ")");
 
     if (pd->element_stack.empty()) {
-        TRACE (THIS_FILE, "end_xml_node - complete XML object fround (", element->xml_obj.getName(), ")");
+        TRACE (THIS_FILE, "end_xml_node - complete XML object fround (", element->xml_obj.get_name(), ")");
 
         if (stream.rx_func) {
             stream.mutex.unlock ();
@@ -323,7 +323,7 @@ void XmlInputStream::XmlParseData::end_xml_node (void* user_data,
         }
     }else{
         XmlStreamParseElement* parent_element = pd->element_stack.front ();
-        parent_element->xml_obj.addNode (std::move(element->xml_obj));
+        parent_element->xml_obj.add_node (std::move(element->xml_obj));
     }
     delete element;
 }
@@ -345,25 +345,37 @@ void XmlInputStream::XmlParseData::start_xml_node (void* user_data,
     // Split the full tag name into name and namespace.
     //
     parse_xml_tag_name (name, tag_name, xml_namespace);
-    xml_obj.setTagName (tag_name);
-    if (xml_namespace.length())
-        xml_obj.setNamespace (xml_namespace);
+    xml_obj.set_tag_name (tag_name);
+    if (!xml_namespace.empty())
+        xml_obj.set_namespace (xml_namespace);
 
     // Parse xml attributes
     //
-    TRACE (THIS_FILE, "start_xml_node - before parsing attributes: (", xml_obj.getNamespace(), ")", to_string(xml_obj));
+    TRACE (THIS_FILE,
+           "start_xml_node - before parsing attributes: (",
+           xml_obj.get_namespace(),
+           ")",
+           to_string(xml_obj));
     parse_xml_attributes (attributes, xml_obj, element->default_namespace, element->namespace_aliases);
-    TRACE (THIS_FILE, "start_xml_node - after parsing attributes: (", xml_obj.getNamespace(), ")", to_string(xml_obj));
+    TRACE (THIS_FILE,
+           "start_xml_node - after parsing attributes: (",
+           xml_obj.get_namespace(),
+           ")",
+           to_string(xml_obj));
 
     // Normalize namespace
     //
     normalize_namespace (*pd, xml_obj);
-    TRACE (THIS_FILE, "start_xml_node - after normalizing namespace: (", xml_obj.getFullName(), ")", to_string(xml_obj));
+    TRACE (THIS_FILE,
+           "start_xml_node - after normalizing namespace: (",
+           xml_obj.get_full_name(),
+           ")",
+           to_string(xml_obj));
 
     // Push the current XML object on the stack
     //
     pd->element_stack.push_front (element);
-    TRACE (THIS_FILE, "start_xml_node - pushing element to stack (", element->xml_obj.getName(), ")");
+    TRACE (THIS_FILE, "start_xml_node - pushing element to stack (", element->xml_obj.get_name(), ")");
 }
 
 
@@ -379,7 +391,7 @@ void XmlInputStream::XmlParseData::xml_character_data (void* user_data,
     if (element == nullptr)
         return;
 
-    element->xml_obj.setContent (element->xml_obj.getContent() + string(data, len));
+    element->xml_obj.set_content (element->xml_obj.get_content() + string(data, len));
 }
 
 
@@ -400,9 +412,9 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
     // Split the name into namespace and name
     //
     parse_xml_tag_name (name, tag_name, xml_namespace);
-    xml_obj.setTagName (tag_name);
-    if (xml_namespace.length())
-        xml_obj.setNamespace (xml_namespace);
+    xml_obj.set_tag_name (tag_name);
+    if (!xml_namespace.empty())
+        xml_obj.set_namespace (xml_namespace);
 
     // Parse xml attributes
     //
@@ -413,30 +425,30 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
     // Normalize namespace
     //
     normalize_namespace (*pd, xml_obj);
-    xml_namespace = xml_obj.getNamespace ();
+    xml_namespace = xml_obj.get_namespace ();
     TRACE (THIS_FILE, "start_stream_element - after normalizing namespace: ", to_string(xml_obj));
 
     // Find default namespace if needed
     //
-    if (!xml_namespace.length() && pd->default_namespace.length()) {
+    if (xml_namespace.empty() && !pd->default_namespace.empty()) {
         // Find default namespace
         xml_namespace = pd->default_namespace;
-        xml_obj.setNamespace (xml_namespace);
-        xml_obj.isNamespaceDefault (true);
+        xml_obj.set_namespace (xml_namespace);
+        xml_obj.is_namespace_default (true);
     }
 
     // Get the canonical tag name
     //
-    if (xml_namespace.length()) {
+    if ( ! xml_namespace.empty()) {
         /*
         full_name = xml_obj.getNamespaceAlias (xml_namespace);
-        if (full_name.length()) {
+        if (!full_name.empty()) {
             full_name += string(":") + tag_name;
         }else{
         */
             full_name = xml_namespace + string(":") + tag_name;
             //}
-    }else if (default_namespace.length() > 0) {
+    }else if ( ! default_namespace.empty()) {
         full_name = default_namespace + string(":") + tag_name;
     }else{
         full_name = tag_name;
@@ -444,14 +456,14 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
 
     // Check if this is the XMPP start stream tag.
     //
-    if (stream.top_node.getFullName() == full_name) {
+    if (stream.top_node.get_full_name() == full_name) {
         //uxmppLogDebug (THIS_FILE, "Got start stream element");
         XML_SetElementHandler (pd->xml_parser,
                                XmlInputStream::XmlParseData::start_xml_node,
                                XmlInputStream::XmlParseData::end_xml_node);
         XML_SetCharacterDataHandler (pd->xml_parser, XmlInputStream::XmlParseData::xml_character_data);
 
-        xml_obj.setPart (XmlObjPart::start);
+        xml_obj.set_part (XmlObjPart::start);
 
         pd->top_element_found = true;
 
@@ -471,7 +483,7 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
 void XmlInputStream::reset ()
 {
     std::lock_guard<std::mutex> lock (mutex);
-    freeResources ();
+    free_resources ();
 
     parse_data = new XmlParseData;
     //parse_data->xml_parser = XML_ParserCreateNS (NULL, namespace_delim);
@@ -493,7 +505,7 @@ void XmlInputStream::reset ()
 //------------------------------------------------------------------------------
 // mutex assumed to be locked
 //------------------------------------------------------------------------------
-void XmlInputStream::freeResources ()
+void XmlInputStream::free_resources ()
 {
     if (parse_data) {
         while (!parse_data->element_stack.empty()) {

@@ -70,27 +70,27 @@ namespace uxmpp {
         /**
          * Called when the stream is opened.
          */
-        virtual void onOpen (XmlStream& stream) override;
+        virtual void on_open (XmlStream& stream) override;
 
         /**
          * Called when the stream is closed.
          */
-        virtual void onClose (XmlStream& stream) override;
+        virtual void on_close (XmlStream& stream) override;
 
         /**
          * Called whan an XML object is received.
          */
-        virtual void onRxXmlObj (XmlStream& stream, XmlObject& xml_obj) override;
+        virtual void on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj) override;
 
         /**
          * Called whan an XML object is received.
          */
-        virtual void onRxXmlError (XmlStream& stream);
+        virtual void on_rx_xml_error (XmlStream& stream);
 
         /**
          * Return a stream error object.
          */
-        StreamError& getError () {
+        StreamError& get_error () {
             return stream_error;
         }
 
@@ -100,59 +100,59 @@ namespace uxmpp {
          * if the session was closed due to an error.
          * @see getError.
          */
-        const bool haveError () {
-            return stream_error.haveError ();
+        const bool have_error () {
+            return stream_error.have_error ();
         }
 
         /**
          * Add a listener object that will receive events from the session.
          */
-        virtual void addSessionListener (SessionListener& listener);
+        virtual void add_session_listener (SessionListener& listener);
 
         /**
          * Remove a listener object that is receiving events from the session.
          */
-        virtual void delSessionListener (SessionListener& listener);
+        virtual void del_session_listener (SessionListener& listener);
 
         /**
          *
          */
-        SessionState getState () const {
+        SessionState get_state () const {
             return state;
         }
 
         /**
          *
          */
-        Jid getJid () const {
+        Jid get_jid () const {
             return Jid (jid);
         }
 
         /**
          *
          */
-        Jid getDomain () const {
+        Jid get_domain () const {
             return Jid (cfg.domain);
         }
 
         /**
          *
          */
-        void sendStanza (const XmlObject& xml_obj) {
+        void send_stanza (const XmlObject& xml_obj) {
             xs.write (xml_obj);
         }
 
         /**
          * Return the session id.
          */
-        std::string getId () const {
+        std::string get_id () const {
             return sess_id;
         }
 
         /**
          * Return the server's 'from' attribute from the initial 'stream' tag.
          */
-        std::string getStreamFromAttr () const {
+        std::string get_stream_from_attr () const {
             return sess_from;
         }
 
@@ -160,7 +160,7 @@ namespace uxmpp {
          * Register an XMPP module that will handle incoming XML objects.
          * The order of the registered XMPP modules are important.
          */
-        void registerModule (XmppModule& module);
+        void register_module (XmppModule& module);
 
         /**
          * Register an XMPP module that will handle incoming XML objects.
@@ -168,31 +168,31 @@ namespace uxmpp {
          * @param before_this The module will be added before 'before_this' module.
          *                    If no 'before_this' module exists it will be added last.
          */
-        void registerModule (XmppModule& module, XmppModule& before_this);
+        void register_module (XmppModule& module, XmppModule& before_this);
 
         /**
          * Unregister an XMPP module.
          */
-        void unregisterModule (XmppModule& module);
+        void unregister_module (XmppModule& module);
 
         /**
          * Get the list of pointers to registered XMPP modules.
          */
-        std::vector<XmppModule*>& getModules () {
+        std::vector<XmppModule*>& get_modules () {
             return xmpp_modules;
         }
 
         /**
          * Return a reference to the underlaying XML stream.
          */
-        XmlStream& getXmlStream () {
+        XmlStream& get_xml_stream () {
             return xs;
         }
 
         /**
          *
          */
-        std::vector<XmlObject>& getFeatures () {
+        std::vector<XmlObject>& get_features () {
             return features;
         }
 
@@ -204,8 +204,8 @@ namespace uxmpp {
         /*
          * Set an application specific error condition.
          */
-        void setAppError (const std::string& app_error, const std::string& text="") {
-            stream_error.setAppError (app_error, text);
+        void set_app_error (const std::string& app_error, const std::string& text="") {
+            stream_error.set_app_error (app_error, text);
         }
 
 
@@ -259,7 +259,7 @@ namespace uxmpp {
         /**
          *
          */
-        virtual bool changeState (SessionState new_state);
+        virtual bool change_state (SessionState new_state);
 
         /**
          *
@@ -275,7 +275,7 @@ namespace uxmpp {
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (Session& session, XmlObject& xml_obj);
+        virtual bool proccess_xml_object (Session& session, XmlObject& xml_obj) override;
 
 
     private:

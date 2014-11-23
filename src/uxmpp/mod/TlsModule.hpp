@@ -53,7 +53,7 @@ namespace uxmpp { namespace mod {
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj);
+        virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
 
         /**
          * TLS configuration.

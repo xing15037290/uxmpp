@@ -104,19 +104,19 @@ static void event_logger (int severity, const char* msg)
         level = LogLevel::error;
         break;
     }
-    Logger::getInstance().log (level, "libevent", msg);
+    Logger::get_instance().log (level, "libevent", msg);
 }
 
 
 //----------------------------------------------------------
 //----------------------------------------------------------
-Logger& Logger::getInstance ()
+Logger& Logger::get_instance ()
 {
 //    static std::mutex global_log_mutex;
     //global_log_mutex.lock ();
     if (Logger::instance == nullptr) {
         Logger::instance = new Logger;
-        Logger::instance->setLogLevel (LogLevel::info);
+        Logger::instance->set_log_level (LogLevel::info);
         //
         // Install libevent log callback.
         //
@@ -156,7 +156,7 @@ void Logger::log (LogLevel level, const std::string& prefix, const std::string& 
 
 //----------------------------------------------------------
 //----------------------------------------------------------
-LogLevel Logger::setLogLevel (LogLevel level)
+LogLevel Logger::set_log_level (LogLevel level)
 {
     mutex.lock ();
     LogLevel old_level = log_level;
@@ -169,7 +169,7 @@ LogLevel Logger::setLogLevel (LogLevel level)
 
 //----------------------------------------------------------
 //----------------------------------------------------------
-LogLevel Logger::getLogLevel ()
+LogLevel Logger::get_log_level ()
 {
     mutex.lock ();
     LogLevel level = log_level;

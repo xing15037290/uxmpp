@@ -65,8 +65,8 @@ namespace uxmpp {
         IqStanza (const IqType type, const std::string& to="", const std::string& from="", const std::string& id="")
             : Stanza (to, from, id)
         {
-            setTagName ("iq");
-            setAttribute ("type", to_string(type));
+            set_tag_name ("iq");
+            set_attribute ("type", to_string(type));
         }
 
         /**
@@ -75,8 +75,8 @@ namespace uxmpp {
         IqStanza (const IqType type, const Jid& to, const Jid& from, const std::string& id="")
             : Stanza (to, from, id)
         {
-            setTagName ("iq");
-            setAttribute ("type", to_string(type));
+            set_tag_name ("iq");
+            set_attribute ("type", to_string(type));
         }
 
         /**
@@ -116,8 +116,8 @@ namespace uxmpp {
         /**
          * Get the IQ type.
          */
-        IqType getType () const {
-            std::string type = getAttribute ("type");
+        IqType get_type () const {
+            std::string type = get_attribute ("type");
             if (type == "get")
                 return IqType::get;
             if (type == "set")
@@ -132,8 +132,8 @@ namespace uxmpp {
         /**
          * Set the IQ type.
          */
-        void getType (const IqType type) {
-            setAttribute ("type", to_string(type));
+        void set_type (const IqType type) {
+            set_attribute ("type", to_string(type));
         }
     };
 

@@ -47,9 +47,9 @@ std::string to_string (const SubscribeOp& type)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-SubscribeOp PresenceStanza::getSubscribeOp ()
+SubscribeOp PresenceStanza::get_subscribe_op ()
 {
-    std::string type = getAttribute ("type");
+    std::string type = get_attribute ("type");
     if (type == "subscribe")
         return SubscribeOp::subscribe;
     else if (type == "unsubscribe")
@@ -63,57 +63,57 @@ SubscribeOp PresenceStanza::getSubscribeOp ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-PresenceStanza& PresenceStanza::setSubscribeOp (const SubscribeOp& type)
+PresenceStanza& PresenceStanza::set_subscribe_op (const SubscribeOp& type)
 {
-    return reinterpret_cast<PresenceStanza&> (setAttribute("type", to_string(type)));
+    return reinterpret_cast<PresenceStanza&> (set_attribute("type", to_string(type)));
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string PresenceStanza::getShow ()
+std::string PresenceStanza::get_show ()
 {
-    auto node = getNode ("show");
-    return node ? node.getContent() : "";
+    auto node = get_node ("show");
+    return node ? node.get_content() : "";
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-PresenceStanza& PresenceStanza::setShow (const std::string& content)
+PresenceStanza& PresenceStanza::set_show (const std::string& content)
 {
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() == "show") {
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() == "show") {
             if (content == "")
                 nodes.erase (i);
             else
-                i->setContent (content);
+                i->set_content (content);
             return *this;
         }
     }
     if (content != "")
-        addNode (XmlObject("show", XmlJabberClientNs, false).setContent(content));
+        add_node (XmlObject("show", XmlJabberClientNs, false).set_content(content));
     return *this;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string PresenceStanza::getStatus (const std::string& lang)
+std::string PresenceStanza::get_status (const std::string& lang)
 {
-    std::string configured_lang = getAttribute ("xml:lang");
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "status")
+    std::string configured_lang = get_attribute ("xml:lang");
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "status")
             continue;
-        std::string node_lang = i->getAttribute ("xml:lang");
+        std::string node_lang = i->get_attribute ("xml:lang");
         if (lang=="") {
             if (node_lang=="" || node_lang==configured_lang)
-                return i->getContent ();
+                return i->get_content ();
         }else{
             if (lang==node_lang || (node_lang=="" && lang==configured_lang))
-                return i->getContent ();
+                return i->get_content ();
         }
     }
     return "";
@@ -122,13 +122,13 @@ std::string PresenceStanza::getStatus (const std::string& lang)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string> > PresenceStanza::getStatusList ()
+std::vector<std::pair<std::string, std::string> > PresenceStanza::get_status_list ()
 {
     std::vector<std::pair<std::string, std::string> > status_list;
-    for (auto node : getNodes()) {
-        if (node.getTagName() == "status")
-            status_list.push_back (std::pair<std::string, std::string>(node.getContent(),
-                                                                       node.getAttribute("xml:lang")));
+    for (auto node : get_nodes()) {
+        if (node.get_tag_name() == "status")
+            status_list.push_back (std::pair<std::string, std::string>(node.get_content(),
+                                                                       node.get_attribute("xml:lang")));
     }
     return status_list;
 }
@@ -136,20 +136,20 @@ std::vector<std::pair<std::string, std::string> > PresenceStanza::getStatusList 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-PresenceStanza& PresenceStanza::setStatus (const std::string& status, const std::string& lang)
+PresenceStanza& PresenceStanza::set_status (const std::string& status, const std::string& lang)
 {
-    std::string configured_lang = getAttribute ("xml:lang");
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "status")
+    std::string configured_lang = get_attribute ("xml:lang");
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "status")
             continue;
-        std::string node_lang = i->getAttribute ("xml:lang");
+        std::string node_lang = i->get_attribute ("xml:lang");
         if (lang=="") {
             if (node_lang=="" || node_lang==configured_lang) {
                 if (status == "")
                     nodes.erase (i);
                 else
-                    i->setContent (status);
+                    i->set_content (status);
                 return *this;
             }
         }else{
@@ -157,7 +157,7 @@ PresenceStanza& PresenceStanza::setStatus (const std::string& status, const std:
                 if (status == "")
                     nodes.erase (i);
                 else
-                    i->setContent (status);
+                    i->set_content (status);
                 return *this;
             }
         }
@@ -165,9 +165,9 @@ PresenceStanza& PresenceStanza::setStatus (const std::string& status, const std:
     if (status != "") {
         XmlObject status_node ("status", XmlJabberClientNs, false);
         if (lang!="" && lang!=configured_lang)
-            status_node.setAttribute ("xml:lang", lang);
-        status_node.setContent (status);
-        addNode (status_node);
+            status_node.set_attribute ("xml:lang", lang);
+        status_node.set_content (status);
+        add_node (status_node);
     }
     return *this;
 }
@@ -175,19 +175,23 @@ PresenceStanza& PresenceStanza::setStatus (const std::string& status, const std:
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-int PresenceStanza::getPriority ()
+int PresenceStanza::get_priority ()
 {
-    auto node = getNode ("priority");
-    if (node)
-        return atoi (node.getContent().c_str());
-    else
+    auto node = get_node ("priority");
+    try {
+        return stoi (node.get_content());
+    }
+//    catch (invalid_argument ia) {
+    catch (...) {
+        uxmpp_log_debug (THIS_FILE, "Content of 'priority' element is not a number");
         return 0;
+    }
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-PresenceStanza& PresenceStanza::setPriority (int prio)
+PresenceStanza& PresenceStanza::set_priority (int prio)
 {
     if (prio > 127)
         prio = 127;
@@ -196,19 +200,19 @@ PresenceStanza& PresenceStanza::setPriority (int prio)
     std::stringstream ss;
     ss << prio;
 
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "priority")
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "priority")
             continue;
         if (prio == 0)
             nodes.erase (i);
         else
-            i->setContent (ss.str());
+            i->set_content (ss.str());
         return *this;
     }
 
     if (prio != 0)
-        addNode (XmlObject("priority", XmlJabberClientNs, false).setContent(ss.str()));
+        add_node (XmlObject("priority", XmlJabberClientNs, false).set_content(ss.str()));
     return *this;
 }
 

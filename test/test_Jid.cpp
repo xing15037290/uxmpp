@@ -25,7 +25,7 @@ using namespace uxmpp;
 
 int main (int argc, char* argv[])
 {
-    uxmppSetLogLevel (LogLevel::trace);
+    uxmpp_set_log_level (LogLevel::trace);
 
     if (argc < 2) {
         cerr << "Usage: test_Jid <jid>" << endl;
@@ -35,11 +35,11 @@ int main (int argc, char* argv[])
     Jid jid (argv[1]);
 
     cout << "Arg: " << argv[1] << endl;
-    cout << "Local part   : " << jid.getLocal() << endl;
-    cout << "Domain part  : " << jid.getDomain() << endl;
-    cout << "Resource part: " << jid.getResource() << endl;
+    cout << "Local part   : " << jid.get_local() << endl;
+    cout << "Domain part  : " << jid.get_domain() << endl;
+    cout << "Resource part: " << jid.get_resource() << endl;
     cout << "JID          : " << to_string(jid) << endl;
-    cout << "Is bare?     : " << (jid.isBare() ? "yes" : "no") << endl;
+    cout << "Is bare?     : " << (jid.is_bare() ? "yes" : "no") << endl;
     cout << "Bare JID     : " << to_string(jid.bare()) << endl;
     cout << "to_string    : \"" << to_string(jid) << "\"" << endl;
     return 0;

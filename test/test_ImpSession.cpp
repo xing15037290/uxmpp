@@ -48,8 +48,8 @@ public:
         switch (new_state) {
         case SessionState::closed:
             closed = true;
-            if (session.haveError())
-                cerr << "Session is closed with error: " << session.getError().getErrorName() << endl;
+            if (session.have_error())
+                cerr << "Session is closed with error: " << session.get_error().get_error_name() << endl;
             else
                 cerr << "Session is closed" << endl;
             break;
@@ -77,16 +77,16 @@ public:
      * Called when the session receives a roster.
      */
     virtual void onRoster (ImpSession& session, Roster& roster) override {
-        auto& contacts = roster.getContacts ();
+        auto& contacts = roster.get_contacts ();
 
         cout << "Got roster (" << contacts.size() << " contacts)" << endl;
 
         for (auto& contact : contacts) {
-            string name = contact.getName ();
+            string name = contact.get_name ();
             if (name.length()) {
-                cout << name << " <" << to_string(contact.getJid()) << ">" << endl;
+                cout << name << " <" << to_string(contact.get_jid()) << ">" << endl;
             }else{
-                cout << to_string(contact.getJid()) << endl;
+                cout << to_string(contact.get_jid()) << endl;
             }
         }
     };

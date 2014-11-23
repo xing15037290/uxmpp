@@ -48,7 +48,7 @@ PresenceModule::PresenceModule ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::moduleRegistered (uxmpp::Session& session)
+void PresenceModule::module_registered (uxmpp::Session& session)
 {
     sess = &session;
     //sess->addSessionListener (*this);
@@ -57,7 +57,7 @@ void PresenceModule::moduleRegistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::moduleUnregistered (uxmpp::Session& session)
+void PresenceModule::module_unregistered (uxmpp::Session& session)
 {
     //sess->delSessionListener (*this);
     sess = nullptr;
@@ -66,7 +66,7 @@ void PresenceModule::moduleUnregistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool PresenceModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool PresenceModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Sanity check
     //
@@ -75,7 +75,7 @@ bool PresenceModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObjec
 
     // Handle iq stanzas
     //
-    if (xml_obj.getFullName() == XmlPresenceTagFull) {
+    if (xml_obj.get_full_name() == XmlPresenceTagFull) {
         PresenceStanza& pr = reinterpret_cast<PresenceStanza&> (xml_obj);
         // Call registered presence handler
         if (presence_handler)
@@ -92,69 +92,69 @@ bool PresenceModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObjec
 //------------------------------------------------------------------------------
 void PresenceModule::announce ()
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogTrace (THIS_FILE, "Can't announce our presence, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_trace (THIS_FILE, "Can't announce our presence, no session or session not bound");
         return;
     }
-    sess->sendStanza (PresenceStanza());
+    sess->send_stanza (PresenceStanza());
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::requestSubscription (const uxmpp::Jid& jid)
+void PresenceModule::request_subscription (const uxmpp::Jid& jid)
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogDebug (THIS_FILE, "Can't request subscription, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (THIS_FILE, "Can't request subscription, no session or session not bound");
         return;
     }
 
-    sess->sendStanza (PresenceStanza(to_string(jid.bare()), "", Stanza::makeId()).
-                      setSubscribeOp(SubscribeOp::subscribe));
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+                       set_subscribe_op(SubscribeOp::subscribe));
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::acceptSubscription (const uxmpp::Jid& jid)
+void PresenceModule::accept_subscription (const uxmpp::Jid& jid)
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogDebug (THIS_FILE, "Can't accept subscription, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (THIS_FILE, "Can't accept subscription, no session or session not bound");
         return;
     }
 
 #warning Check server for pre-approval support
 
-    sess->sendStanza (PresenceStanza(to_string(jid.bare()), "", Stanza::makeId()).
-                      setSubscribeOp(SubscribeOp::subscribed));
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+                       set_subscribe_op(SubscribeOp::subscribed));
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::denySubscription (const uxmpp::Jid& jid)
+void PresenceModule::deny_subscription (const uxmpp::Jid& jid)
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogDebug (THIS_FILE, "Can't deny subscription, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (THIS_FILE, "Can't deny subscription, no session or session not bound");
         return;
     }
 
-    sess->sendStanza (PresenceStanza(to_string(jid.bare()), "", Stanza::makeId()).
-                      setSubscribeOp(SubscribeOp::unsubscribed));
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+                       set_subscribe_op(SubscribeOp::unsubscribed));
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::cancelSubscription (const uxmpp::Jid& jid)
+void PresenceModule::cancel_subscription (const uxmpp::Jid& jid)
 {
-    if (!sess || sess->getState()!=SessionState::bound) {
-        uxmppLogDebug (THIS_FILE, "Can't cancel subscription, no session or session not bound");
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (THIS_FILE, "Can't cancel subscription, no session or session not bound");
         return;
     }
 
-    sess->sendStanza (PresenceStanza(to_string(jid.bare()), "", Stanza::makeId()).
-                      setSubscribeOp(SubscribeOp::unsubscribe));
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+                       set_subscribe_op(SubscribeOp::unsubscribe));
 }
 
 

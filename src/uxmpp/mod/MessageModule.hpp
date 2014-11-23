@@ -49,24 +49,24 @@ namespace uxmpp { namespace mod {
         /**
          * Called when the module is registered to a session.
          */
-        virtual void moduleRegistered (uxmpp::Session& session);
+        virtual void module_registered (uxmpp::Session& session) override;
 
         /**
          * Called when the module is unregistered from a session.
          */
-        virtual void moduleUnregistered (uxmpp::Session& session);
+        virtual void module_unregistered (uxmpp::Session& session) override;
 
         /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj);
+        virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
 
         /**
          * Return a list of service discovery information features supported
          * by the module;
          */
-        virtual std::vector<std::string> getDiscoFeatures () {
+        virtual std::vector<std::string> get_disco_features () {
             return {"urn:xmpp:receipts"};
         }
 
@@ -75,7 +75,7 @@ namespace uxmpp { namespace mod {
          * @param msg The message stanza to send.
          * @param want_receipt If a recepipt is required as defined in XEP-0184.
          */
-        virtual void sendMessage (const uxmpp::MessageStanza& msg, bool want_receipt=false);
+        virtual void send_message (const uxmpp::MessageStanza& msg, bool want_receipt=false);
 
         /**
          * Send a message.
@@ -83,20 +83,20 @@ namespace uxmpp { namespace mod {
          * @param body The message body.
          * @param want_receipt If a recepipt is required as defined in XEP-0184.
          */
-        virtual void sendMessage (const uxmpp::Jid& to, const std::string& body, bool want_receipt=false);
+        virtual void send_message (const uxmpp::Jid& to, const std::string& body, bool want_receipt=false);
 
         /**
          *
          */
-        void setMessageHandler (std::function<void (MessageModule&, uxmpp::MessageStanza&)> on_message) {
+        void set_message_handler (std::function<void (MessageModule&, uxmpp::MessageStanza&)> on_message) {
             message_handler = on_message;
         }
 
         /**
          *
          */
-        void setReceiptHandler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
-                                on_receipt)
+        void set_receipt_handler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
+                                  on_receipt)
         {
             receipt_handler = on_receipt;
         }

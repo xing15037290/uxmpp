@@ -51,17 +51,17 @@ TlsModule::TlsModule (const uxmpp::TlsConfig& tls_config)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool TlsModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
-    XmlStream& xs = session.getXmlStream ();
+    XmlStream& xs = session.get_xml_stream ();
     bool start_tls = false;
 
     //
     // Handle 'features'
     //
-    if (xml_obj.getFullName() ==  XmlFeaturesTagFull) {
-        for (auto& node : xml_obj.getNodes()) {
-            if (node.getFullName() == XmlStarttlsTagFull && xs.getPeerAddr().proto != AddrProto::tls) {
+    if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
+        for (auto& node : xml_obj.get_nodes()) {
+            if (node.get_full_name() == XmlStarttlsTagFull && xs.get_peer_addr().proto != AddrProto::tls) {
                 start_tls = true;
                 break;
             }
@@ -76,14 +76,14 @@ bool TlsModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xm
     //
     // Handle 'proceed'
     //
-    if (xml_obj.getFullName() == XmlProceedTagFull && xs.getPeerAddr().proto != AddrProto::tls) {
-        uxmppLogInfo (THIS_FILE, "Restart the stream with TLS enabled");
+    if (xml_obj.get_full_name() == XmlProceedTagFull && xs.get_peer_addr().proto != AddrProto::tls) {
+        uxmpp_log_info (THIS_FILE, "Restart the stream with TLS enabled");
         string error_text;
-        if (xs.enableTls(tls_cfg, error_text)) {
+        if (xs.enable_tls(tls_cfg, error_text)) {
             session.reset ();
         }else{
-            uxmppLogError (THIS_FILE, "Unable to restart the stream with TLS enabled");
-            session.setAppError ("tls-error", error_text);
+            uxmpp_log_error (THIS_FILE, "Unable to restart the stream with TLS enabled");
+            session.set_app_error ("tls-error", error_text);
             session.stop ();
             //changeState (SessionState::closing);
         }

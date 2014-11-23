@@ -78,7 +78,7 @@ namespace uxmpp {
                         const std::string& id="")
             : Stanza (to, from, id)
         {
-            setTagName ("presence");
+            set_tag_name ("presence");
         }
 
         /**
@@ -87,7 +87,7 @@ namespace uxmpp {
         PresenceStanza (const Jid& to, const Jid& from, const std::string& id="")
             : Stanza (to, from, id)
         {
-            setTagName ("presence");
+            set_tag_name ("presence");
         }
 
         /**
@@ -127,12 +127,12 @@ namespace uxmpp {
         /**
          * Return the subscription type.
          */
-        SubscribeOp getSubscribeOp ();
+        SubscribeOp get_subscribe_op ();
 
         /**
          * Set the subscription type.
          */
-        PresenceStanza& setSubscribeOp (const SubscribeOp& type);
+        PresenceStanza& set_subscribe_op (const SubscribeOp& type);
 
         /**
          * Get the content of the 'show' element. It it is missing an empty string is returned.
@@ -143,7 +143,7 @@ namespace uxmpp {
          * * dnd -- The entity or resource is busy (dnd = "Do Not Disturb").<br/>
          * * xa -- The entity or resource is away for an extended period (xa = "eXtended Away").<br/>
          */
-        std::string getShow ();
+        std::string get_show ();
 
         /**
          * Set the content of the 'show' element.
@@ -155,32 +155,32 @@ namespace uxmpp {
          * * dnd -- The entity or resource is busy (dnd = "Do Not Disturb").<br/>
          * * xa -- The entity or resource is away for an extended period (xa = "eXtended Away").<br/>
          */
-        PresenceStanza& setShow (const std::string& content);
+        PresenceStanza& set_show (const std::string& content);
 
         /**
          *
          */
-        std::string getStatus (const std::string& lang="");
+        std::string get_status (const std::string& lang="");
 
         /**
          *
          */
-        std::vector<std::pair<std::string, std::string> > getStatusList ();
+        std::vector<std::pair<std::string, std::string> > get_status_list ();
 
         /**
          *
          */
-        PresenceStanza& setStatus (const std::string& status, const std::string& lang="");
+        PresenceStanza& set_status (const std::string& status, const std::string& lang="");
 
         /**
          *
          */
-        int getPriority ();
+        int get_priority ();
 
         /**
          *
          */
-        PresenceStanza& setPriority (int prio);
+        PresenceStanza& set_priority (int prio);
     };
 
 

@@ -66,21 +66,21 @@ public:
     AppLogic (app_config_t& app_config);
     virtual ~AppLogic () = default;
 
-    virtual void onStateChange (Session& session, SessionState new_state, SessionState old_state);
+    virtual void on_state_change (Session& session, SessionState new_state, SessionState old_state);
     void print_status ();
     void run ();
     void stop ();
 
-    virtual void onRoster (RosterModule& module, Roster& roster) {
+    virtual void on_roster (RosterModule& module, Roster& roster) {
         print_status ();
     }
-    virtual void onRosterPush (RosterModule& module, RosterItem& item) {
+    virtual void on_roster_push (RosterModule& module, RosterItem& item) {
         print_status ();
     }
-    virtual void onPresence (PresenceModule& module, uxmpp::PresenceStanza& presence);
+    virtual void on_presence (PresenceModule& module, uxmpp::PresenceStanza& presence);
 
-    virtual void onMessage (MessageModule& module, uxmpp::MessageStanza& msg);
-    virtual void onReceipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id);
+    virtual void on_message (MessageModule& module, uxmpp::MessageStanza& msg);
+    virtual void on_receipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id);
 
     Session         sess;
     SessionConfig   cfg;
@@ -117,18 +117,18 @@ AppLogic::AppLogic (app_config_t& app_cfg)
 {
     // Configure modules
     //
-    mod_alive.setInterval (app_cfg.keep_alive);
+    mod_alive.set_interval (app_cfg.keep_alive);
     mod_tls.tls_cfg.method        = TlsMethod::tlsv1_2;
     mod_tls.tls_cfg.verify_server = false;
-    mod_auth.auth_user            = app_cfg.jid.getLocal ();
+    mod_auth.auth_user            = app_cfg.jid.get_local ();
     mod_auth.auth_pass            = app_cfg.pass;
 
     // Configure xmpp session
     //
-    cfg.domain   = app_cfg.jid.getDomain ();
+    cfg.domain   = app_cfg.jid.get_domain ();
     cfg.server   = app_cfg.server;
     cfg.user_id  = to_string (app_cfg.jid.bare());
-    cfg.resource = app_cfg.jid.getResource ();
+    cfg.resource = app_cfg.jid.get_resource ();
     if (cfg.server.length()) {
         cfg.disable_srv = true; // Don't use DNS SRV lookup if we manually specify the server host/IP.
     }
@@ -138,14 +138,14 @@ AppLogic::AppLogic (app_config_t& app_cfg)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void AppLogic::onStateChange (Session& session, SessionState new_state, SessionState old_state)
+void AppLogic::on_state_change (Session& session, SessionState new_state, SessionState old_state)
 {
     if (new_state==SessionState::bound && old_state!=SessionState::bound) {
 
         // Unregister modules that we don't need anymore
         //
-        session.unregisterModule (mod_tls);
-        session.unregisterModule (mod_auth);
+        session.unregister_module (mod_tls);
+        session.unregister_module (mod_auth);
 
         // Send initial stanzas
         //
@@ -157,7 +157,7 @@ void AppLogic::onStateChange (Session& session, SessionState new_state, SessionS
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void AppLogic::onPresence (PresenceModule& module, uxmpp::PresenceStanza& presence)
+void AppLogic::on_presence (PresenceModule& module, uxmpp::PresenceStanza& presence)
 {
     cout << "Got presence stanza:" << to_string(presence) << endl;
 }
@@ -165,16 +165,16 @@ void AppLogic::onPresence (PresenceModule& module, uxmpp::PresenceStanza& presen
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void AppLogic::onMessage (MessageModule& module, uxmpp::MessageStanza& msg)
+void AppLogic::on_message (MessageModule& module, uxmpp::MessageStanza& msg)
 {
     //cout << "Got message from " << to_string(msg.getFrom().bare()) << ": " << msg.getBody() << endl;
-    cout << "Got message from " << to_string(msg.getFrom()) << ": " << msg.getBody() << endl;
+    cout << "Got message from " << to_string(msg.get_from()) << ": " << msg.get_body() << endl;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void AppLogic::onReceipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id)
+void AppLogic::on_receipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id)
 {
     cout << "Got message receipt " << id << " from " << to_string(from) << endl;
 }
@@ -184,36 +184,36 @@ void AppLogic::onReceipt (MessageModule& module, const uxmpp::Jid& from, const s
 //------------------------------------------------------------------------------
 void AppLogic::run ()
 {
-    sess.registerModule (mod_tls);
-    sess.registerModule (mod_auth);
-    sess.registerModule (mod_session);
-    sess.registerModule (mod_roster);
-    sess.registerModule (mod_pr);
-    sess.registerModule (mod_msg);
-    sess.registerModule (mod_alive);
-    sess.registerModule (mod_ping);
-    sess.registerModule (mod_disco);
+    sess.register_module (mod_tls);
+    sess.register_module (mod_auth);
+    sess.register_module (mod_session);
+    sess.register_module (mod_roster);
+    sess.register_module (mod_pr);
+    sess.register_module (mod_msg);
+    sess.register_module (mod_alive);
+    sess.register_module (mod_ping);
+    sess.register_module (mod_disco);
 
-    mod_roster.setRosterHandler ([this](RosterModule& rm, Roster& r) { onRoster (rm, r); });
-    mod_roster.setRosterPushHandler ([this](RosterModule& rm, RosterItem& ri) { onRosterPush (rm, ri); });
-    mod_pr.setPresenceHandler ([this](PresenceModule& pm, PresenceStanza& ps) { onPresence (pm, ps); });
-    mod_msg.setMessageHandler ([this](MessageModule& mm, MessageStanza& ms) { onMessage(mm, ms); });
-    mod_msg.setReceiptHandler ([this](MessageModule& mm, const Jid& f, const string& id) { onReceipt(mm, f, id); });
+    mod_roster.set_roster_handler ([this](RosterModule& rm, Roster& r) { on_roster (rm, r); });
+    mod_roster.set_roster_push_handler ([this](RosterModule& rm, RosterItem& ri) { on_roster_push (rm, ri); });
+    mod_pr.set_presence_handler ([this](PresenceModule& pm, PresenceStanza& ps) { on_presence (pm, ps); });
+    mod_msg.set_message_handler ([this](MessageModule& mm, MessageStanza& ms) { on_message(mm, ms); });
+    mod_msg.set_receipt_handler ([this](MessageModule& mm, const Jid& f, const string& id) { on_receipt(mm, f, id); });
 
-    sess.addSessionListener (*this);
+    sess.add_session_listener (*this);
 
     session_thread = thread ([this](){
             sess.start (cfg);
             //
             // If TLS v1.2 is not supported, try TLS v1.1
             //
-            if (sess.getError().getAppError() == "tls-error") {
+            if (sess.get_error().get_app_error() == "tls-error") {
                 mod_tls.tls_cfg.method = TlsMethod::tlsv1_1;
                 sess.start (cfg);
                 //
                 // If TLS v1.1 is not supported, try TLS v1.0
                 //
-                if (sess.getError().getAppError() == "tls-error") {
+                if (sess.get_error().get_app_error() == "tls-error") {
                     mod_tls.tls_cfg.method = TlsMethod::tlsv1;
                     sess.start (cfg);
                 }
@@ -235,12 +235,12 @@ void AppLogic::stop ()
 //------------------------------------------------------------------------------
 void AppLogic::print_status ()
 {
-    StreamError& err = sess.getError ();
-    if (err.getErrorName() != "") {
-        string err_name = err.getAppError ();
-        string err_text = err.getText ();
+    StreamError& err = sess.get_error ();
+    if (err.get_error_name() != "") {
+        string err_name = err.get_app_error ();
+        string err_text = err.get_text ();
         if (err_name.length() == 0)
-            err_name = err.getErrorName ();
+            err_name = err.get_error_name ();
 
         cout << endl;
         cout << "# XMPP Error: " << err_name;
@@ -252,18 +252,18 @@ void AppLogic::print_status ()
 
     cout << endl;
     cout << endl;
-    cout << "JID: " << to_string(sess.getJid()) << endl;
+    cout << "JID: " << to_string(sess.get_jid()) << endl;
     cout << endl;
     cout << "Roster:" << endl;
 
-    Roster& r = mod_roster.getRoster ();
+    Roster& r = mod_roster.get_roster ();
     int i=0;
-    for (auto& item : r.getItems()) {
-        string handle = item.getHandle ();
+    for (auto& item : r.get_items()) {
+        string handle = item.get_handle ();
         if (handle.length())
-            cout << setw(4) << i++ << setw(0) << ": " << handle << " <" << to_string(item.getJid().bare()) << ">";
+            cout << setw(4) << i++ << setw(0) << ": " << handle << " <" << to_string(item.get_jid().bare()) << ">";
         else
-            cout << setw(4) << i++ << setw(0) << ": " << to_string(item.getJid().bare());
+            cout << setw(4) << i++ << setw(0) << ": " << to_string(item.get_jid().bare());
         cout << " (" << to_string(item, false) << ")" << endl;
     }
 }
@@ -444,7 +444,7 @@ int main (int argc, char* argv[])
 
     // Set log level
     //
-    uxmppSetLogLevel (cfg.log_level);
+    uxmpp_set_log_level (cfg.log_level);
 
     // Read passphrase (if not present)
     //
@@ -453,7 +453,7 @@ int main (int argc, char* argv[])
 
     // Set Stanza id generator
     //
-    Stanza::makeId = generate_uuid_v4;
+    Stanza::make_id = generate_uuid_v4;
 
     // Create and start the XMPP application object
     //
@@ -498,7 +498,7 @@ int main (int argc, char* argv[])
                 if (level<-1 || level>5) {
                     cout << "Invalid log level argument" << endl;
                 }else{
-                    uxmppSetLogLevel (static_cast<LogLevel>(level));
+                    uxmpp_set_log_level (static_cast<LogLevel>(level));
                 }
             }else{
                 cout << "Invalid log level argument" << endl;
@@ -512,7 +512,7 @@ int main (int argc, char* argv[])
             bool got_arg;
             got_arg = get_int_argument ("Enter new keep alive timeout in seconds (0 to disable): ", ss, sec);
             if (got_arg && sec>=0)
-                app.mod_alive.setInterval (sec);
+                app.mod_alive.set_interval (sec);
             else
                 cout << "Invalid argument" << endl;
         }
@@ -531,13 +531,13 @@ int main (int argc, char* argv[])
             }
             get_string_argument ("Enter buddy name: ", ss, name);
 
-            auto items = app.mod_roster.getRoster().getItems ();
+            auto items = app.mod_roster.get_roster().get_items ();
             if ((unsigned)index >= items.size()) {
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            items[index].setHandle (name);
-            app.mod_roster.updateItem (items[index]);
+            items[index].set_handle (name);
+            app.mod_roster.update_item (items[index]);
         }
         //
         // Command 'r-add' - Add roster item
@@ -546,7 +546,7 @@ int main (int argc, char* argv[])
             string jid;
             if (!get_string_argument("Enter jid: ", ss, jid))
                 continue;
-            app.mod_roster.addItem (Jid(jid));
+            app.mod_roster.add_item (Jid(jid));
         }
         //
         // Command 'r-del' - Remove roster item
@@ -560,12 +560,12 @@ int main (int argc, char* argv[])
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            auto items = app.mod_roster.getRoster().getItems ();
+            auto items = app.mod_roster.get_roster().get_items ();
             if ((unsigned)index >= items.size()) {
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            app.mod_roster.removeItem (items[index]);
+            app.mod_roster.remove_item (items[index]);
         }
         //
         // Command 'pr-subscribe' - Request presence subscription
@@ -574,7 +574,7 @@ int main (int argc, char* argv[])
             string jid;
             if (!get_string_argument("Enter jid: ", ss, jid))
                 continue;
-            app.mod_pr.requestSubscription (Jid(jid));
+            app.mod_pr.request_subscription (Jid(jid));
         }
         //
         // Command 'pr-accept' - Accept presence subscription
@@ -588,12 +588,12 @@ int main (int argc, char* argv[])
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            auto items = app.mod_roster.getRoster().getItems ();
+            auto items = app.mod_roster.get_roster().get_items ();
             if ((unsigned)index >= items.size()) {
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            app.mod_pr.acceptSubscription (items[index].getJid().bare());
+            app.mod_pr.accept_subscription (items[index].get_jid().bare());
         }
         //
         // Command 'pr-deny' - Deny presence subscription
@@ -607,12 +607,12 @@ int main (int argc, char* argv[])
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            auto items = app.mod_roster.getRoster().getItems ();
+            auto items = app.mod_roster.get_roster().get_items ();
             if ((unsigned)index >= items.size()) {
                 cout << "Invalid buddy index" << endl;
                 continue;
             }
-            app.mod_pr.denySubscription (items[index].getJid().bare());
+            app.mod_pr.deny_subscription (items[index].get_jid().bare());
         }
         else if (cmd == "buddy-add") {
         }
@@ -627,12 +627,12 @@ int main (int argc, char* argv[])
 
             got_arg = get_int_or_string_argument ("Enter buddy index or JID: ", ss, index, jid);
             if (got_arg.first) {
-                auto items = app.mod_roster.getRoster().getItems ();
+                auto items = app.mod_roster.get_roster().get_items ();
                 if (index < 0 || (unsigned)index >= items.size()) {
                     cout << "Invalid buddy index" << endl;
                     continue;
                 }
-                jid = to_string (items[index].getJid().bare());
+                jid = to_string (items[index].get_jid().bare());
             }
 
             if (jid != "") {
@@ -641,7 +641,7 @@ int main (int argc, char* argv[])
                 if (msg != "") {
                     cout << "Send message to " << jid << ": " << msg << endl;
                     //app.mod_msg.sendMessage (MessageStanza(jid, app.sess.getJid(), msg));
-                    app.mod_msg.sendMessage (jid, msg, true);
+                    app.mod_msg.send_message (jid, msg, true);
                 }
             }
         }
@@ -661,12 +661,12 @@ int main (int argc, char* argv[])
 
             got_arg = get_int_or_string_argument ("Enter buddy index or JID: ", ss, index, jid_arg);
             if (got_arg.first) { // int argument
-                auto items = app.mod_roster.getRoster().getItems ();
+                auto items = app.mod_roster.get_roster().get_items ();
                 if (index < 0 || (unsigned)index >= items.size()) {
                     cout << "Invalid buddy index" << endl;
                     continue;
                 }
-                jid = items[index].getJid ();
+                jid = items[index].get_jid ();
             }
             else if (got_arg.second) { // string argument
                 jid = Jid (jid_arg);
@@ -674,7 +674,7 @@ int main (int argc, char* argv[])
             else {
                 continue;
             }
-            app.mod_disco.queryInfo (jid);
+            app.mod_disco.query_info (jid);
         }
         else if (cmd == "") {
         }

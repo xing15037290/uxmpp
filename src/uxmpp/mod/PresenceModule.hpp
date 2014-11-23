@@ -49,18 +49,18 @@ namespace uxmpp { namespace mod {
         /**
          * Called when the module is registered to a session.
          */
-        virtual void moduleRegistered (uxmpp::Session& session);
+        virtual void module_registered (uxmpp::Session& session) override;
 
         /**
          * Called when the module is unregistered from a session.
          */
-        virtual void moduleUnregistered (uxmpp::Session& session);
+        virtual void module_unregistered (uxmpp::Session& session) override;
 
         /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj);
+        virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
 
         /**
          * Announce our presence.
@@ -71,30 +71,30 @@ namespace uxmpp { namespace mod {
          * Request to subscribe to a JID's presence information.
          * This vill send a presence stanza with the type 'subscribe'.
          */
-        virtual void requestSubscription (const uxmpp::Jid& jid);
+        virtual void request_subscription (const uxmpp::Jid& jid);
 
         /**
          * Accept a subscription from a JID's.
          * This vill send a presence stanza with the type 'subscribed'.
          */
-        virtual void acceptSubscription (const uxmpp::Jid& jid);
+        virtual void accept_subscription (const uxmpp::Jid& jid);
 
         /**
          * Deny a subscription from a JID's.
          * This vill send a presence stanza with the type 'unsubscribed'.
          */
-        virtual void denySubscription (const uxmpp::Jid& jid);
+        virtual void deny_subscription (const uxmpp::Jid& jid);
 
         /**
          * Cancel a subscription from a JID's.
          * This vill send a presence stanza with the type 'unsubscribe'.
          */
-        virtual void cancelSubscription (const uxmpp::Jid& jid);
+        virtual void cancel_subscription (const uxmpp::Jid& jid);
 
         /**
          *
          */
-        void setPresenceHandler (std::function<void (PresenceModule&, uxmpp::PresenceStanza&)> on_presence) {
+        void set_presence_handler (std::function<void (PresenceModule&, uxmpp::PresenceStanza&)> on_presence) {
             presence_handler = on_presence;
         }
 

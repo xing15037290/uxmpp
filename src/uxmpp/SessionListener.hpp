@@ -50,7 +50,7 @@ namespace uxmpp {
         /**
          * Called when the state if the session changes.
          */
-        virtual void onStateChange (Session& session, SessionState new_state, SessionState old_state) = 0;
+        virtual void on_state_change (Session& session, SessionState new_state, SessionState old_state) = 0;
     };
 
 

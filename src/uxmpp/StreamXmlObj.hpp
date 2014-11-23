@@ -37,11 +37,11 @@ namespace uxmpp {
          * Default Constructor.
          */
         StreamXmlObj () : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false) {
-            addNamespaceAlias (XmlStreamNsAlias, XmlStreamNs);
-            setDefaultNamespaceAttr (XmlJabberClientNs);
-            setAttribute ("version", "1.0");
-            setAttribute ("xml:lang", "en");
-            setPart (XmlObjPart::start);
+            add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
+            set_default_namespace_attr (XmlJabberClientNs);
+            set_attribute ("version", "1.0");
+            set_attribute ("xml:lang", "en");
+            set_part (XmlObjPart::start);
         }
 
         /**
@@ -50,14 +50,14 @@ namespace uxmpp {
         StreamXmlObj (const std::string& to, const std::string& from)
             : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
         {
-            addNamespaceAlias (XmlStreamNsAlias, XmlStreamNs);
-            setDefaultNamespaceAttr (XmlJabberClientNs);
-            setAttribute ("version", "1.0");
-            setAttribute ("xml:lang", "en");
-            setPart (XmlObjPart::start);
+            add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
+            set_default_namespace_attr (XmlJabberClientNs);
+            set_attribute ("version", "1.0");
+            set_attribute ("xml:lang", "en");
+            set_part (XmlObjPart::start);
 
-            setTo (to);
-            setFrom (from);
+            set_to (to);
+            set_from (from);
         }
 
         /**
@@ -68,43 +68,43 @@ namespace uxmpp {
         /**
          *
          */
-        void setTo (const std::string& to) {
-            setAttribute ("to", to);
+        void set_to (const std::string& to) {
+            set_attribute ("to", to);
         }
 
         /**
          *
          */
-        std::string getTo () const {
-            return getAttribute ("to");
+        std::string get_to () const {
+            return get_attribute ("to");
         }
 
         /**
          *
          */
-        void setId (const std::string& id) {
-            setAttribute ("id", id);
+        void set_id (const std::string& id) {
+            set_attribute ("id", id);
         }
 
         /**
          *
          */
-        std::string getId () const {
-            return getAttribute ("id");
+        std::string get_id () const {
+            return get_attribute ("id");
         }
 
         /**
          *
          */
-        void setFrom (const std::string& from) {
-            setAttribute ("from", from);
+        void set_from (const std::string& from) {
+            set_attribute ("from", from);
         }
 
         /**
          *
          */
-        std::string getFrom () const {
-            return getAttribute ("from");
+        std::string get_from () const {
+            return get_attribute ("from");
         }
 
     };

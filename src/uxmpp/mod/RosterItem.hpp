@@ -50,10 +50,10 @@ namespace uxmpp { namespace mod {
             : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
         {
             std::string strjid = to_string (jid);
-            if (strjid.length())
-                setAttribute ("jid", strjid);
-            if (handle.length())
-                setAttribute ("name", handle);
+            if (!strjid.empty())
+                set_attribute ("jid", strjid);
+            if (!handle.empty())
+                set_attribute ("name", handle);
         }
 
         /**
@@ -63,10 +63,10 @@ namespace uxmpp { namespace mod {
             : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
         {
             std::string strjid = to_string (jid);
-            if (strjid.length())
-                setAttribute ("jid", strjid);
+            if (!strjid.empty())
+                set_attribute ("jid", strjid);
             for (auto group : groups)
-                addNode (XmlObject("group", XmlIqRosterNs, false).setContent(group));
+                add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
         }
 
         /**
@@ -76,12 +76,12 @@ namespace uxmpp { namespace mod {
             : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
         {
             std::string strjid = to_string (jid);
-            if (strjid.length())
-                setAttribute ("jid", strjid);
-            if (handle.length())
-                setAttribute ("name", handle);
+            if (!strjid.empty())
+                set_attribute ("jid", strjid);
+            if (!handle.empty())
+                set_attribute ("name", handle);
             for (auto group : groups)
-                addNode (XmlObject("group", XmlIqRosterNs, false).setContent(group));
+                add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
         }
 
         /**
@@ -121,63 +121,63 @@ namespace uxmpp { namespace mod {
         /**
          * Get the JID of the item.
          */
-        uxmpp::Jid getJid () const {
-            return uxmpp::Jid (getAttribute("jid"));
+        uxmpp::Jid get_jid () const {
+            return uxmpp::Jid (get_attribute("jid"));
         }
 
         /**
          * Set the JID of the item.
          */
-        void setJid (const uxmpp::Jid& jid) {
-            setAttribute ("jid", to_string(jid));
+        void set_jid (const uxmpp::Jid& jid) {
+            set_attribute ("jid", to_string(jid));
         }
 
         /**
          * Get the handle of the item.
          */
-        std::string getHandle () const {
-            return getAttribute ("name");
+        std::string get_handle () const {
+            return get_attribute ("name");
         }
 
         /**
          * Set the handle of the item.
          */
-        void setHandle (const std::string& handle) {
-            setAttribute ("name", handle);
+        void set_handle (const std::string& handle) {
+            set_attribute ("name", handle);
         }
 
         /**
          *
          */
-        bool isApproved () const {
-            return getAttribute("approved") == "true";
+        bool is_approved () const {
+            return get_attribute("approved") == "true";
         }
 
         /**
          *
          */
-        void setApproved (bool approved) {
-            setAttribute("approved", approved ? "true" : "");
+        void set_approved (bool approved) {
+            set_attribute("approved", approved ? "true" : "");
         }
 
         /**
          * Get the 'ask' attribute.
          */
-        std::string getAsk () const {
-            return getAttribute ("ask");
+        std::string get_ask () const {
+            return get_attribute ("ask");
         }
 
         /**
          * Get the 'subscription' attribute.
          */
-        std::string getSubscription () const {
-            return getAttribute ("subscription");
+        std::string get_subscription () const {
+            return get_attribute ("subscription");
         }
 
         /**
          * Get the group(s) that the item belongs to.
          */
-        std::vector<std::string> getGroups ();
+        std::vector<std::string> get_groups ();
 
 
     protected:

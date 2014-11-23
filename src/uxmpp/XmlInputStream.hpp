@@ -48,12 +48,12 @@ namespace uxmpp {
         /**
          * Set the XML object input handler.
          */
-        void setXmlHandler (std::function<void (XmlInputStream&, XmlObject&)> xml_handler);
+        void set_xml_handler (std::function<void (XmlInputStream&, XmlObject&)> xml_handler);
 
         /**
          * Set the XML error handler.
          */
-        void setErrorHandler (std::function<void (XmlInputStream&)> err_handler);
+        void set_error_handler (std::function<void (XmlInputStream&)> err_handler);
 
         /**
          * Reset the stream.
@@ -88,7 +88,7 @@ namespace uxmpp {
         /**
          * Free allocated parsing resources.
          */
-        void freeResources ();
+        void free_resources ();
 
         /**
          * Callback for incoming XML object.

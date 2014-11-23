@@ -38,50 +38,50 @@ KeepAliveModule::KeepAliveModule (const unsigned interval)
 {
     this->interval = interval;
     sess = nullptr;
-    keep_alive.setPart (XmlObjPart::body);
-    keep_alive.setContent (" ");
+    keep_alive.set_part (XmlObjPart::body);
+    keep_alive.set_content (" ");
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void KeepAliveModule::moduleRegistered (uxmpp::Session& session)
+void KeepAliveModule::module_registered (uxmpp::Session& session)
 {
     sess = &session;
-    sess->addSessionListener (*this);
+    sess->add_session_listener (*this);
 
-    if (sess->getState() == SessionState::bound) {
+    if (sess->get_state() == SessionState::bound) {
         // Start the keep-alive timer
         if (interval && sess)
-            sess->getXmlStream().setTimeout ("keep-alive", interval * 1000, true);
+            sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
     }
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void KeepAliveModule::moduleUnregistered (uxmpp::Session& session)
+void KeepAliveModule::module_unregistered (uxmpp::Session& session)
 {
-    sess->delSessionListener (*this);
+    sess->del_session_listener (*this);
     sess = nullptr;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool KeepAliveModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool KeepAliveModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Check timer events
     //
-    if (xml_obj.getFullName() == XmlUxmppTimerTagFull) {
+    if (xml_obj.get_full_name() == XmlUxmppTimerTagFull) {
         //
         // Check the keep-alive timer
         //
-        if (xml_obj.getAttribute("id") == "keep-alive") {
+        if (xml_obj.get_attribute("id") == "keep-alive") {
             if (interval)
-                sess->getXmlStream().setTimeout ("keep-alive", interval * 1000, true);
-            uxmppLogTrace (THIS_FILE, "Send keep-alive");
-            sess->getXmlStream().write (keep_alive);
+                sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
+            uxmpp_log_trace (THIS_FILE, "Send keep-alive");
+            sess->get_xml_stream().write (keep_alive);
             return true;
         }
     }
@@ -92,26 +92,26 @@ bool KeepAliveModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObje
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void KeepAliveModule::onStateChange (uxmpp::Session& session,
-                                     uxmpp::SessionState new_state,
-                                     uxmpp::SessionState old_state)
+void KeepAliveModule::on_state_change (uxmpp::Session& session,
+                                       uxmpp::SessionState new_state,
+                                       uxmpp::SessionState old_state)
 {
     if (new_state == SessionState::bound) {
         // Start the keep-alive timer
         if (interval && sess)
-            sess->getXmlStream().setTimeout ("keep-alive", interval * 1000, true);
+            sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
     }
     else if (old_state == SessionState::bound) {
         // Stop the keep-alive timer
         if (sess)
-            sess->getXmlStream().setTimeout ("keep-alive", 0);
+            sess->get_xml_stream().set_timeout ("keep-alive", 0);
     }
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void KeepAliveModule::setInterval (unsigned new_interval)
+void KeepAliveModule::set_interval (unsigned new_interval)
 {
     interval = new_interval;
 
@@ -119,9 +119,9 @@ void KeepAliveModule::setInterval (unsigned new_interval)
         return;
 
     if (interval == 0)
-        sess->getXmlStream().setTimeout ("keep-alive", 0, true);
-    else if (sess->getState()==SessionState::bound)
-        sess->getXmlStream().setTimeout ("keep-alive", interval * 1000, true);
+        sess->get_xml_stream().set_timeout ("keep-alive", 0, true);
+    else if (sess->get_state()==SessionState::bound)
+        sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
 }
 
 

@@ -26,7 +26,7 @@ using namespace uxmpp::net;
 
 int main (int argc, char* argv[])
 {
-    uxmppSetLogLevel (LogLevel::trace);
+    uxmpp_set_log_level (LogLevel::trace);
 
     if (argc < 2) {
         cerr << "Usage: test_Resolver <domain>" << endl;

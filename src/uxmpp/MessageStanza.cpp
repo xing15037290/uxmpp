@@ -84,9 +84,9 @@ std::string to_string (const ChatState& state)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-MessageType MessageStanza::getMessageType ()
+MessageType MessageStanza::get_message_type ()
 {
-    std::string type = getType ();
+    std::string type = get_type ();
 
     if (type == "chat")
         return MessageType::chat;
@@ -103,46 +103,46 @@ MessageType MessageStanza::getMessageType ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-MessageStanza& MessageStanza::setMessageType (const MessageType type)
+MessageStanza& MessageStanza::set_message_type (const MessageType type)
 {
-    setType (to_string(type));
+    set_type (to_string(type));
     return *this;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string MessageStanza::getThread ()
+std::string MessageStanza::get_thread ()
 {
-    return getNode("thread").getContent ();
+    return get_node("thread").get_content ();
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-MessageStanza& MessageStanza::setThread (const std::string& thread_id, const std::string& parent_thread_id)
+MessageStanza& MessageStanza::set_thread (const std::string& thread_id, const std::string& parent_thread_id)
 {
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "thread")
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "thread")
             continue;
         if (thread_id == "") {
             nodes.erase (i);
         }else{
-            i->setContent (thread_id);
+            i->set_content (thread_id);
             if (parent_thread_id == "")
-                i->removeAttribute ("parent");
+                i->remove_attribute ("parent");
             else
-                i->setAttribute ("parent", parent_thread_id);
+                i->set_attribute ("parent", parent_thread_id);
         }
         return *this;
     }
     if (thread_id != "") {
         if (parent_thread_id == "")
-            addNode (XmlObject("thread", XmlJabberClientNs, false).setContent(thread_id));
+            add_node (XmlObject("thread", XmlJabberClientNs, false).set_content(thread_id));
         else
-            addNode (XmlObject("thread", XmlJabberClientNs, false).
-                     setContent(thread_id).setAttribute("parent", parent_thread_id));
+            add_node (XmlObject("thread", XmlJabberClientNs, false).
+                      set_content(thread_id).set_attribute("parent", parent_thread_id));
     }
     return *this;
 }
@@ -150,24 +150,24 @@ MessageStanza& MessageStanza::setThread (const std::string& thread_id, const std
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string MessageStanza::getParentThread ()
+std::string MessageStanza::get_parent_thread ()
 {
-    return getNode("thread").getAttribute ("parent");
+    return get_node("thread").get_attribute ("parent");
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-MessageStanza& MessageStanza::setParentThread (const std::string& parent_thread_id)
+MessageStanza& MessageStanza::set_parent_thread (const std::string& parent_thread_id)
 {
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "thread")
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "thread")
             continue;
         if (parent_thread_id=="")
-            i->removeAttribute ("parent");
+            i->remove_attribute ("parent");
         else
-            i->setAttribute ("parent", parent_thread_id);
+            i->set_attribute ("parent", parent_thread_id);
         break;
     }
     return *this;
@@ -176,20 +176,20 @@ MessageStanza& MessageStanza::setParentThread (const std::string& parent_thread_
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string MessageStanza::getBody (std::string lang)
+std::string MessageStanza::get_body (std::string lang)
 {
-    string configured_lang = getAttribute ("xml:lang");
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "body")
+    string configured_lang = get_attribute ("xml:lang");
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "body")
             continue;
-        string node_lang = i->getAttribute ("xml:lang");
+        string node_lang = i->get_attribute ("xml:lang");
         if (lang=="") {
             if (node_lang=="" || node_lang==configured_lang)
-                return i->getContent ();
+                return i->get_content ();
         }else{
             if (lang==node_lang || (node_lang=="" && lang==configured_lang))
-                return i->getContent ();
+                return i->get_content ();
         }
     }
     return "";
@@ -198,20 +198,20 @@ std::string MessageStanza::getBody (std::string lang)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-MessageStanza& MessageStanza::setBody (const std::string& body, std::string lang)
+MessageStanza& MessageStanza::set_body (const std::string& body, std::string lang)
 {
-    std::string configured_lang = getAttribute ("xml:lang");
-    auto& nodes = getNodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); i++) {
-        if (i->getTagName() != "body")
+    std::string configured_lang = get_attribute ("xml:lang");
+    auto& nodes = get_nodes ();
+    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        if (i->get_tag_name() != "body")
             continue;
-        std::string node_lang = i->getAttribute ("xml:lang");
+        std::string node_lang = i->get_attribute ("xml:lang");
         if (lang=="") {
             if (node_lang=="" || node_lang==configured_lang) {
                 if (body == "")
                     nodes.erase (i);
                 else
-                    i->setContent (body);
+                    i->set_content (body);
                 return *this;
             }
         }else{
@@ -219,7 +219,7 @@ MessageStanza& MessageStanza::setBody (const std::string& body, std::string lang
                 if (body == "")
                     nodes.erase (i);
                 else
-                    i->setContent (body);
+                    i->set_content (body);
                 return *this;
             }
         }
@@ -227,9 +227,9 @@ MessageStanza& MessageStanza::setBody (const std::string& body, std::string lang
     if (body != "") {
         XmlObject body_node ("body", XmlJabberClientNs, false);
         if (lang!="" && lang!=configured_lang)
-            body_node.setAttribute ("xml:lang", lang);
-        body_node.setContent (body);
-        addNode (body_node);
+            body_node.set_attribute ("xml:lang", lang);
+        body_node.set_content (body);
+        add_node (body_node);
     }
     return *this;
 /*
@@ -247,9 +247,9 @@ MessageStanza& MessageStanza::setBody (const std::string& body, std::string lang
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-ChatState MessageStanza::getChatState ()
+ChatState MessageStanza::get_chat_state ()
 {
-    string state = getNsNode(ChatStateNs).getTagName ();
+    string state = get_ns_node(ChatStateNs).get_tag_name ();
 
     if (state == "active")
         return ChatState::active;
@@ -268,21 +268,21 @@ ChatState MessageStanza::getChatState ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-MessageStanza& MessageStanza::setChatState (const ChatState state)
+MessageStanza& MessageStanza::set_chat_state (const ChatState state)
 {
-    for (auto& node : getNodes()) {
+    for (auto& node : get_nodes()) {
         //
         // Find the first node with the correct name space and set the name of the object.
         //
-        if (node.getNamespace() == ChatStateNs) {
-            node.setTagName (to_string(state));
+        if (node.get_namespace() == ChatStateNs) {
+            node.set_tag_name (to_string(state));
             return *this;
         }
     }
     //
     // No xml object found, add it.
     //
-    addNode (XmlObject(to_string(state), ChatStateNs));
+    add_node (XmlObject(to_string(state), ChatStateNs));
     return *this;
 }
 

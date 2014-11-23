@@ -50,18 +50,18 @@ namespace uxmpp { namespace mod {
         /**
          * Called when the module is registered to a session.
          */
-        virtual void moduleRegistered (uxmpp::Session& session);
+        virtual void module_registered (uxmpp::Session& session) override;
 
         /**
          * Called when the module is unregistered from a session.
          */
-        virtual void moduleUnregistered (uxmpp::Session& session);
+        virtual void module_unregistered (uxmpp::Session& session) override;
 
         /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj);
+        virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
 
         /**
          * Ping the server.
@@ -77,7 +77,7 @@ namespace uxmpp { namespace mod {
          * Return a list of service discovery information features supported
          * by the module;
          */
-        virtual std::vector<std::string> getDiscoFeatures () {
+        virtual std::vector<std::string> get_disco_features () {
             return {"urn:xmpp:ping"};
         }
 

@@ -53,18 +53,18 @@ namespace uxmpp { namespace mod {
         /**
          * Called when the module is registered to a session.
          */
-        virtual void moduleRegistered (uxmpp::Session& session);
+        virtual void module_registered (uxmpp::Session& session) override;
 
         /**
          * Called when the module is unregistered from a session.
          */
-        virtual void moduleUnregistered (uxmpp::Session& session);
+        virtual void module_unregistered (uxmpp::Session& session) override;
 
         /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj);
+        virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
 
         /**
          * Send a roster query to the server.
@@ -74,56 +74,56 @@ namespace uxmpp { namespace mod {
         /**
          * Return the roster.
          */
-        Roster& getRoster () {
+        Roster& get_roster () {
             return roster;
         }
 
         /**
          * Update/modify a roster item.
          */
-        void updateItem (const RosterItem& item) {
-            rosterSet (item);
+        void update_item (const RosterItem& item) {
+            roster_set (item);
         }
 
         /**
          * Add a new roster item.
          */
-        void addItem (const RosterItem& item) {
-            rosterSet (item);
+        void add_item (const RosterItem& item) {
+            roster_set (item);
         }
 
         /**
          * Add a new jid to the roster.
          */
-        void addItem (const uxmpp::Jid& jid) {
-            rosterSet (RosterItem(jid));
+        void add_item (const uxmpp::Jid& jid) {
+            roster_set (RosterItem(jid));
         }
 
         /**
          * Remove a roster item.
          */
-        void removeItem (const RosterItem& item) {
-            rosterSet (item, true);
+        void remove_item (const RosterItem& item) {
+            roster_set (item, true);
         }
 
         /**
          * Remove a jid from the roster.
          */
-        void removeItem (const uxmpp::Jid& jid) {
-            rosterSet (RosterItem(jid), true);
+        void remove_item (const uxmpp::Jid& jid) {
+            roster_set (RosterItem(jid), true);
         }
 
         /**
          *
          */
-        void setRosterHandler (std::function<void (RosterModule&, Roster&)> on_roster) {
+        void set_roster_handler (std::function<void (RosterModule&, Roster&)> on_roster) {
             roster_handler = on_roster;
         }
 
         /**
          *
          */
-        void setRosterPushHandler (std::function<void (RosterModule&, RosterItem&)> on_roster_push) {
+        void set_roster_push_handler (std::function<void (RosterModule&, RosterItem&)> on_roster_push) {
             roster_push_handler = on_roster_push;
         }
 
@@ -136,14 +136,14 @@ namespace uxmpp { namespace mod {
         /**
          * Handle a roster push.
          */
-        void handleRosterPush (RosterItem& item);
+        void handle_roster_push (RosterItem& item);
 
 
     private:
         /**
          * Add/modify/remove a roster item.
          */
-        void rosterSet (const RosterItem& item, bool remove=false);
+        void roster_set (const RosterItem& item, bool remove=false);
 
         /**
          * Callback for roster query result.

@@ -53,25 +53,25 @@ namespace uxmpp {
         /**
          * Return the name of the XMPP module.
          */
-        const std::string& getName () const {
+        const std::string& get_name () const {
             return name;
         }
 
         /**
          * Called when the module is registered to a session.
          */
-        virtual void moduleRegistered (Session& session) {}
+        virtual void module_registered (Session& session) {}
 
         /**
          * Called when the module is unregistered from a session.
          */
-        virtual void moduleUnregistered (Session& session) {}
+        virtual void module_unregistered (Session& session) {}
 
         /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
-        virtual bool proccessXmlObject (Session& session, XmlObject& xml_obj) {
+        virtual bool proccess_xml_object (Session& session, XmlObject& xml_obj) {
             return false;
         }
 
@@ -79,7 +79,7 @@ namespace uxmpp {
          * Return a list of service discovery information features supported
          * by the module;
          */
-        virtual std::vector<std::string> getDiscoFeatures () {
+        virtual std::vector<std::string> get_disco_features () {
             return std::vector<std::string> ();
         }
 

@@ -30,15 +30,15 @@ UXMPP_START_NAMESPACE1(uxmpp)
 
 using namespace std;
 
-static std::string default_makeId ();
+static std::string default_make_id ();
 
 
-std::function<std::string (void)> Stanza::makeId = default_makeId;
+std::function<std::string (void)> Stanza::make_id = default_make_id;
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-static std::string default_makeId ()
+static std::string default_make_id ()
 {
     static random_device rd;
     static default_random_engine re (rd());
@@ -51,7 +51,7 @@ static std::string default_makeId ()
     char ch;
     int len = 16;//dlen (re);
 
-    for (auto i=0; i<len; i++) {
+    for (auto i=0; i<len; ++i) {
         switch (d0(re)) {
         case 0:
             ch = '0' + d1(re);

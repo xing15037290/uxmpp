@@ -88,31 +88,31 @@ namespace uxmpp {
         /**
          * Add a listener object that will receive events from the stream.
          */
-        virtual void addListener (XmlStreamListener& listener);
+        virtual void add_listener (XmlStreamListener& listener);
 
         /**
          * Remove a listener object that is receiving events from the stream.
          */
-        virtual void delListener (XmlStreamListener& listener);
+        virtual void del_listener (XmlStreamListener& listener);
 
         /**
          * Check if the stream is open.
          */
-        bool isOpen () const {
+        bool is_open () const {
             return sock != -1;
         }
 
         /**
          * Return the IP(v4|v6) address of the peer.
          */
-        uxmpp::net::IpHostAddr getPeerAddr () const {
+        uxmpp::net::IpHostAddr get_peer_addr () const {
             return peer_addr;
         }
 
         /**
          * Start TLS.
          */
-        bool enableTls (const TlsConfig& tls_cfg, std::string& error_description);
+        bool enable_tls (const TlsConfig& tls_cfg, std::string& error_description);
 
         /**
          * Reset the stream.
@@ -140,7 +140,7 @@ namespace uxmpp {
          *                    Set this to true if you are reusing a timer id often. Set this
          *                    to false if you are using many timers with different id's.
          */
-        void setTimeout (const std::string& id, unsigned msec, bool cache_timer=false);
+        void set_timeout (const std::string& id, unsigned msec, bool cache_timer=false);
 
 
     protected:

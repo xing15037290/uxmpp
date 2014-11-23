@@ -41,7 +41,7 @@
 //#define DEBUG_TRACE
 
 #ifdef DEBUG_TRACE
-#define TRACE(prefix, msg, ...) uxmppLogTrace(prefix, msg, ## __VA_ARGS__)
+#define TRACE(prefix, msg, ...) uxmpp_log_trace(prefix, msg, ## __VA_ARGS__)
 #else
 #define TRACE(prefix, msg, ...)
 #endif
@@ -145,7 +145,7 @@ public:
             }
         }
         if (!event) {
-            uxmppLogError (THIS_FILE, "Unable to start timer ", id);
+            uxmpp_log_error (THIS_FILE, "Unable to start timer ", id);
             return;
         }
 
@@ -211,7 +211,7 @@ static void parse_xml_attributes (const XML_Char** attributes,
                                   string& default_namespace,
                                   map<string, string>& namespace_aliases)
 {
-    string xml_namespace = xml_obj.getNamespace ();
+    string xml_namespace = xml_obj.get_namespace ();
     string name;
     string value;
 
@@ -234,13 +234,13 @@ static void parse_xml_attributes (const XML_Char** attributes,
             TRACE (THIS_FILE, "parse_xml_attributes - set default namespace: ", value);
 
             default_namespace = value;
-            xml_obj.setDefaultNamespaceAttr (default_namespace);
+            xml_obj.set_default_namespace_attr (default_namespace);
             if (xml_namespace.length() == 0) {
                 xml_namespace = default_namespace;
-                xml_obj.setNamespace (xml_namespace);
+                xml_obj.set_namespace (xml_namespace);
             }
             if (default_namespace == xml_namespace)
-                xml_obj.isNamespaceDefault (true);
+                xml_obj.is_namespace_default (true);
         }
         //
         // Handle namespace alias attribute
@@ -256,7 +256,7 @@ static void parse_xml_attributes (const XML_Char** attributes,
                 namespace_aliases[alias] = value;
 /*
                 if (alias == xml_obj.getNamespace()) {
-                    uxmppLogDebug (THIS_FILE, "Set namespace to: ->", value, "<-");
+                    uxmpp_log_debug (THIS_FILE, "Set namespace to: ->", value, "<-");
                     xml_obj.setNamespace (value);
                     if (xml_obj.getDefaultNamespaceAttr() == xml_obj.getNamespace())
                         xml_obj.isNamespaceDefault (true);
@@ -268,7 +268,7 @@ static void parse_xml_attributes (const XML_Char** attributes,
         // Handle 'normal' attribute
         //
         else{
-            xml_obj.setAttribute (name, value);
+            xml_obj.set_attribute (name, value);
         }
     }
 }
@@ -278,7 +278,7 @@ static void parse_xml_attributes (const XML_Char** attributes,
 //------------------------------------------------------------------------------
 static void normalize_namespace (XmlStreamParseData& pd, XmlObject& xml_obj)
 {
-    string xml_namespace = xml_obj.getNamespace ();
+    string xml_namespace = xml_obj.get_namespace ();
 
     if (xml_namespace.length() == 0) {
         //
@@ -296,8 +296,8 @@ static void normalize_namespace (XmlStreamParseData& pd, XmlObject& xml_obj)
         }
         if (xml_namespace.length() != 0) {
             TRACE (THIS_FILE, "normalize_namespace - found default namespace: ", xml_namespace);
-            xml_obj.setNamespace (xml_namespace);
-            xml_obj.isNamespaceDefault (true);
+            xml_obj.set_namespace (xml_namespace);
+            xml_obj.is_namespace_default (true);
         }
     }else{
         //
@@ -314,7 +314,7 @@ static void normalize_namespace (XmlStreamParseData& pd, XmlObject& xml_obj)
             alias_value = pd.namespace_aliases[xml_namespace];
 
         if (alias_value.length()) {
-            xml_obj.setNamespace (alias_value);
+            xml_obj.set_namespace (alias_value);
             // See if this is also the default namespace
             string default_namespace = pd.default_namespace;
             for (auto element : pd.element_stack) {
@@ -323,8 +323,8 @@ static void normalize_namespace (XmlStreamParseData& pd, XmlObject& xml_obj)
                     break;
                 }
             }
-            if (default_namespace.length() && default_namespace == xml_obj.getDefaultNamespaceAttr())
-                xml_obj.isNamespaceDefault (true);
+            if (default_namespace.length() && default_namespace == xml_obj.get_default_namespace_attr())
+                xml_obj.is_namespace_default (true);
         }
     }
 }
@@ -363,18 +363,18 @@ bool XmlStream::start (const uxmpp::net::IpHostAddr& addr)
     // Check if the stream is already running.
     //
     if (running) {
-        uxmppLogWarning (THIS_FILE, "Stream already connected to ", to_string(peer_addr));
+        uxmpp_log_warning (THIS_FILE, "Stream already connected to ", to_string(peer_addr));
         return false;
     }
     if (std::this_thread::get_id() == rx_thread.get_id()) {
-        uxmppLogWarning (THIS_FILE, "Can't start the stream from the XmlStreamListener");
+        uxmpp_log_warning (THIS_FILE, "Can't start the stream from the XmlStreamListener");
         return false;
     }
 
     // Set peer address
     //
     peer_addr = addr;
-    uxmppLogDebug (THIS_FILE, "Open XML stream to ", to_string(peer_addr));
+    uxmpp_log_debug (THIS_FILE, "Open XML stream to ", to_string(peer_addr));
 
     /*
      * Assume TCP for now.
@@ -404,14 +404,14 @@ bool XmlStream::start (const uxmpp::net::IpHostAddr& addr)
         sock = socket (AF_INET6, SOCK_STREAM, 0);
     }
     else {
-        uxmppLogError (THIS_FILE, "Wrong address type");
+        uxmpp_log_error (THIS_FILE, "Wrong address type");
         return false;
     }
 
     // Check for errors
     //
     if (sock == -1) {
-        uxmppLogError (THIS_FILE, "Error creating socket");
+        uxmpp_log_error (THIS_FILE, "Error creating socket");
         return false;
     }
 
@@ -419,7 +419,7 @@ bool XmlStream::start (const uxmpp::net::IpHostAddr& addr)
     //
     int result = connect (sock, saddr, saddr_len);
     if (result == -1) {
-        uxmppLogError (THIS_FILE, "Error connecting socket");
+        uxmpp_log_error (THIS_FILE, "Error connecting socket");
         ::close (sock);
         sock = -1;
         return false;
@@ -477,7 +477,7 @@ static string get_tls_error_text (int result)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
+bool XmlStream::enable_tls (const TlsConfig& tls_cfg, string& error_description)
 {
     mutex.lock ();
 
@@ -485,7 +485,7 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
     //
     if (!running) {
         mutex.unlock ();
-        uxmppLogDebug (THIS_FILE, "Can't enable TLS, stream not open");
+        uxmpp_log_debug (THIS_FILE, "Can't enable TLS, stream not open");
         error_description = "Stream no open";
         return false;
     }
@@ -494,7 +494,7 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
     //
     if (peer_addr.proto == AddrProto::tls) {
         mutex.unlock ();
-        uxmppLogTrace (THIS_FILE, "TLS already enabled");
+        uxmpp_log_trace (THIS_FILE, "TLS already enabled");
         error_description = "";
         return true;
     }
@@ -538,7 +538,7 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
     }
     ssl_ctx = SSL_CTX_new (method);
     if (!ssl_ctx) {
-        uxmppLogError (THIS_FILE, "Unable to create SSL context");
+        uxmpp_log_error (THIS_FILE, "Unable to create SSL context");
         event_add (rx_event, NULL);//&tv);
         mutex.unlock ();
         stop ();
@@ -554,7 +554,7 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
     //
     ssl = SSL_new (ssl_ctx);
     if (!ssl) {
-        uxmppLogError (THIS_FILE, "Unable to create SSL object");
+        uxmpp_log_error (THIS_FILE, "Unable to create SSL object");
         event_add (rx_event, NULL);//&tv);
         mutex.unlock ();
         stop ();
@@ -568,7 +568,7 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
     if (!result) {
         string tls_error = get_tls_error_text (result);
         error_description = string("Unable to initialize the SSL stream, ") + tls_error;
-        uxmppLogError (THIS_FILE, error_description);
+        uxmpp_log_error (THIS_FILE, error_description);
         event_add (rx_event, NULL);//&tv);
         mutex.unlock ();
         stop ();
@@ -577,13 +577,13 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
 
     // Perform TLS handshake
     //
-    uxmppLogTrace (THIS_FILE, "Perform TLS handshake");
+    uxmpp_log_trace (THIS_FILE, "Perform TLS handshake");
     ERR_clear_error ();
     result = SSL_connect (ssl);
     if (result != 1) {
         string tls_error = get_tls_error_text (result);
         error_description = string("TLS handshake failed, ") + tls_error;
-        uxmppLogError (THIS_FILE, error_description);
+        uxmpp_log_error (THIS_FILE, error_description);
         event_add (rx_event, NULL);//&tv);
         mutex.unlock ();
         stop ();
@@ -593,7 +593,7 @@ bool XmlStream::enableTls (const TlsConfig& tls_cfg, string& error_description)
 
     event_add (rx_event, NULL);//&tv);
     mutex.unlock ();
-    uxmppLogDebug (THIS_FILE, "TLS (", to_string(tls_cfg.method), ") enabled");
+    uxmpp_log_debug (THIS_FILE, "TLS (", to_string(tls_cfg.method), ") enabled");
     error_description = "";
     return true;
 }
@@ -606,18 +606,18 @@ void XmlStream::stop ()
     std::lock_guard<std::mutex> lock (mutex);
 
     if (!running) {
-        uxmppLogTrace (THIS_FILE, "Stop non-running xml stream");
+        uxmpp_log_trace (THIS_FILE, "Stop non-running xml stream");
         return;
     }
 
     if (std::this_thread::get_id() == rx_thread.get_id()) {
-        uxmppLogTrace (THIS_FILE, "Stop xml stream from RX thread");
+        uxmpp_log_trace (THIS_FILE, "Stop xml stream from RX thread");
         running = false;
         event_base_loopbreak (ebase);
         return;
     }
 
-    uxmppLogTrace (THIS_FILE, "Stop xml stream and notify RX thread");
+    uxmpp_log_trace (THIS_FILE, "Stop xml stream and notify RX thread");
     rx_cond_mutex.lock ();
     if (running) {
         running = false;
@@ -638,7 +638,7 @@ bool XmlStream::write (const XmlObject& xml_obj)
     std::lock_guard<std::mutex> lock (mutex);
 
     if (sock == -1) {
-        uxmppLogWarning (THIS_FILE, "Unable to write to stream: not opened");
+        uxmpp_log_warning (THIS_FILE, "Unable to write to stream: not opened");
         return false;
     }
 
@@ -646,7 +646,7 @@ bool XmlStream::write (const XmlObject& xml_obj)
     size_t len = xml_str.length ();
     size_t sent = 0;
 
-    uxmppLogDebug (THIS_FILE, "Send xml object: ", /*xml_str*/ to_string(xml_obj, true));
+    uxmpp_log_debug (THIS_FILE, "Send xml object: ", /*xml_str*/ to_string(xml_obj, true));
     while (sent < len) {
         int result;
 
@@ -657,9 +657,9 @@ bool XmlStream::write (const XmlObject& xml_obj)
 
         if (result <= 0) {
             if (result==0) {
-                uxmppLogError (THIS_FILE, "Unable to write XML object, connection reset by peer");
+                uxmpp_log_error (THIS_FILE, "Unable to write XML object, connection reset by peer");
             }else{
-                uxmppLogError (THIS_FILE, "Error writing XML object to stream");
+                uxmpp_log_error (THIS_FILE, "Error writing XML object to stream");
             }
             return false;
         }
@@ -671,7 +671,7 @@ bool XmlStream::write (const XmlObject& xml_obj)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlStream::addListener (XmlStreamListener& listener)
+void XmlStream::add_listener (XmlStreamListener& listener)
 {
     std::lock_guard<std::mutex> lock (mutex);
 
@@ -685,7 +685,7 @@ void XmlStream::addListener (XmlStreamListener& listener)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlStream::delListener (XmlStreamListener& listener)
+void XmlStream::del_listener (XmlStreamListener& listener)
 {
     std::lock_guard<std::mutex> lock (mutex);
 
@@ -700,7 +700,7 @@ void XmlStream::delListener (XmlStreamListener& listener)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlStream::setTimeout (const std::string& id, unsigned msec, bool cache_timer)
+void XmlStream::set_timeout (const std::string& id, unsigned msec, bool cache_timer)
 {
     if (id.length() == 0)
         return;
@@ -710,23 +710,23 @@ void XmlStream::setTimeout (const std::string& id, unsigned msec, bool cache_tim
     if (!te) {
         if (!msec)
             return;
-        uxmppLogTrace (THIS_FILE, "Creating timer ", id);
+        uxmpp_log_trace (THIS_FILE, "Creating timer ", id);
         te = new XmlTimerEvent (id, *this, ebase, parse_data, cache_timer);
         timers[id] = te;
     }else{
-        uxmppLogTrace (THIS_FILE, "Found cached timer ", id);
+        uxmpp_log_trace (THIS_FILE, "Found cached timer ", id);
         if (!cache_timer)
             te->cached = false;
     }
 
     if (msec) {
-        uxmppLogTrace (THIS_FILE, "Start timer ", id);
+        uxmpp_log_trace (THIS_FILE, "Start timer ", id);
         te->start (msec);
     }else{
-        uxmppLogTrace (THIS_FILE, "Disable timer ", id);
+        uxmpp_log_trace (THIS_FILE, "Disable timer ", id);
         te->stop ();
         if (!te->cached) {
-            uxmppLogTrace (THIS_FILE, "Delete timer ", id);
+            uxmpp_log_trace (THIS_FILE, "Delete timer ", id);
             timers[id] = nullptr;
             delete te;
             timers.erase (id);
@@ -748,7 +748,7 @@ static void end_xml_node (void* user_data,
         if (pd->top_element_found) {
             pd->top_element_found = false;
             XmlObject xml_obj (XmlStreamTag, XmlStreamNs, false);
-            xml_obj.setPart (XmlObjPart::end);
+            xml_obj.set_part (XmlObjPart::end);
             pd->rx_cond_mutex->lock ();
             pd->rx_queue->push (xml_obj);
             pd->rx_cond_mutex->unlock ();
@@ -774,7 +774,7 @@ static void end_xml_node (void* user_data,
         pd->rx_cond->notify_all ();
     }else{
         XmlStreamParseElement* parent_element = pd->element_stack.front ();
-        parent_element->xml_obj.addNode (std::move(element->xml_obj));
+        parent_element->xml_obj.add_node (std::move(element->xml_obj));
     }
     delete element;
 }
@@ -796,9 +796,9 @@ static void start_xml_node (void* user_data,
     // Split the full tag name into name and namespace.
     //
     parse_xml_tag_name (name, tag_name, xml_namespace);
-    xml_obj.setTagName (tag_name);
+    xml_obj.set_tag_name (tag_name);
     if (xml_namespace.length())
-        xml_obj.setNamespace (xml_namespace);
+        xml_obj.set_namespace (xml_namespace);
 
     // Parse xml attributes
     //
@@ -830,7 +830,7 @@ static void xml_character_data (void* user_data,
     if (element == nullptr)
         return;
 
-    element->xml_obj.setContent (element->xml_obj.getContent() + string(data, len));
+    element->xml_obj.set_content (element->xml_obj.get_content() + string(data, len));
 }
 
 
@@ -850,9 +850,9 @@ static void start_stream_element (void* user_data,
     // Split the name into namespace and name
     //
     parse_xml_tag_name (name, tag_name, xml_namespace);
-    xml_obj.setTagName (tag_name);
+    xml_obj.set_tag_name (tag_name);
     if (xml_namespace.length())
-        xml_obj.setNamespace (xml_namespace);
+        xml_obj.set_namespace (xml_namespace);
 
     // Parse xml attributes
     //
@@ -863,7 +863,7 @@ static void start_stream_element (void* user_data,
     // Normalize namespace
     //
     normalize_namespace (*pd, xml_obj);
-    xml_namespace = xml_obj.getNamespace ();
+    xml_namespace = xml_obj.get_namespace ();
     TRACE (THIS_FILE, "start_stream_element - after normalizing namespace: ", to_string(xml_obj));
 
     // Find default namespace if needed
@@ -871,8 +871,8 @@ static void start_stream_element (void* user_data,
     if (!xml_namespace.length() && pd->default_namespace.length()) {
         // Find default namespace
         xml_namespace = pd->default_namespace;
-        xml_obj.setNamespace (xml_namespace);
-        xml_obj.isNamespaceDefault (true);
+        xml_obj.set_namespace (xml_namespace);
+        xml_obj.is_namespace_default (true);
     }
 
     // Get the canonical tag name
@@ -894,14 +894,14 @@ static void start_stream_element (void* user_data,
 
     // Check if this is the XMPP start stream tag.
     //
-    if (pd->top_node.getFullName() == full_name) {
-        uxmppLogDebug (THIS_FILE, "Got start stream element");
+    if (pd->top_node.get_full_name() == full_name) {
+        uxmpp_log_debug (THIS_FILE, "Got start stream element");
         XML_SetElementHandler (pd->xml_parser,
                                start_xml_node,
                                end_xml_node);
         XML_SetCharacterDataHandler (pd->xml_parser, xml_character_data);
 
-        xml_obj.setPart (XmlObjPart::start);
+        xml_obj.set_part (XmlObjPart::start);
 
         pd->top_element_found = true;
         pd->rx_cond_mutex->lock ();
@@ -909,7 +909,7 @@ static void start_stream_element (void* user_data,
         pd->rx_cond_mutex->unlock ();
         pd->rx_cond->notify_all ();
     }else{
-        uxmppLogDebug (THIS_FILE, "Ignoring XML element: ", full_name);
+        uxmpp_log_debug (THIS_FILE, "Ignoring XML element: ", full_name);
     }
 }
 
@@ -918,11 +918,11 @@ static void start_stream_element (void* user_data,
 //------------------------------------------------------------------------------
 void XmlStream::reset ()
 {
-    uxmppLogDebug (THIS_FILE, "Reset XML parse data");
+    uxmpp_log_debug (THIS_FILE, "Reset XML parse data");
     mutex.lock ();
     initializeParseData ();
     mutex.unlock ();
-    uxmppLogDebug (THIS_FILE, "Reset XML parse data - done");
+    uxmpp_log_debug (THIS_FILE, "Reset XML parse data - done");
 }
 
 
@@ -974,13 +974,13 @@ void XmlStream::rx_queue_thread_func (XmlStream* stream)
 {
     XmlStream& xs = *stream;
 
-    uxmppLogTrace (THIS_FILE, "Starting XML RX queue thread.");
+    uxmpp_log_trace (THIS_FILE, "Starting XML RX queue thread.");
     unique_lock<std::mutex> ul (xs.rx_cond_mutex);
 
 
     xs.rx_cond_mutex.unlock ();
     for (auto listener : xs.listeners)
-        listener->onOpen (xs);
+        listener->on_open (xs);
     xs.rx_cond_mutex.lock ();
 
     while (xs.running) {
@@ -990,7 +990,7 @@ void XmlStream::rx_queue_thread_func (XmlStream* stream)
             XmlObject& xml_obj = xs.rx_queue.front ();
             xs.rx_cond_mutex.unlock ();
             for (auto listener : xs.listeners)
-                listener->onRxXmlObj (xs, xml_obj);
+                listener->on_rx_xml_obj (xs, xml_obj);
             xs.rx_cond_mutex.lock ();
             xs.rx_queue.pop ();
         }
@@ -1001,12 +1001,12 @@ void XmlStream::rx_queue_thread_func (XmlStream* stream)
 
     xs.rx_cond_mutex.unlock ();
     for (auto listener : xs.listeners)
-        listener->onClose (xs);
+        listener->on_close (xs);
     xs.rx_cond_mutex.lock ();
 
     event_base_loopbreak (xs.ebase);
 
-    uxmppLogTrace (THIS_FILE, "RX queue thread ended");
+    uxmpp_log_trace (THIS_FILE, "RX queue thread ended");
 }
 
 
@@ -1018,8 +1018,8 @@ void XmlTimerEvent::event_timeout_callback (evutil_socket_t fd, short what, void
     XmlTimerEvent* te = reinterpret_cast<XmlTimerEvent*> (arg);
     if (!te)
         return;
-    uxmppLogTrace (THIS_FILE, "Timeout: ", te->id);
-    xml_obj.setAttribute ("id", te->id);
+    uxmpp_log_trace (THIS_FILE, "Timeout: ", te->id);
+    xml_obj.set_attribute ("id", te->id);
 
     std::lock_guard<std::mutex> lock (te->stream.mutex);
 
@@ -1029,7 +1029,7 @@ void XmlTimerEvent::event_timeout_callback (evutil_socket_t fd, short what, void
     te->stream.rx_cond.notify_all ();
 
     if (!te->cached) {
-        uxmppLogTrace (THIS_FILE, "Delete timer ", te->id);
+        uxmpp_log_trace (THIS_FILE, "Delete timer ", te->id);
         te->stream.timers[te->id] = nullptr;
         te->stream.timers.erase (te->id);
         delete te;
@@ -1049,7 +1049,7 @@ void XmlStream::event_rx_callback (evutil_socket_t fd, short what, void* stream)
         // Disable all timers
         for (auto& t : self->timers) {
             if (t.second) {
-                uxmppLogTrace (THIS_FILE, "Disable timer ", t.second->id);
+                uxmpp_log_trace (THIS_FILE, "Disable timer ", t.second->id);
                 t.second->stop ();
             }
         }
@@ -1060,7 +1060,7 @@ void XmlStream::event_rx_callback (evutil_socket_t fd, short what, void* stream)
     // Check timeout
     //
     if (what & EV_TIMEOUT) {
-        //uxmppLogTrace (THIS_FILE, "RX timed out");
+        //uxmpp_log_trace (THIS_FILE, "RX timed out");
         return;
     }
 
@@ -1079,12 +1079,12 @@ void XmlStream::event_rx_callback (evutil_socket_t fd, short what, void* stream)
         result = ::read (self->sock, self->buf, sizeof(self->buf));
 
     if (result == -1) {
-        uxmppLogError (THIS_FILE, "RX read error");
+        uxmpp_log_error (THIS_FILE, "RX read error");
         self->broken_socket = true;
         event_base_loopbreak (self->ebase);
     }
     else if (result == 0) {
-        uxmppLogDebug (THIS_FILE, "Connection reset by peer");
+        uxmpp_log_debug (THIS_FILE, "Connection reset by peer");
         self->broken_socket = true;
         event_base_loopbreak (self->ebase);
     }
@@ -1095,7 +1095,7 @@ void XmlStream::event_rx_callback (evutil_socket_t fd, short what, void* stream)
         // Disable all timers
         for (auto& t : self->timers) {
             if (t.second) {
-                uxmppLogTrace (THIS_FILE, "Disable timer ", t.second->id);
+                uxmpp_log_trace (THIS_FILE, "Disable timer ", t.second->id);
                 t.second->stop ();
             }
         }
@@ -1126,9 +1126,9 @@ void XmlStream::run ()
     while (running && !broken_socket) {
         event_add (rx_event, &tv);
         mutex.unlock ();
-        uxmppLogTrace (THIS_FILE, "Run event loop");
+        uxmpp_log_trace (THIS_FILE, "Run event loop");
         result = event_base_loop (ebase, 0);
-        uxmppLogTrace (THIS_FILE, "Event loop returned ", result);
+        uxmpp_log_trace (THIS_FILE, "Event loop returned ", result);
         mutex.lock ();
         event_del (rx_event);
     }
@@ -1146,19 +1146,19 @@ void XmlStream::freeResources ()
 
     // Close the socket
     //
-    uxmppLogDebug (THIS_FILE, "Closing XML stream to ", to_string(peer_addr));
+    uxmpp_log_debug (THIS_FILE, "Closing XML stream to ", to_string(peer_addr));
     if (peer_addr.proto == AddrProto::tls && ssl) {
         // Gracefully close the TLS connection.
         int result = SSL_shutdown (ssl);
         if (result < 0)
-            uxmppLogWarning (THIS_FILE, "Error sending TLS close_notify - ", get_tls_error_text(result));
+            uxmpp_log_warning (THIS_FILE, "Error sending TLS close_notify - ", get_tls_error_text(result));
     }
     ::close (sock);
     sock = -1;
 
     // Free XML resources
     //
-    uxmppLogDebug (THIS_FILE, "Deinitialize XML parser");
+    uxmpp_log_debug (THIS_FILE, "Deinitialize XML parser");
     XML_ParserFree (parse_data->xml_parser);
     delete parse_data;
     parse_data = nullptr;
@@ -1178,7 +1178,7 @@ void XmlStream::freeResources ()
     //
     for (auto& t : timers) {
         if (t.second) {
-            uxmppLogTrace (THIS_FILE, "Free timer ", t.second->id);
+            uxmpp_log_trace (THIS_FILE, "Free timer ", t.second->id);
             delete t.second;
         }
     }
@@ -1202,7 +1202,7 @@ void XmlStream::freeResources ()
 void XmlStream::on_rx (const char* buf, int bytes)
 {
     //std::lock_guard<std::mutex> lock (mutex);
-    uxmppLogTrace (THIS_FILE, "RX:\n", string(buf, bytes), "\n");
+    uxmpp_log_trace (THIS_FILE, "RX:\n", string(buf, bytes), "\n");
 
     // Ignore incoming data on error.
     //
@@ -1213,7 +1213,7 @@ void XmlStream::on_rx (const char* buf, int bytes)
     //
     if (!XML_Parse(parse_data->xml_parser, buf, bytes, 0)) {
         parse_data->error = true;
-        uxmppLogError (THIS_FILE, "RX XML parse error");
+        uxmpp_log_error (THIS_FILE, "RX XML parse error");
         while (parse_data && !parse_data->element_stack.empty()) {
             delete parse_data->element_stack.front ();
             parse_data->element_stack.pop_front ();

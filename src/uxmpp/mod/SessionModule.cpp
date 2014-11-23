@@ -40,14 +40,14 @@ static const std::string XmlSessionTagFull  = XmlSessionNs + string(":") + XmlSe
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-static void sendIqSetSession (uxmpp::Session& s, string& iq_id)
+static void send_iq_set_session (uxmpp::Session& s, string& iq_id)
 {
-    auto& features = s.getFeatures ();
+    auto& features = s.get_features ();
     for (auto& node : features) {
-        if (node.getFullName() == XmlSessionTagFull) {
-            iq_id = Stanza::makeId ();
-            s.sendStanza (IqStanza(IqType::set, s.getStreamFromAttr(), "", iq_id).
-                          addNode(XmlObject("session", XmlSessionNs)));
+        if (node.get_full_name() == XmlSessionTagFull) {
+            iq_id = Stanza::make_id ();
+            s.send_stanza (IqStanza(IqType::set, s.get_stream_from_attr(), "", iq_id).
+                           add_node(XmlObject("session", XmlSessionNs)));
             break;
         }
     }
@@ -56,40 +56,40 @@ static void sendIqSetSession (uxmpp::Session& s, string& iq_id)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void SessionModule::moduleRegistered (uxmpp::Session& session)
+void SessionModule::module_registered (uxmpp::Session& session)
 {
-    session.addSessionListener (*this);
+    session.add_session_listener (*this);
 
-    if (session.getState() == SessionState::bound && iq_id=="")
-        sendIqSetSession (session, iq_id);
+    if (session.get_state() == SessionState::bound && iq_id=="")
+        send_iq_set_session (session, iq_id);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void SessionModule::moduleUnregistered (uxmpp::Session& session)
+void SessionModule::module_unregistered (uxmpp::Session& session)
 {
-    session.delSessionListener (*this);
+    session.del_session_listener (*this);
     iq_id = "";
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool SessionModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool SessionModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     //
     // Handle 'session' result
     //
-    if (xml_obj.getFullName() ==  XmlIqStanzaTagFull) {
+    if (xml_obj.get_full_name() ==  XmlIqStanzaTagFull) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
-        if (iq.getId() == iq_id) {
-            if (iq.getType() == IqType::result) {
+        if (iq.get_id() == iq_id) {
+            if (iq.get_type() == IqType::result) {
                 // Success
-                uxmppLogDebug (THIS_FILE, "Session established");
-                session.unregisterModule (*this);
+                uxmpp_log_debug (THIS_FILE, "Session established");
+                session.unregister_module (*this);
             }
-            else if (iq.getType() == IqType::error) {
+            else if (iq.get_type() == IqType::error) {
 #warning How to handle session request error?
             }
             return true;
@@ -102,12 +102,12 @@ bool SessionModule::proccessXmlObject (uxmpp::Session& session, uxmpp::XmlObject
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void SessionModule::onStateChange (uxmpp::Session& session,
+void SessionModule::on_state_change (uxmpp::Session& session,
                                      uxmpp::SessionState new_state,
                                      uxmpp::SessionState old_state)
 {
     if (new_state == SessionState::bound && iq_id=="")
-        sendIqSetSession (session, iq_id);
+        send_iq_set_session (session, iq_id);
 }
 
 

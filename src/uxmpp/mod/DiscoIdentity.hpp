@@ -51,9 +51,9 @@ namespace uxmpp { namespace mod {
                        const std::string& name="")
             : XmlObject ("identity", "http://jabber.org/protocol/disco#info", false)
         {
-            setCategory (category);
-            setType (type);
-            setName (name);
+            set_category (category);
+            set_type (type);
+            set_name (name);
         }
 
         /**
@@ -108,16 +108,16 @@ namespace uxmpp { namespace mod {
          * This will return the value of the 'category' attribute.
          * @return The identity category.
          */
-        const std::string getCategory () const {
-            return getAttribute ("category");
+        const std::string get_category () const {
+            return get_attribute ("category");
         }
 
         /**
          * Set the identity category.
          * @param category The value of the 'category' attribute.
          */
-        void setCategory (const std::string& category) {
-            setAttribute ("category", category);
+        void set_category (const std::string& category) {
+            set_attribute ("category", category);
         }
 
         /**
@@ -125,16 +125,16 @@ namespace uxmpp { namespace mod {
          * This will return the value of the 'type' attribute.
          * @return The identity type.
          */
-        const std::string getType () const {
-            return getAttribute ("type");
+        const std::string get_type () const {
+            return get_attribute ("type");
         }
 
         /**
          * Set the identity type.
          * @param type The value of the 'type' attribute.
          */
-        void setType (const std::string& type) {
-            setAttribute ("type", type);
+        void set_type (const std::string& type) {
+            set_attribute ("type", type);
         }
 
         /**
@@ -142,16 +142,16 @@ namespace uxmpp { namespace mod {
          * This will return the value of the 'name attribute.
          * @return The identity name.
          */
-        const std::string getName () const {
-            return getAttribute ("name");
+        const std::string get_name () const {
+            return get_attribute ("name");
         }
 
         /**
          * Set the identity name.
          * @param name The value of the 'name' attribute.
          */
-        void setName (const std::string& name) {
-            setAttribute ("name", name);
+        void set_name (const std::string& name) {
+            set_attribute ("name", name);
         }
     };
 
