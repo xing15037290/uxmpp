@@ -55,6 +55,7 @@ namespace uxmpp {
 #include <uxmpp/SessionListener.hpp>
 #include <uxmpp/Session.hpp>
 
+#include <uxmpp/io.hpp>
 #include <uxmpp/net.hpp>
 #include <uxmpp/mod.hpp>
 

@@ -20,7 +20,7 @@ if ENABLE_TESTAPPS_SET
 
 AM_CXXFLAGS  = -Wall -pipe -std=c++11 -ggdb
 AM_CXXFLAGS += -I$(srcdir)/../src -I../src $(expat_CFLAGS) $(libevent_CFLAGS) $(openssl_CFLAGS)
-AM_LDFLAGS = -L../src -luxmpp $(expat_LIBS) $(libevent_LIBS) $(openssl_LIBS)
+AM_LDFLAGS = -L../src -luxmpp $(expat_LIBS) $(libevent_LIBS) $(openssl_LIBS) -lrt -lpthread
 
 
 noinst_bindir =
@@ -55,6 +55,9 @@ test_Session_SOURCES  = test_Session.cpp
 
 noinst_bin_PROGRAMS     += test_ImpSession
 test_ImpSession_SOURCES  = test_ImpSession.cpp
+
+noinst_bin_PROGRAMS     += test_Timer
+test_Timer_SOURCES  = test_Timer.cpp
 
 noinst_bin_PROGRAMS     += uxmpp
 uxmpp_SOURCES  = uxmpp.cpp
