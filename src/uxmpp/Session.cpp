@@ -87,81 +87,6 @@ Session::~Session ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Session::add_session_listener (SessionListener& listener)
-{
-    for (auto& l : listeners) {
-        if (l == &listener)
-            return; // Already added
-    }
-    listeners.push_back (&listener);
-    uxmpp_log_trace (THIS_FILE, "Added session listener");
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void Session::del_session_listener (SessionListener& listener)
-{
-    for (auto i=listeners.begin(); i!=listeners.end(); ++i) {
-        if ((*i) == &listener) {
-            listeners.erase (i);
-            uxmpp_log_trace (THIS_FILE, "Removed session listener");
-            return;
-        }
-    }
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void Session::register_module (XmppModule& module)
-{
-    for (XmppModule* m : xmpp_modules) {
-        if (&module == m) {
-            uxmpp_log_info (THIS_FILE,
-                            string("Not registering XMPP module '") +
-                            module.get_name() + "' - already registered");
-            return;
-        }
-    }
-    xmpp_modules.push_back (&module);
-    module.module_registered (*this);
-    uxmpp_log_info (THIS_FILE, string("XMPP module '") + module.get_name() + "' - registered");
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void Session::unregister_module (XmppModule& module)
-{
-    for (auto i=xmpp_modules.begin(); i!=xmpp_modules.end(); ++i) {
-        if (*i == &module) {
-            xmpp_modules.erase (i);
-            module.module_unregistered (*this);
-            uxmpp_log_info (THIS_FILE, string("XMPP module '") + module.get_name() + "' - unregistered");
-            return;
-        }
-    }
-    uxmpp_log_info (THIS_FILE,
-                    string("Not unregistering XMPP module '") +
-                    module.get_name() + "' - not registered");
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void Session::reset ()
-{
-    xs.reset ();
-    features.clear ();
-    stream_xml_obj.set_from (cfg.user_id);
-    stream_xml_obj.set_part (XmlObjPart::start);
-    xs.write (stream_xml_obj);
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 void Session::start (const SessionConfig& config)
 {
     if (!change_state(SessionState::connecting)) {
@@ -403,6 +328,177 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
 //------------------------------------------------------------------------------
 void Session::on_rx_xml_error (XmlStream& stream)
 {
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+StreamError& Session::get_error ()
+{
+    return stream_error;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+const bool Session::have_error ()
+{
+    return stream_error.have_error ();
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::add_session_listener (SessionListener& listener)
+{
+    for (auto& l : listeners) {
+        if (l == &listener)
+            return; // Already added
+    }
+    listeners.push_back (&listener);
+    uxmpp_log_trace (THIS_FILE, "Added session listener");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::del_session_listener (SessionListener& listener)
+{
+    for (auto i=listeners.begin(); i!=listeners.end(); ++i) {
+        if ((*i) == &listener) {
+            listeners.erase (i);
+            uxmpp_log_trace (THIS_FILE, "Removed session listener");
+            return;
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+SessionState Session::get_state () const
+{
+    return state;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+Jid Session::get_jid () const
+{
+    return Jid (jid);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+Jid Session::get_domain () const
+{
+    return Jid (cfg.domain);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::send_stanza (const XmlObject& xml_obj)
+{
+    xs.write (xml_obj);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string Session::get_id () const
+{
+    return sess_id;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string Session::get_stream_from_attr () const
+{
+    return sess_from;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::register_module (XmppModule& module)
+{
+    for (XmppModule* m : xmpp_modules) {
+        if (&module == m) {
+            uxmpp_log_info (THIS_FILE,
+                            string("Not registering XMPP module '") +
+                            module.get_name() + "' - already registered");
+            return;
+        }
+    }
+    xmpp_modules.push_back (&module);
+    module.module_registered (*this);
+    uxmpp_log_info (THIS_FILE, string("XMPP module '") + module.get_name() + "' - registered");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::unregister_module (XmppModule& module)
+{
+    for (auto i=xmpp_modules.begin(); i!=xmpp_modules.end(); ++i) {
+        if (*i == &module) {
+            xmpp_modules.erase (i);
+            module.module_unregistered (*this);
+            uxmpp_log_info (THIS_FILE, string("XMPP module '") + module.get_name() + "' - unregistered");
+            return;
+        }
+    }
+    uxmpp_log_info (THIS_FILE,
+                    string("Not unregistering XMPP module '") +
+                    module.get_name() + "' - not registered");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::vector<XmppModule*>& Session::get_modules ()
+{
+    return xmpp_modules;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlStream& Session::get_xml_stream ()
+{
+    return xs;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::vector<XmlObject>& Session::get_features ()
+{
+    return features;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::reset ()
+{
+    xs.reset ();
+    features.clear ();
+    stream_xml_obj.set_from (cfg.user_id);
+    stream_xml_obj.set_part (XmlObjPart::start);
+    xs.write (stream_xml_obj);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Session::set_app_error (const std::string& app_error, const std::string& text)
+{
+    stream_error.set_app_error (app_error, text);
 }
 
 

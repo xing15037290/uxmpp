@@ -77,9 +77,7 @@ namespace uxmpp { namespace mod {
          * Return a list of service discovery information features supported
          * by the module;
          */
-        virtual std::vector<std::string> get_disco_features () {
-            return {"urn:xmpp:ping"};
-        }
+        virtual std::vector<std::string> get_disco_features ();
 
 
     protected:

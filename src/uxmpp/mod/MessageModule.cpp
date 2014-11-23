@@ -152,6 +152,14 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+std::vector<std::string> MessageModule::get_disco_features ()
+{
+    return {"urn:xmpp:receipts"};
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void MessageModule::send_message (const MessageStanza& msg, bool want_receipt)
 {
     // Sanity check
@@ -199,6 +207,24 @@ void MessageModule::send_message (const uxmpp::Jid& to, const std::string& body,
     // Send the message
     sess->send_stanza (std::move(ms));
     return;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void MessageModule::set_message_handler (std::function<void (MessageModule&, uxmpp::MessageStanza&)>
+                                         on_message)
+{
+    message_handler = on_message;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void MessageModule::set_receipt_handler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
+                                         on_receipt)
+{
+    receipt_handler = on_receipt;
 }
 
 

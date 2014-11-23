@@ -41,31 +41,25 @@ namespace uxmpp { namespace mod {
          * Construct an xml object named 'query' qualified
          * by the namespace http://jabber.org/protocol/disco#info.
          */
-        DiscoInfo () : XmlObject ("query", "http://jabber.org/protocol/disco#info") {
-        }
+        DiscoInfo ();
 
         /**
          * Constructor.
          * @param info An xml object viewed as a sevice discovery info query result.
          */
-        DiscoInfo (const uxmpp::XmlObject& info)
-            : XmlObject (info)
-        {
-        }
+        DiscoInfo (const uxmpp::XmlObject& info);
 
         /**
          * Copy constructor.
          * @param info The object to copy.
          */
-        DiscoInfo (const DiscoInfo& info) : XmlObject (info) {
-        }
+        DiscoInfo (const DiscoInfo& info);
 
         /**
          * Move constructor.
          * @param info The object to move.
          */
-        DiscoInfo (const DiscoInfo&& info) : XmlObject (info) {
-        }
+        DiscoInfo (const DiscoInfo&& info);
 
         /**
          * Destructor.
@@ -76,20 +70,13 @@ namespace uxmpp { namespace mod {
          * Assignment operator.
          * @param info The object to copy.
          */
-        DiscoInfo& operator= (const DiscoInfo& info) {
-            if (this != &info)
-                XmlObject::operator= (info);
-            return *this;
-        }
+        DiscoInfo& operator= (const DiscoInfo& info);
 
         /**
          * Move operator.
          * @param info The object to move.
          */
-        DiscoInfo& operator= (const DiscoInfo&& info) {
-            XmlObject::operator= (info);
-            return *this;
-        }
+        DiscoInfo& operator= (const DiscoInfo&& info);
     };
 
 

@@ -158,5 +158,14 @@ void PresenceModule::cancel_subscription (const uxmpp::Jid& jid)
 }
 
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void PresenceModule::set_presence_handler (std::function<void (PresenceModule&, uxmpp::PresenceStanza&)>
+                                           on_presence)
+{
+    presence_handler = on_presence;
+}
+
+
 
 UXMPP_END_NAMESPACE2

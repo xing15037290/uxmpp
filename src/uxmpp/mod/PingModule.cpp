@@ -158,5 +158,13 @@ void PingModule::ping (const uxmpp::Jid& jid)
 }
 
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::vector<std::string> PingModule::get_disco_features ()
+{
+    return {"urn:xmpp:ping"};
+}
+
+
 
 UXMPP_END_NAMESPACE2

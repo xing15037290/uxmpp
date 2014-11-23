@@ -37,7 +37,7 @@ namespace uxmpp { namespace mod {
         /**
          * Default Constructor.
          */
-        TlsModule () : uxmpp::XmppModule ("mod_starttls") { }
+        TlsModule ();
 
         /**
          * Constructor.

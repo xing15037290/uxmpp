@@ -77,9 +77,7 @@ namespace uxmpp { namespace mod {
         /**
          * Return the keep-alive interval in seconds. If 0, the keep-alive timer is disabled.
          */
-        unsigned get_interval () const {
-            return interval;
-        }
+        unsigned get_interval () const;
 
 
     protected:

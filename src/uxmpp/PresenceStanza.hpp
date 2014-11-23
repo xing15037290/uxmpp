@@ -75,32 +75,22 @@ namespace uxmpp {
          */
         PresenceStanza (const std::string& to="",
                         const std::string& from="",
-                        const std::string& id="")
-            : Stanza (to, from, id)
-        {
-            set_tag_name ("presence");
-        }
+                        const std::string& id="");
 
         /**
          * Constructor.
          */
-        PresenceStanza (const Jid& to, const Jid& from, const std::string& id="")
-            : Stanza (to, from, id)
-        {
-            set_tag_name ("presence");
-        }
+        PresenceStanza (const Jid& to, const Jid& from, const std::string& id="");
 
         /**
          * Copy constructor.
          */
-        PresenceStanza (const PresenceStanza& msg_stanza) : Stanza (msg_stanza) {
-        }
+        PresenceStanza (const PresenceStanza& msg_stanza);
 
         /**
          * Move constructor.
          */
-        PresenceStanza (PresenceStanza&& msg_stanza) : Stanza (msg_stanza) {
-        }
+        PresenceStanza (PresenceStanza&& msg_stanza);
 
         /**
          * Destructor.
@@ -110,19 +100,12 @@ namespace uxmpp {
         /**
          * Assignment operator.
          */
-        PresenceStanza& operator= (const PresenceStanza& msg_stanza) {
-            if (this != &msg_stanza)
-                Stanza::operator= (msg_stanza);
-            return *this;
-        }
+        PresenceStanza& operator= (const PresenceStanza& msg_stanza);
 
         /**
          * Move operator.
          */
-        PresenceStanza& operator= (PresenceStanza&& msg_stanza) {
-            Stanza::operator= (msg_stanza);
-            return *this;
-        }
+        PresenceStanza& operator= (PresenceStanza&& msg_stanza);
 
         /**
          * Return the subscription type.

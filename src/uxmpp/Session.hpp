@@ -90,9 +90,7 @@ namespace uxmpp {
         /**
          * Return a stream error object.
          */
-        StreamError& get_error () {
-            return stream_error;
-        }
+        StreamError& get_error ();
 
         /**
          * Did an error occurr?
@@ -100,9 +98,7 @@ namespace uxmpp {
          * if the session was closed due to an error.
          * @see getError.
          */
-        const bool have_error () {
-            return stream_error.have_error ();
-        }
+        const bool have_error ();
 
         /**
          * Add a listener object that will receive events from the session.
@@ -117,44 +113,32 @@ namespace uxmpp {
         /**
          *
          */
-        SessionState get_state () const {
-            return state;
-        }
+        SessionState get_state () const;
 
         /**
          *
          */
-        Jid get_jid () const {
-            return Jid (jid);
-        }
+        Jid get_jid () const;
 
         /**
          *
          */
-        Jid get_domain () const {
-            return Jid (cfg.domain);
-        }
+        Jid get_domain () const;
 
         /**
          *
          */
-        void send_stanza (const XmlObject& xml_obj) {
-            xs.write (xml_obj);
-        }
+        void send_stanza (const XmlObject& xml_obj);
 
         /**
          * Return the session id.
          */
-        std::string get_id () const {
-            return sess_id;
-        }
+        std::string get_id () const;
 
         /**
          * Return the server's 'from' attribute from the initial 'stream' tag.
          */
-        std::string get_stream_from_attr () const {
-            return sess_from;
-        }
+        std::string get_stream_from_attr () const;
 
         /**
          * Register an XMPP module that will handle incoming XML objects.
@@ -178,23 +162,17 @@ namespace uxmpp {
         /**
          * Get the list of pointers to registered XMPP modules.
          */
-        std::vector<XmppModule*>& get_modules () {
-            return xmpp_modules;
-        }
+        std::vector<XmppModule*>& get_modules ();
 
         /**
          * Return a reference to the underlaying XML stream.
          */
-        XmlStream& get_xml_stream () {
-            return xs;
-        }
+        XmlStream& get_xml_stream ();
 
         /**
          *
          */
-        std::vector<XmlObject>& get_features () {
-            return features;
-        }
+        std::vector<XmlObject>& get_features ();
 
         /**
          * Re-send a new XML 'stream' start tag.
@@ -204,9 +182,7 @@ namespace uxmpp {
         /*
          * Set an application specific error condition.
          */
-        void set_app_error (const std::string& app_error, const std::string& text="") {
-            stream_error.set_app_error (app_error, text);
-        }
+        void set_app_error (const std::string& app_error, const std::string& text="");
 
 
     protected:

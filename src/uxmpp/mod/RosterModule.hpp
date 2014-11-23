@@ -74,58 +74,42 @@ namespace uxmpp { namespace mod {
         /**
          * Return the roster.
          */
-        Roster& get_roster () {
-            return roster;
-        }
+        Roster& get_roster ();
 
         /**
          * Update/modify a roster item.
          */
-        void update_item (const RosterItem& item) {
-            roster_set (item);
-        }
+        void update_item (const RosterItem& item);
 
         /**
          * Add a new roster item.
          */
-        void add_item (const RosterItem& item) {
-            roster_set (item);
-        }
+        void add_item (const RosterItem& item);
 
         /**
          * Add a new jid to the roster.
          */
-        void add_item (const uxmpp::Jid& jid) {
-            roster_set (RosterItem(jid));
-        }
+        void add_item (const uxmpp::Jid& jid);
 
         /**
          * Remove a roster item.
          */
-        void remove_item (const RosterItem& item) {
-            roster_set (item, true);
-        }
+        void remove_item (const RosterItem& item);
 
         /**
          * Remove a jid from the roster.
          */
-        void remove_item (const uxmpp::Jid& jid) {
-            roster_set (RosterItem(jid), true);
-        }
+        void remove_item (const uxmpp::Jid& jid);
 
         /**
          *
          */
-        void set_roster_handler (std::function<void (RosterModule&, Roster&)> on_roster) {
-            roster_handler = on_roster;
-        }
+        void set_roster_handler (std::function<void (RosterModule&, Roster&)> on_roster);
 
         /**
          *
          */
-        void set_roster_push_handler (std::function<void (RosterModule&, RosterItem&)> on_roster_push) {
-            roster_push_handler = on_roster_push;
-        }
+        void set_roster_push_handler (std::function<void (RosterModule&, RosterItem&)> on_roster_push);
 
 
     protected:

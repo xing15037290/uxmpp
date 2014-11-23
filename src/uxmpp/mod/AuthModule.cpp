@@ -20,6 +20,7 @@
 #include <uxmpp/mod/AuthModule.hpp>
 #include <uxmpp/Session.hpp>
 #include <uxmpp/utils.hpp>
+#include <uxmpp/XmlNames.hpp>
 
 
 #define THIS_FILE "AuthModule"
@@ -47,6 +48,14 @@ static const std::string XmlFailureTagFull  = XmlSaslNs + string(":") + XmlFailu
 static const std::string XmlIqAuthNs = "http://jabber.org/features/iq-auth";
 static const std::string XmlAuthTag     = "auth";
 static const std::string XmlAuthTagFull = XmlIqAuthNs + string(":") + XmlAuthTag;
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+AuthModule::AuthModule ()
+    : uxmpp::XmppModule ("mod_auth")
+{
+}
 
 
 //------------------------------------------------------------------------------

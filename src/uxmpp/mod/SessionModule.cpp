@@ -56,6 +56,14 @@ static void send_iq_set_session (uxmpp::Session& s, string& iq_id)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+SessionModule::SessionModule ()
+    : uxmpp::XmppModule("mod_session"), iq_id{""}
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void SessionModule::module_registered (uxmpp::Session& session)
 {
     session.add_session_listener (*this);

@@ -66,9 +66,7 @@ namespace uxmpp { namespace mod {
          * Return a list of service discovery information features supported
          * by the module;
          */
-        virtual std::vector<std::string> get_disco_features () {
-            return {"urn:xmpp:receipts"};
-        }
+        virtual std::vector<std::string> get_disco_features ();
 
         /**
          * Send a message.
@@ -88,18 +86,13 @@ namespace uxmpp { namespace mod {
         /**
          *
          */
-        void set_message_handler (std::function<void (MessageModule&, uxmpp::MessageStanza&)> on_message) {
-            message_handler = on_message;
-        }
+        void set_message_handler (std::function<void (MessageModule&, uxmpp::MessageStanza&)> on_message);
 
         /**
          *
          */
         void set_receipt_handler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
-                                  on_receipt)
-        {
-            receipt_handler = on_receipt;
-        }
+                                  on_receipt);
 
 
     protected:

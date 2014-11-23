@@ -38,40 +38,22 @@ namespace uxmpp {
         /**
          * Constructor.
          */
-        Stanza (const std::string& to="", const std::string& from="", const std::string& id="")
-            : XmlObject ("", XmlJabberClientNs, false, true, 1)
-        {
-            if (!to.empty())
-                set_attribute ("to", to);
-            if (!from.empty())
-                set_attribute ("from", from);
-            // Set a random ID if none is provided
-            set_id (id.empty() ? make_id() : id);
-        }
+        Stanza (const std::string& to="", const std::string& from="", const std::string& id="");
 
         /**
          * Constructor.
          */
-        Stanza (const Jid& to, const Jid& from, const std::string& id="")
-            : XmlObject ("", XmlJabberClientNs, false, true, 1)
-        {
-            set_to (to);
-            set_from (from);
-            // Set a random ID if none is provided
-            set_id (id.empty() ? make_id() : id);
-        }
+        Stanza (const Jid& to, const Jid& from, const std::string& id="");
 
         /**
          * Copy constructor.
          */
-        Stanza (const Stanza& stanza) : XmlObject (stanza) {
-        }
+        Stanza (const Stanza& stanza);
 
         /**
          * Move constructor.
          */
-        Stanza (Stanza&& stanza) : XmlObject (stanza) {
-        }
+        Stanza (Stanza&& stanza);
 
         /**
          * Destructor.
@@ -81,127 +63,72 @@ namespace uxmpp {
         /**
          * Assignment operator.
          */
-        Stanza& operator= (const Stanza& stanza) {
-            if (this != &stanza)
-                XmlObject::operator= (stanza);
-            return *this;
-        }
+        Stanza& operator= (const Stanza& stanza);
 
         /**
          * Move operator.
          */
-        Stanza& operator= (Stanza&& stanza) {
-            XmlObject::operator= (stanza);
-            return *this;
-        }
+        Stanza& operator= (Stanza&& stanza);
 
         /**
          * Get 'to'.
          */
-        Jid get_to () const {
-            return Jid (get_attribute("to"));
-        }
+        Jid get_to () const;
 
         /**
          * Set 'to'.
          */
-        void set_to (const Jid& to) {
-            std::string to_str = to_string (to);
-            if (to_str.length())
-                set_attribute ("to", to_str);
-        }
+        void set_to (const Jid& to);
 
         /**
          * Get 'from'.
          */
-        Jid get_from () const {
-            return Jid (get_attribute("from"));
-        }
+        Jid get_from () const;
 
         /**
          * Set 'from'.
          */
-        void set_from (const Jid& from) {
-            std::string from_str = to_string (from);
-            if (from_str.length())
-                set_attribute ("from", from_str);
-        }
+        void set_from (const Jid& from);
 
         /**
          * Get 'id'.
          */
-        std::string get_id () const {
-            return get_attribute ("id");
-        }
+        std::string get_id () const;
 
         /**
          * Set 'id'.
          */
-        void set_id (const std::string& id) {
-            set_attribute ("id", id);
-        }
+        void set_id (const std::string& id);
 
         /**
          * Get 'type'.
          */
-        std::string get_type () const {
-            return get_attribute ("type");
-        }
+        std::string get_type () const;
 
         /**
          * Set 'type'.
          */
-        void set_type (const std::string& type) {
-            set_attribute ("type", type);
-        }
+        void set_type (const std::string& type);
 
         /**
          * Check if an error is present.
          */
-        bool have_error () const {
-            return get_type() == "error";
-        }
+        bool have_error () const;
 
         /**
          * It the IQ type is 'error' this will return the error type.
          */
-        std::string get_error_type () {
-            if (!have_error())
-                return "";
-            for (XmlObject& node : get_nodes()) {
-                if (node.get_full_name() == XmlIqErrorStanzaTagFull) {
-                    return node.get_attribute ("type");
-                }
-            }
-            return "";
-        }
+        std::string get_error_type ();
 
         /**
          * It the IQ type is 'error' this will return the error code.
          */
-        int get_error_code () {
-            if (!have_error())
-                return 0;
-            auto node = get_node (XmlIqErrorStanzaTagFull, true);
-            return node ? atoi(node.get_attribute("code").c_str()) : 0;
-        }
+        int get_error_code ();
 
         /**
          * It the IQ type is 'error' this will return the error name.
          */
-        std::string get_error_name () {
-            if (!have_error())
-                return "";
-            auto node = get_node (XmlIqErrorStanzaTagFull, true);
-            if (node) {
-                auto child_nodes = node.get_nodes ();
-                if (!child_nodes.empty())
-                    return child_nodes.begin()->get_tag_name ();
-                else
-                    return "";
-            }
-            return "";
-        }
+        std::string get_error_name ();
 
         /**
          * Generate a pseudo random id string.

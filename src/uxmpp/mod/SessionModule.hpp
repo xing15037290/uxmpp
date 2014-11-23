@@ -38,7 +38,7 @@ namespace uxmpp { namespace mod {
         /**
          * Default Constructor.
          */
-        SessionModule () : uxmpp::XmppModule("mod_session"), iq_id{""} { }
+        SessionModule ();
 
         /**
          * Destructor.

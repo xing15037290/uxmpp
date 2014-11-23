@@ -94,9 +94,8 @@ namespace uxmpp { namespace mod {
         /**
          *
          */
-        void set_presence_handler (std::function<void (PresenceModule&, uxmpp::PresenceStanza&)> on_presence) {
-            presence_handler = on_presence;
-        }
+        void set_presence_handler (std::function<void (PresenceModule&, uxmpp::PresenceStanza&)> on_presence);
+
 
     protected:
         uxmpp::Session* sess;

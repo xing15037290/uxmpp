@@ -37,7 +37,7 @@ namespace uxmpp { namespace mod {
         /**
          * Default Constructor.
          */
-        AuthModule () : uxmpp::XmppModule ("mod_auth") { }
+        AuthModule ();
 
         /**
          * Destructor.

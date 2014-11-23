@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -16,11 +16,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <uxmpp/Logger.hpp>
-#include <uxmpp/mod/Roster.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/mod/DiscoInfo.hpp>
 
-#define THIS_FILE "Roster"
+#define THIS_FILE "DiscoInfo"
 
 
 UXMPP_START_NAMESPACE2(uxmpp, mod)
@@ -32,67 +30,54 @@ using namespace uxmpp;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster::Roster (const std::string& version)
-    : uxmpp::XmlObject ("query", XmlIqRosterNs, true, true, 1)
-{
-    if (!version.empty())
-        set_attribute ("ver", version);
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-Roster::Roster (const Roster& roster)
-    : uxmpp::XmlObject (roster)
+DiscoInfo::DiscoInfo ()
+    : XmlObject ("query", "http://jabber.org/protocol/disco#info")
 {
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster::Roster (Roster&& roster)
-    : uxmpp::XmlObject (roster)
+DiscoInfo::DiscoInfo (const uxmpp::XmlObject& info)
+    : XmlObject (info)
 {
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster& Roster::operator= (const Roster& roster)
+DiscoInfo::DiscoInfo (const DiscoInfo& info)
+    : XmlObject (info)
 {
-    if (this != &roster) {
-        uxmpp::XmlObject::operator= (roster);
-    }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+DiscoInfo::DiscoInfo (const DiscoInfo&& info)
+    : XmlObject (info)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+DiscoInfo& DiscoInfo::operator= (const DiscoInfo& info)
+{
+    if (this != &info)
+        XmlObject::operator= (info);
     return *this;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster& Roster::operator= (const uxmpp::XmlObject& roster)
+DiscoInfo& DiscoInfo::operator= (const DiscoInfo&& info)
 {
-    if (this != &roster) {
-        uxmpp::XmlObject::operator= (roster);
-    }
+    XmlObject::operator= (info);
     return *this;
 }
 
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-Roster& Roster::operator= (Roster&& roster)
-{
-    uxmpp::XmlObject::operator= (roster);
-    return *this;
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-std::vector<RosterItem>& Roster::get_items ()
-{
-    return reinterpret_cast<std::vector<RosterItem>&> (get_nodes());
-}
 
 
 UXMPP_END_NAMESPACE2

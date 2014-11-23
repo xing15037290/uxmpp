@@ -47,6 +47,61 @@ std::string to_string (const SubscribeOp& type)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+PresenceStanza::PresenceStanza (const std::string& to,
+                                const std::string& from,
+                                const std::string& id)
+    : Stanza (to, from, id)
+{
+    set_tag_name ("presence");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+PresenceStanza::PresenceStanza (const Jid& to, const Jid& from, const std::string& id)
+    : Stanza (to, from, id)
+{
+    set_tag_name ("presence");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+PresenceStanza::PresenceStanza (const PresenceStanza& msg_stanza)
+    : Stanza (msg_stanza)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+PresenceStanza::PresenceStanza (PresenceStanza&& msg_stanza)
+    : Stanza (msg_stanza)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+PresenceStanza& PresenceStanza::operator= (const PresenceStanza& msg_stanza)
+{
+    if (this != &msg_stanza)
+        Stanza::operator= (msg_stanza);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+PresenceStanza& PresenceStanza::operator= (PresenceStanza&& msg_stanza)
+{
+    Stanza::operator= (msg_stanza);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 SubscribeOp PresenceStanza::get_subscribe_op ()
 {
     std::string type = get_attribute ("type");

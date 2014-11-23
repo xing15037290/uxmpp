@@ -19,6 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/KeepAliveModule.hpp>
 #include <uxmpp/Session.hpp>
+#include <uxmpp/XmlNames.hpp>
 
 
 #define THIS_FILE "KeepAliveModule"
@@ -122,6 +123,14 @@ void KeepAliveModule::set_interval (unsigned new_interval)
         sess->get_xml_stream().set_timeout ("keep-alive", 0, true);
     else if (sess->get_state()==SessionState::bound)
         sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+unsigned KeepAliveModule::get_interval () const
+{
+    return interval;
 }
 
 

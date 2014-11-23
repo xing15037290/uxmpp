@@ -29,6 +29,156 @@ using namespace std;
 using namespace uxmpp;
 
 
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem::RosterItem ()
+    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle)
+    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+{
+    std::string strjid = to_string (jid);
+    if (!strjid.empty())
+        set_attribute ("jid", strjid);
+    if (!handle.empty())
+        set_attribute ("name", handle);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem::RosterItem (const uxmpp::Jid& jid, const std::vector<std::string>& groups)
+    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+{
+    std::string strjid = to_string (jid);
+    if (!strjid.empty())
+        set_attribute ("jid", strjid);
+    for (auto group : groups)
+        add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle, const std::vector<std::string>& groups)
+    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+{
+    std::string strjid = to_string (jid);
+    if (!strjid.empty())
+        set_attribute ("jid", strjid);
+    if (!handle.empty())
+        set_attribute ("name", handle);
+    for (auto group : groups)
+        add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem::RosterItem (const RosterItem& item)
+    : uxmpp::XmlObject (item)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem::RosterItem (RosterItem&& item)
+    : uxmpp::XmlObject (item)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem& RosterItem::operator= (const RosterItem& item)
+{
+    if (this != &item)
+        uxmpp::XmlObject::operator= (item);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+RosterItem& RosterItem::operator= (RosterItem&& item)
+{
+    uxmpp::XmlObject::operator= (item);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+uxmpp::Jid RosterItem::get_jid () const
+{
+    return uxmpp::Jid (get_attribute("jid"));
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void RosterItem::set_jid (const uxmpp::Jid& jid)
+{
+    set_attribute ("jid", to_string(jid));
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string RosterItem::get_handle () const
+{
+    return get_attribute ("name");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void RosterItem::set_handle (const std::string& handle)
+{
+    set_attribute ("name", handle);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool RosterItem::is_approved () const
+{
+    return get_attribute("approved") == "true";
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void RosterItem::set_approved (bool approved)
+{
+    set_attribute("approved", approved ? "true" : "");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string RosterItem::get_ask () const
+{
+    return get_attribute ("ask");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string RosterItem::get_subscription () const
+{
+    return get_attribute ("subscription");
+}
+
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 std::vector<std::string> RosterItem::get_groups ()

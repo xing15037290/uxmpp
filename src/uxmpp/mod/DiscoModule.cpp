@@ -200,6 +200,22 @@ void DiscoModule::on_state_change (uxmpp::Session& session,
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+std::vector<DiscoIdentity>& DiscoModule::get_server_identities ()
+{
+    return server_identities;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::vector<std::string>& DiscoModule::get_server_features ()
+{
+    return server_features;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 std::string DiscoModule::query_info (const uxmpp::Jid& jid, const std::string& query_id)
 {
     // Sanity check

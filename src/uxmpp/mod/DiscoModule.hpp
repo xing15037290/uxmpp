@@ -74,16 +74,12 @@ namespace uxmpp { namespace mod {
         /**
          * Return the identities received from the server.
          */
-        std::vector<DiscoIdentity>& get_server_identities () {
-            return server_identities;
-        }
+        std::vector<DiscoIdentity>& get_server_identities ();
 
         /**
          * Return the features received from the server.
          */
-        std::vector<std::string>& get_server_features () {
-            return server_features;
-        }
+        std::vector<std::string>& get_server_features ();
 
         /**
          * Send an info query to a specific jid.

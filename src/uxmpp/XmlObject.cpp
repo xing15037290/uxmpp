@@ -197,4 +197,367 @@ std::string to_string (const XmlObject& xml_obj)
 }
 */
 
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject::XmlObject (int reserved_nodes)
+    :
+    namespace_is_default {false},
+    part {XmlObjPart::all}
+{
+    nodes.reserve (reserved_nodes);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject::XmlObject (const std::string& the_name,
+                      const std::string& the_namespace,
+                      const bool         set_namespace_attr,
+                      const bool         namespace_is_default,
+                      const int          reserved_nodes)
+    :
+    tag_name             {the_name},
+    xml_namespace        {the_namespace},
+    namespace_is_default {namespace_is_default},
+    part                 {XmlObjPart::all}
+{
+    nodes.reserve (reserved_nodes);
+    if (set_namespace_attr)
+        set_default_namespace_attr (the_namespace);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject::XmlObject (const XmlObject& xml_obj)
+{
+    tag_name             = xml_obj.tag_name;
+    xml_namespace        = xml_obj.xml_namespace;
+    namespace_is_default = xml_obj.namespace_is_default;
+    namespace_alias      = xml_obj.namespace_alias;
+    default_namespace    = xml_obj.default_namespace;
+    attributes           = xml_obj.attributes;
+    nodes                = xml_obj.nodes;
+    content              = xml_obj.content;
+    part                 = xml_obj.part;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject::XmlObject (XmlObject&& xml_obj)
+{
+    tag_name             = std::move (xml_obj.tag_name);
+    xml_namespace        = std::move (xml_obj.xml_namespace);
+    namespace_is_default = xml_obj.namespace_is_default;
+    namespace_alias      = std::move (xml_obj.namespace_alias);
+    default_namespace    = std::move (xml_obj.default_namespace);
+    attributes           = std::move (xml_obj.attributes);
+    nodes                = std::move (xml_obj.nodes);
+    content              = std::move (xml_obj.content);
+    part                 = xml_obj.part;
+    xml_obj.namespace_is_default = false;
+    xml_obj.part                 = XmlObjPart::all;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::operator= (const XmlObject& xml_obj)
+{
+    if (&xml_obj != this) {
+        tag_name             = xml_obj.tag_name;
+        xml_namespace        = xml_obj.xml_namespace;
+        namespace_is_default = xml_obj.namespace_is_default;
+        namespace_alias      = xml_obj.namespace_alias;
+        default_namespace    = xml_obj.default_namespace;
+        attributes           = xml_obj.attributes;
+        nodes                = xml_obj.nodes;
+        content              = xml_obj.content;
+        part                 = xml_obj.part;
+    }
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::operator= (XmlObject&& xml_obj)
+{
+    tag_name             = std::move (xml_obj.tag_name);
+    xml_namespace        = std::move (xml_obj.xml_namespace);
+    namespace_is_default = xml_obj.namespace_is_default;
+    namespace_alias      = std::move (xml_obj.namespace_alias);
+    default_namespace    = std::move (xml_obj.default_namespace);
+    attributes           = std::move (xml_obj.attributes);
+    nodes                = std::move (xml_obj.nodes);
+    content              = std::move (xml_obj.content);
+    part                 = xml_obj.part;
+    xml_obj.namespace_is_default = false;
+    xml_obj.part                 = XmlObjPart::all;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string XmlObject::get_tag_name () const
+{
+    return tag_name;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_tag_name (const std::string& name)
+{
+    tag_name = name;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string XmlObject::get_namespace () const
+{
+    return xml_namespace;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_namespace (const std::string& xml_namespace)
+{
+    this->xml_namespace = xml_namespace;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_namespace (const std::string& xml_namespace, bool is_default)
+{
+    this->xml_namespace = xml_namespace;
+    is_namespace_default (is_default);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool XmlObject::is_namespace_default () const
+{
+    return namespace_is_default;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::is_namespace_default (const bool is_default)
+{
+    namespace_is_default = is_default;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+const std::unordered_map<std::string, std::string>& XmlObject::get_namespace_alias () const
+{
+    return namespace_alias;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string XmlObject::get_namespace_alias (const std::string& alias) const
+{
+    auto element = namespace_alias.find (alias);
+    return element==namespace_alias.end() ? "" : (*element).second;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::add_namespace_alias (const std::string& alias, const std::string& xml_namespace)
+{
+    namespace_alias[alias] = xml_namespace;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::remove_namespace_alias (const std::string& alias)
+{
+    namespace_alias.erase (alias);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string XmlObject::get_default_namespace_attr () const
+{
+    return default_namespace;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_default_namespace_attr (const std::string& default_namespace)
+{
+    this->default_namespace = default_namespace;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string XmlObject::get_full_name () const
+{
+    if (xml_namespace.length())
+        return xml_namespace + std::string(":") + tag_name;
+    /*
+      else if (namespace_alias.length())
+      return namespace_alias + std::string(":") + tag_name;
+    */
+    else if (default_namespace.length())
+        return default_namespace + std::string(":") + tag_name;
+    else
+        return tag_name;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+const std::string XmlObject::get_attribute (const std::string& name) const
+{
+    auto value = attributes.find (name);
+    return value == attributes.end() ? "" : (*value).second;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::unordered_map<std::string, std::string>& XmlObject::get_attributes ()
+{
+    return attributes;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_attribute (const std::string& name, const std::string& value)
+{
+    attributes[name] = value;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::remove_attribute (const std::string& name)
+{
+    attributes.erase (name);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::add_node (const XmlObject& xml_obj)
+{
+    nodes.push_back (xml_obj);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::add_node (XmlObject&& xml_obj)
+{
+    nodes.push_back (std::move(xml_obj));
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::vector<XmlObject>& XmlObject::get_nodes ()
+{
+    return nodes;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject XmlObject::get_node (const std::string& name, bool full_name)
+{
+    for (auto& node : get_nodes()) {
+        std::string node_name = full_name ? node.get_full_name() : node.get_tag_name();
+        if (node_name == name)
+            return node;
+    }
+    return XmlObject (0); // Return an empty object
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject XmlObject::get_ns_node (const std::string& name_space)
+{
+    for (auto& node : get_nodes()) {
+        if (name_space == xml_namespace)
+            return node;
+    }
+    return XmlObject (0); // Return an empty object
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+const std::string& XmlObject::get_content () const
+{
+    return content;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_content (const std::string& content)
+{
+    this->content = content;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_content (std::string&& content)
+{
+    this->content = std::move (content);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObject& XmlObject::set_part (const XmlObjPart obj_part)
+{
+    part = obj_part;
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+XmlObjPart XmlObject::get_part () const
+{
+    return part;
+}
+
+
+
 UXMPP_END_NAMESPACE1

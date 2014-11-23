@@ -84,6 +84,77 @@ std::string to_string (const ChatState& state)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+MessageStanza::MessageStanza (const std::string& to,
+                              const std::string& from,
+                              const std::string& body,
+                              const MessageType  type,
+                              const ChatState    chat_state,
+                              const std::string& id,
+                              const std::string& lang)
+    : Stanza (to, from, id)
+{
+    set_tag_name ("message");
+    set_message_type (type);
+    set_chat_state (chat_state);
+    set_body (body, lang);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza::MessageStanza (const Jid&         to,
+                              const Jid&         from,
+                              const std::string& body,
+                              const MessageType  type,
+                              const ChatState    chat_state,
+                              const std::string& id,
+                              const std::string& lang)
+    : Stanza (to, from, id)
+{
+    set_tag_name ("message");
+    set_message_type (type);
+    set_chat_state (chat_state);
+    set_body (body, lang);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza::MessageStanza (const MessageStanza& msg_stanza)
+    : Stanza (msg_stanza)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza::MessageStanza (MessageStanza&& msg_stanza)
+    : Stanza (msg_stanza)
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza& MessageStanza::operator= (const MessageStanza& msg_stanza)
+{
+    if (this != &msg_stanza)
+        Stanza::operator= (msg_stanza);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza& MessageStanza::operator= (MessageStanza&& msg_stanza)
+{
+    Stanza::operator= (msg_stanza);
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 MessageType MessageStanza::get_message_type ()
 {
     std::string type = get_type ();

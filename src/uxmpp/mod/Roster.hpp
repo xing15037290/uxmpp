@@ -21,10 +21,8 @@
 
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmlObject.hpp>
-#include <uxmpp/XmlNames.hpp>
 #include <uxmpp/mod/RosterItem.hpp>
 #include <vector>
-#include <set>
 
 
 namespace uxmpp { namespace mod {
@@ -39,24 +37,17 @@ namespace uxmpp { namespace mod {
         /**
          * Constructor.
          */
-        Roster (const std::string& version="")
-            : uxmpp::XmlObject ("query", XmlIqRosterNs, true, true, 1)
-        {
-            if (!version.empty())
-                set_attribute ("ver", version);
-        }
+        Roster (const std::string& version="");
 
         /**
          * Copy constructor.
          */
-        Roster (const Roster& roster) : uxmpp::XmlObject (roster) {
-        }
+        Roster (const Roster& roster);
 
         /**
          * Move constructor.
          */
-        Roster (Roster&& roster) : uxmpp::XmlObject (roster) {
-        }
+        Roster (Roster&& roster);
 
         /**
          * Destructor.
@@ -66,37 +57,22 @@ namespace uxmpp { namespace mod {
         /**
          * Assignment operator.
          */
-        Roster& operator= (const Roster& roster) {
-            if (this != &roster) {
-                uxmpp::XmlObject::operator= (roster);
-            }
-            return *this;
-        }
+        Roster& operator= (const Roster& roster);
 
         /**
          * Assignment operator.
          */
-        Roster& operator= (const uxmpp::XmlObject& roster) {
-            if (this != &roster) {
-                uxmpp::XmlObject::operator= (roster);
-            }
-            return *this;
-        }
+        Roster& operator= (const uxmpp::XmlObject& roster);
 
         /**
          * Move operator.
          */
-        Roster& operator= (Roster&& roster) {
-            uxmpp::XmlObject::operator= (roster);
-            return *this;
-        }
+        Roster& operator= (Roster&& roster);
 
         /**
          * Return the roster items.
          */
-        std::vector<RosterItem>& get_items () {
-            return reinterpret_cast<std::vector<RosterItem>&> (get_nodes());
-        }
+        std::vector<RosterItem>& get_items ();
     };
 
 

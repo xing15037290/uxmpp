@@ -122,14 +122,7 @@ namespace uxmpp {
                        const MessageType  type=MessageType::normal,
                        const ChatState    chat_state=ChatState::none,
                        const std::string& id="",
-                       const std::string& lang="")
-            : Stanza (to, from, id)
-        {
-            set_tag_name ("message");
-            set_message_type (type);
-            set_chat_state (chat_state);
-            set_body (body, lang);
-        }
+                       const std::string& lang="");
 
         /**
          * Constructor.
@@ -140,26 +133,17 @@ namespace uxmpp {
                        const MessageType  type=MessageType::normal,
                        const ChatState    chat_state=ChatState::none,
                        const std::string& id="",
-                       const std::string& lang="")
-            : Stanza (to, from, id)
-        {
-            set_tag_name ("message");
-            set_message_type (type);
-            set_chat_state (chat_state);
-            set_body (body, lang);
-        }
+                       const std::string& lang="");
 
         /**
          * Copy constructor.
          */
-        MessageStanza (const MessageStanza& msg_stanza) : Stanza (msg_stanza) {
-        }
+        MessageStanza (const MessageStanza& msg_stanza);
 
         /**
          * Move constructor.
          */
-        MessageStanza (MessageStanza&& msg_stanza) : Stanza (msg_stanza) {
-        }
+        MessageStanza (MessageStanza&& msg_stanza);
 
         /**
          * Destructor.
@@ -169,19 +153,12 @@ namespace uxmpp {
         /**
          * Assignment operator.
          */
-        MessageStanza& operator= (const MessageStanza& msg_stanza) {
-            if (this != &msg_stanza)
-                Stanza::operator= (msg_stanza);
-            return *this;
-        }
+        MessageStanza& operator= (const MessageStanza& msg_stanza);
 
         /**
          * Move operator.
          */
-        MessageStanza& operator= (MessageStanza&& msg_stanza) {
-            Stanza::operator= (msg_stanza);
-            return *this;
-        }
+        MessageStanza& operator= (MessageStanza&& msg_stanza);
 
         /**
          * Return the message type.

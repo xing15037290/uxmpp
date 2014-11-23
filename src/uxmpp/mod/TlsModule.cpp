@@ -19,6 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/TlsModule.hpp>
 #include <uxmpp/Session.hpp>
+#include <uxmpp/XmlNames.hpp>
 
 
 #define THIS_FILE "TlsModule"
@@ -38,6 +39,14 @@ static const std::string XmlStarttlsTagFull = XmlStarttlsNs + std::string(":") +
 
 static const std::string XmlProceedTag     = "proceed";
 static const std::string XmlProceedTagFull = XmlStarttlsNs + std::string(":") + XmlProceedTag;
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+TlsModule::TlsModule ()
+    : uxmpp::XmppModule ("mod_starttls")
+{
+}
 
 
 //------------------------------------------------------------------------------

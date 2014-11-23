@@ -54,21 +54,13 @@ public:
      * Copy constructor.
      * @param jid The JID to copy.
      */
-    Jid (const Jid& jid) {
-        local    = jid.local;
-        domain   = jid.domain;
-        resource = jid.resource;
-    }
+    Jid (const Jid& jid) = default;
 
     /**
      * Move constructor.
      * @param jid The JID to move.
      */
-    Jid (Jid& jid) {
-        local    = std::move (jid.local);
-        domain   = std::move (jid.domain);
-        resource = std::move (jid.resource);
-    }
+    Jid (Jid&& jid) = default;
 
     /**
      * Destructor.
@@ -80,44 +72,28 @@ public:
      * @param jid The JID to copy.
      * @return A reference to this object.
      */
-    Jid& operator= (const Jid& jid) {
-        if (&jid != this) {
-            local    = jid.local;
-            domain   = jid.domain;
-            resource = jid.resource;
-        }
-        return *this;
-    }
+    Jid& operator= (const Jid& jid) = default;
 
     /**
      * Move operator.
      * @param jid The JID to move.
      * @return A reference to this object.
      */
-    Jid& operator= (Jid& jid) {
-        local    = std::move (jid.local);
-        domain   = std::move (jid.domain);
-        resource = std::move (jid.resource);
-        return *this;
-    }
+    Jid& operator= (Jid&& jid) = default;
 
     /**
      * Equality operator.
      * @param jid The JID to compare.
      * @return true if the two jid's are identical, false otherwise.
      */
-    bool operator== (const Jid& jid) {
-        return jid.local==local && jid.domain==domain && jid.resource==resource;
-    }
+    bool operator== (const Jid& jid);
 
     /**
      * Inequality operator.
      * @param jid The JID to compare.
      * @return true if the two jid's differ, false otherwise.
      */
-    bool operator!= (const Jid& jid) {
-        return !(*this == jid);
-    }
+    bool operator!= (const Jid& jid);
 
     /**
      * Set the local part of the JID.
@@ -130,9 +106,7 @@ public:
      * Return the local part of the JID.
      * @return The local part of the JID.
      */
-    const std::string& get_local () const {
-        return local;
-    }
+    const std::string& get_local () const;
 
     /**
      * Set the domain part of the JID.
@@ -145,9 +119,7 @@ public:
      * Return the domain part of the JID.
      * @return The domain part of the JID.
      */
-    const std::string& get_domain () const {
-        return domain;
-    }
+    const std::string& get_domain () const;
 
     /**
      * Set the resource part of the JID.
@@ -160,27 +132,21 @@ public:
      * Return the resource part of the JID.
      * @return The resource part of the JID.
      */
-    const std::string& get_resource () const {
-        return resource;
-    }
+    const std::string& get_resource () const;
 
     /**
      * Return a 'bare' jid based on this jid.
      * A bare JID is a JID with only a localpart and a domainpart.
      * @return A copy of this JID but without the resourcepart.
      */
-    Jid bare () const {
-        return Jid (local, domain, "");
-    }
+    Jid bare () const;
 
     /**
      * Return true if this is a bare jid.
      * A bare JID is a JID with only a localpart and a domainpart.
      * @return true if the resourcepart is empty, false otherwise.
      */
-    bool is_bare () const {
-        return resource.length() == 0;
-    }
+    bool is_bare () const;
 
 
 protected:

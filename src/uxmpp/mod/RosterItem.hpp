@@ -22,6 +22,7 @@
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmlObject.hpp>
 #include <uxmpp/Jid.hpp>
+#include <uxmpp/XmlNames.hpp>
 #include <string>
 #include <vector>
 
@@ -38,63 +39,32 @@ namespace uxmpp { namespace mod {
         /**
          * Default constructor.
          */
-        RosterItem ()
-            : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
-        {
-        }
+        RosterItem ();
 
         /**
          * Constructor.
          */
-        RosterItem (const uxmpp::Jid& jid, const std::string& handle="")
-            : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
-        {
-            std::string strjid = to_string (jid);
-            if (!strjid.empty())
-                set_attribute ("jid", strjid);
-            if (!handle.empty())
-                set_attribute ("name", handle);
-        }
+        RosterItem (const uxmpp::Jid& jid, const std::string& handle="");
 
         /**
          * Constructor.
          */
-        RosterItem (const uxmpp::Jid& jid, const std::vector<std::string>& groups)
-            : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
-        {
-            std::string strjid = to_string (jid);
-            if (!strjid.empty())
-                set_attribute ("jid", strjid);
-            for (auto group : groups)
-                add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
-        }
+        RosterItem (const uxmpp::Jid& jid, const std::vector<std::string>& groups);
 
         /**
          * Constructor.
          */
-        RosterItem (const uxmpp::Jid& jid, const std::string& handle, const std::vector<std::string>& groups)
-            : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
-        {
-            std::string strjid = to_string (jid);
-            if (!strjid.empty())
-                set_attribute ("jid", strjid);
-            if (!handle.empty())
-                set_attribute ("name", handle);
-            for (auto group : groups)
-                add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
-        }
+        RosterItem (const uxmpp::Jid& jid, const std::string& handle, const std::vector<std::string>& groups);
 
         /**
          * Copy constructor.
          */
-        RosterItem (const RosterItem& item) : uxmpp::XmlObject (item) {
-        }
+        RosterItem (const RosterItem& item);
 
         /**
          * Move constructor.
          */
-        RosterItem (RosterItem&& item) : uxmpp::XmlObject (item) {
-        }
+        RosterItem (RosterItem&& item);
 
         /**
          * Destructor.
@@ -104,75 +74,52 @@ namespace uxmpp { namespace mod {
         /**
          * Assignment operator.
          */
-        RosterItem& operator= (const RosterItem& item) {
-            if (this != &item)
-                uxmpp::XmlObject::operator= (item);
-            return *this;
-        }
+        RosterItem& operator= (const RosterItem& item);
 
         /**
          * Move operator.
          */
-        RosterItem& operator= (RosterItem&& item) {
-            uxmpp::XmlObject::operator= (item);
-            return *this;
-        }
+        RosterItem& operator= (RosterItem&& item);
 
         /**
          * Get the JID of the item.
          */
-        uxmpp::Jid get_jid () const {
-            return uxmpp::Jid (get_attribute("jid"));
-        }
+        uxmpp::Jid get_jid () const;
 
         /**
          * Set the JID of the item.
          */
-        void set_jid (const uxmpp::Jid& jid) {
-            set_attribute ("jid", to_string(jid));
-        }
+        void set_jid (const uxmpp::Jid& jid);
 
         /**
          * Get the handle of the item.
          */
-        std::string get_handle () const {
-            return get_attribute ("name");
-        }
+        std::string get_handle () const;
 
         /**
          * Set the handle of the item.
          */
-        void set_handle (const std::string& handle) {
-            set_attribute ("name", handle);
-        }
+        void set_handle (const std::string& handle);
 
         /**
          *
          */
-        bool is_approved () const {
-            return get_attribute("approved") == "true";
-        }
+        bool is_approved () const;
 
         /**
          *
          */
-        void set_approved (bool approved) {
-            set_attribute("approved", approved ? "true" : "");
-        }
+        void set_approved (bool approved);
 
         /**
          * Get the 'ask' attribute.
          */
-        std::string get_ask () const {
-            return get_attribute ("ask");
-        }
+        std::string get_ask () const;
 
         /**
          * Get the 'subscription' attribute.
          */
-        std::string get_subscription () const {
-            return get_attribute ("subscription");
-        }
+        std::string get_subscription () const;
 
         /**
          * Get the group(s) that the item belongs to.

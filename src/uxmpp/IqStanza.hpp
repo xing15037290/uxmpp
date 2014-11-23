@@ -39,19 +39,7 @@ namespace uxmpp {
     /**
      * Return a string representation of the type of IQ stanza.
      */
-    static inline std::string to_string (const IqType& iq_type) {
-        switch (iq_type) {
-        case IqType::get :
-            return "get";
-        case IqType::set :
-            return "set";
-        case IqType::result :
-            return "result";
-        case IqType::error :
-        default :
-            return "error";
-        }
-    }
+    std::string to_string (const IqType& iq_type);
 
 
     /**
@@ -62,34 +50,22 @@ namespace uxmpp {
         /**
          * Constructor.
          */
-        IqStanza (const IqType type, const std::string& to="", const std::string& from="", const std::string& id="")
-            : Stanza (to, from, id)
-        {
-            set_tag_name ("iq");
-            set_attribute ("type", to_string(type));
-        }
+        IqStanza (const IqType type, const std::string& to="", const std::string& from="", const std::string& id="");
 
         /**
          * Constructor.
          */
-        IqStanza (const IqType type, const Jid& to, const Jid& from, const std::string& id="")
-            : Stanza (to, from, id)
-        {
-            set_tag_name ("iq");
-            set_attribute ("type", to_string(type));
-        }
+        IqStanza (const IqType type, const Jid& to, const Jid& from, const std::string& id="");
 
         /**
          * Copy constructor.
          */
-        IqStanza (const IqStanza& iq_stanza) : Stanza (iq_stanza) {
-        }
+        IqStanza (const IqStanza& iq_stanza);
 
         /**
          * Move constructor.
          */
-        IqStanza (IqStanza&& iq_stanza) : Stanza (iq_stanza) {
-        }
+        IqStanza (IqStanza&& iq_stanza);
 
         /**
          * Destructor.
@@ -99,42 +75,22 @@ namespace uxmpp {
         /**
          * Assignment operator.
          */
-        IqStanza& operator= (const IqStanza& iq_stanza) {
-            if (this != &iq_stanza)
-                Stanza::operator= (iq_stanza);
-            return *this;
-        }
+        IqStanza& operator= (const IqStanza& iq_stanza);
 
         /**
          * Move operator.
          */
-        IqStanza& operator= (IqStanza&& iq_stanza) {
-            Stanza::operator= (iq_stanza);
-            return *this;
-        }
+        IqStanza& operator= (IqStanza&& iq_stanza);
 
         /**
          * Get the IQ type.
          */
-        IqType get_type () const {
-            std::string type = get_attribute ("type");
-            if (type == "get")
-                return IqType::get;
-            if (type == "set")
-                return IqType::set;
-            if (type == "result")
-                return IqType::result;
-            if (type == "error")
-                return IqType::error;
-            return IqType::error; // default
-        }
+        IqType get_type () const;
 
         /**
          * Set the IQ type.
          */
-        void set_type (const IqType type) {
-            set_attribute ("type", to_string(type));
-        }
+        void set_type (const IqType type);
     };
 
 

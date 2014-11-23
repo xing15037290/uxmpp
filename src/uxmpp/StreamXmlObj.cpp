@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -16,83 +16,96 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <uxmpp/StreamXmlObj.hpp>
 #include <uxmpp/Logger.hpp>
-#include <uxmpp/mod/Roster.hpp>
 #include <uxmpp/XmlNames.hpp>
 
-#define THIS_FILE "Roster"
+
+#define THIS_FILE "StreamXmlObj.cpp"
 
 
-UXMPP_START_NAMESPACE2(uxmpp, mod)
+UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
-using namespace uxmpp;
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster::Roster (const std::string& version)
-    : uxmpp::XmlObject ("query", XmlIqRosterNs, true, true, 1)
+StreamXmlObj::StreamXmlObj ()
+    : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
 {
-    if (!version.empty())
-        set_attribute ("ver", version);
+    add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
+    set_default_namespace_attr (XmlJabberClientNs);
+    set_attribute ("version", "1.0");
+    set_attribute ("xml:lang", "en");
+    set_part (XmlObjPart::start);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster::Roster (const Roster& roster)
-    : uxmpp::XmlObject (roster)
+StreamXmlObj::StreamXmlObj (const std::string& to, const std::string& from)
+    : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
 {
+    add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
+    set_default_namespace_attr (XmlJabberClientNs);
+    set_attribute ("version", "1.0");
+    set_attribute ("xml:lang", "en");
+    set_part (XmlObjPart::start);
+
+    set_to (to);
+    set_from (from);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster::Roster (Roster&& roster)
-    : uxmpp::XmlObject (roster)
+void StreamXmlObj::set_to (const std::string& to)
 {
+    set_attribute ("to", to);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster& Roster::operator= (const Roster& roster)
+std::string StreamXmlObj::get_to () const
 {
-    if (this != &roster) {
-        uxmpp::XmlObject::operator= (roster);
-    }
-    return *this;
+    return get_attribute ("to");
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster& Roster::operator= (const uxmpp::XmlObject& roster)
+void StreamXmlObj::set_id (const std::string& id)
 {
-    if (this != &roster) {
-        uxmpp::XmlObject::operator= (roster);
-    }
-    return *this;
+    set_attribute ("id", id);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Roster& Roster::operator= (Roster&& roster)
+std::string StreamXmlObj::get_id () const
 {
-    uxmpp::XmlObject::operator= (roster);
-    return *this;
+    return get_attribute ("id");
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::vector<RosterItem>& Roster::get_items ()
+void StreamXmlObj::set_from (const std::string& from)
 {
-    return reinterpret_cast<std::vector<RosterItem>&> (get_nodes());
+    set_attribute ("from", from);
 }
 
 
-UXMPP_END_NAMESPACE2
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string StreamXmlObj::get_from () const
+{
+    return get_attribute ("from");
+}
+
+
+
+UXMPP_END_NAMESPACE1

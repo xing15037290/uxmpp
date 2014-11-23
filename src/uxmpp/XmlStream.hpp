@@ -98,16 +98,12 @@ namespace uxmpp {
         /**
          * Check if the stream is open.
          */
-        bool is_open () const {
-            return sock != -1;
-        }
+        bool is_open () const;
 
         /**
          * Return the IP(v4|v6) address of the peer.
          */
-        uxmpp::net::IpHostAddr get_peer_addr () const {
-            return peer_addr;
-        }
+        uxmpp::net::IpHostAddr get_peer_addr () const;
 
         /**
          * Start TLS.

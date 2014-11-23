@@ -72,4 +72,29 @@ std::string to_string (const IpHostAddr& addr)
 }
 
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+IpHostAddr::IpHostAddr ()
+    :
+    hostname {""},
+    proto    {AddrProto::tcp},
+    type     {AddrType::ipv4},
+    ipv6     {{0}},
+    port     {0}
+{
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool IpHostAddr::operator== (const IpHostAddr& addr)
+{
+    return hostname == addr.hostname
+        && type == addr.type
+        && proto == addr.proto
+        && (type==AddrType::ipv4 ? ipv4==addr.ipv4 : ipv6==addr.ipv6)
+        && port == addr.port;
+}
+
+
 UXMPP_END_NAMESPACE2

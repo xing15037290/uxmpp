@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -19,6 +19,7 @@
 #ifndef UXMPP_UXMPPEXCEPTION_HPP
 #define UXMPP_UXMPPEXCEPTION_HPP
 
+#include <uxmpp/types.hpp>
 #include <string>
 
 
@@ -33,8 +34,7 @@ namespace uxmpp {
         /**
          * Constructor.
          */
-        UxmppException (const std::string& description="") : msg{description} {
-        }
+        UxmppException (const std::string& description="");
 
         /**
          * Destructor.
@@ -44,9 +44,7 @@ namespace uxmpp {
         /**
          * Return the error description.
          */
-        const std::string& what () const {
-            return msg;
-        }
+        const std::string& what () const;
 
 
     protected:

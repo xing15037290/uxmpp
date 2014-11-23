@@ -48,36 +48,25 @@ namespace uxmpp { namespace mod {
          */
         DiscoIdentity (const std::string& category,
                        const std::string& type,
-                       const std::string& name="")
-            : XmlObject ("identity", "http://jabber.org/protocol/disco#info", false)
-        {
-            set_category (category);
-            set_type (type);
-            set_name (name);
-        }
+                       const std::string& name="");
 
         /**
          * Constructor.
          * @param identity An xml object viewed as a sevice discovery identity object.
          */
-        DiscoIdentity (const uxmpp::XmlObject& identity)
-            : XmlObject (identity)
-        {
-        }
+        DiscoIdentity (const uxmpp::XmlObject& identity);
 
         /**
          * Copy constructor.
          * @param identity The object to copy.
          */
-        DiscoIdentity (const DiscoIdentity& identity) : XmlObject (identity) {
-        }
+        DiscoIdentity (const DiscoIdentity& identity);
 
         /**
          * Move constructor.
          * @param identity The object to move.
          */
-        DiscoIdentity (const DiscoIdentity&& identity) : XmlObject (identity) {
-        }
+        DiscoIdentity (const DiscoIdentity&& identity);
 
         /**
          * Destructor.
@@ -88,71 +77,52 @@ namespace uxmpp { namespace mod {
          * Assignment operator.
          * @param identity The object to copy.
          */
-        DiscoIdentity& operator= (const DiscoIdentity& identity) {
-            if (this != &identity)
-                XmlObject::operator= (identity);
-            return *this;
-        }
+        DiscoIdentity& operator= (const DiscoIdentity& identity);
 
         /**
          * Move operator.
          * @param identity The object to move.
          */
-        DiscoIdentity& operator= (const DiscoIdentity&& identity) {
-            XmlObject::operator= (identity);
-            return *this;
-        }
+        DiscoIdentity& operator= (const DiscoIdentity&& identity);
 
         /**
          * Return the identity category.
          * This will return the value of the 'category' attribute.
          * @return The identity category.
          */
-        const std::string get_category () const {
-            return get_attribute ("category");
-        }
+        const std::string get_category () const;
 
         /**
          * Set the identity category.
          * @param category The value of the 'category' attribute.
          */
-        void set_category (const std::string& category) {
-            set_attribute ("category", category);
-        }
+        void set_category (const std::string& category);
 
         /**
          * Return the identity type.
          * This will return the value of the 'type' attribute.
          * @return The identity type.
          */
-        const std::string get_type () const {
-            return get_attribute ("type");
-        }
+        const std::string get_type () const;
 
         /**
          * Set the identity type.
          * @param type The value of the 'type' attribute.
          */
-        void set_type (const std::string& type) {
-            set_attribute ("type", type);
-        }
+        void set_type (const std::string& type);
 
         /**
          * Return the identity name.
          * This will return the value of the 'name attribute.
          * @return The identity name.
          */
-        const std::string get_name () const {
-            return get_attribute ("name");
-        }
+        const std::string get_name () const;
 
         /**
          * Set the identity name.
          * @param name The value of the 'name' attribute.
          */
-        void set_name (const std::string& name) {
-            set_attribute ("name", name);
-        }
+        void set_name (const std::string& name);
     };
 
 

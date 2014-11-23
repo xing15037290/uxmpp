@@ -64,8 +64,7 @@ namespace uxmpp { namespace net {
         /**
          * Default constructor.
          */
-        IpHostAddr () : hostname{""}, proto{AddrProto::tcp}, type{AddrType::ipv4}, ipv6{{0}}, port{0} {
-        }
+        IpHostAddr ();
 
         /**
          * Destructor.
@@ -75,13 +74,7 @@ namespace uxmpp { namespace net {
         /**
          * Compare operator.
          */
-        bool operator== (const IpHostAddr& addr) {
-            return hostname == addr.hostname
-                && type == addr.type
-                && proto == addr.proto
-                && (type==AddrType::ipv4 ? ipv4==addr.ipv4 : ipv6==addr.ipv6)
-                && port == addr.port;
-        }
+        bool operator== (const IpHostAddr& addr);
 
         /**
          * The name of the host.
