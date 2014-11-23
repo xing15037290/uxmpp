@@ -70,7 +70,7 @@ namespace uxmpp {
          * Constructor.
          * This will create an XML object with specified tag name and namespace.
          * <br/><em>Warning:</em> No check is made for valid XML names.
-         * @param the_name The tag name of the XML element.
+         * @param tag_name The tag name of the XML element.
          *                 If the name of the XML element is an empty string, the
          *                 XML object will be treated as an invalid object and will
          *                 have a value of false in boolean expressions and an empty
@@ -78,7 +78,7 @@ namespace uxmpp {
          *                 child elements).
          *                 <br/><em>Note:</em> Do not include the namespace in the
          *                 name, use parameter <code>the_namespace</code> instead.
-         * @param the_namespace The namespace of the XML element.
+         * @param xml_namespace The namespace of the XML element.
          *                      This defines the namespace the object belongs to.
          * @param set_namespace_attr Set the namespace as an 'xmlns' attribute.
          *                           If true, the attribute 'xmlns' will be set with the
@@ -94,8 +94,8 @@ namespace uxmpp {
          *                       that will be added to the XML object this can be used
          *                       to optimize memory allocation a bit.
          */
-        XmlObject (const std::string& the_name,
-                   const std::string& the_namespace="",
+        XmlObject (const std::string& tag_name,
+                   const std::string& xml_namespace="",
                    const bool         set_namespace_attr=true,
                    const bool         namespace_is_default=true,
                    const int          reserved_nodes=0);
@@ -332,7 +332,7 @@ namespace uxmpp {
          *         XML object. The resulting object can be tested in a
          *         boolean expression and if false, no child node was found.
          */
-        XmlObject get_node (const std::string& name, bool full_name=false);
+        XmlObject find_node (const std::string& name, bool full_name=false);
 
         /**
          * Return the first child node with a given name space.
@@ -344,7 +344,7 @@ namespace uxmpp {
          *         The result can be tested in a boolean expression
          *         and if false, no element was found.
          */
-        XmlObject get_ns_node (const std::string& name_space);
+        XmlObject find_node_by_namespace (const std::string& name_space);
 
         /**
          * Set the content of the XML object.

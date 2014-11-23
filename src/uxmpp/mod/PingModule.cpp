@@ -79,7 +79,7 @@ bool PingModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
         // Check for incoming ping
         //
         if (iq.get_type() == IqType::get) {
-            XmlObject ping = xml_obj.get_node (XmlPingTagFull, true);
+            XmlObject ping = xml_obj.find_node (XmlPingTagFull, true);
             if (ping) {
                 uxmpp_log_debug (THIS_FILE, "Got ping from ", to_string(iq.get_from()));
                 sess->send_stanza (IqStanza(IqType::result, iq.get_from(), sess->get_jid(), iq.get_id()));

@@ -114,7 +114,7 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
 
         // Check if this is a receipt
         //
-        XmlObject receipt = msg.get_node ("urn:xmpp:receipts:received", true);
+        XmlObject receipt = msg.find_node ("urn:xmpp:receipts:received", true);
         if (receipt) {
             // Call registered receipt handler
             if (receipt_handler)
@@ -122,7 +122,7 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
 
             // The receipt should not include a message body, but if it does we
             // call the registered message handler
-            if (msg.get_node("body")) {
+            if (msg.find_node("body")) {
                 if (message_handler)
                     message_handler (*this, msg);
             }
@@ -135,7 +135,7 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
         // Check for requested receipt (XEP-0184)
         // Don't send a receipt if the sender is not authorized to view our presence (XEP-0184, section 8).
         //
-        XmlObject request = msg.get_node ("urn:xmpp:receipts:request", true);
+        XmlObject request = msg.find_node ("urn:xmpp:receipts:request", true);
         if (request && is_jid_authorized(session, msg.get_from().bare())) {
             sess->send_stanza (MessageStanza(msg.get_from(), sess->get_jid()).
                                remove_attribute("type").
@@ -172,7 +172,7 @@ void MessageModule::send_message (const MessageStanza& msg, bool want_receipt)
         //
         // Add a receipt request if not already added
         //
-        if (!ms.get_node("urn:xmpp:receipts:request", true))
+        if (!ms.find_node("urn:xmpp:receipts:request", true))
             ms.add_node (XmlObject("request", "urn:xmpp:receipts"));
     }else{
         //

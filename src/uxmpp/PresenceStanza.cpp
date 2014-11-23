@@ -128,7 +128,7 @@ PresenceStanza& PresenceStanza::set_subscribe_op (const SubscribeOp& type)
 //------------------------------------------------------------------------------
 std::string PresenceStanza::get_show ()
 {
-    auto node = get_node ("show");
+    auto node = find_node ("show");
     return node ? node.get_content() : "";
 }
 
@@ -232,7 +232,7 @@ PresenceStanza& PresenceStanza::set_status (const std::string& status, const std
 //------------------------------------------------------------------------------
 int PresenceStanza::get_priority ()
 {
-    auto node = get_node ("priority");
+    auto node = find_node ("priority");
     try {
         return stoi (node.get_content());
     }

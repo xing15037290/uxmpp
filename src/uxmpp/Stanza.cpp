@@ -227,7 +227,7 @@ int Stanza::get_error_code ()
 {
     if (!have_error())
         return 0;
-    auto node = get_node (XmlIqErrorStanzaTagFull, true);
+    auto node = find_node (XmlIqErrorStanzaTagFull, true);
     return node ? atoi(node.get_attribute("code").c_str()) : 0;
 }
 
@@ -238,7 +238,7 @@ std::string Stanza::get_error_name ()
 {
     if (!have_error())
         return "";
-    auto node = get_node (XmlIqErrorStanzaTagFull, true);
+    auto node = find_node (XmlIqErrorStanzaTagFull, true);
     if (node) {
         auto child_nodes = node.get_nodes ();
         if (!child_nodes.empty())

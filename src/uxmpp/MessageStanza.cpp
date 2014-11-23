@@ -185,7 +185,7 @@ MessageStanza& MessageStanza::set_message_type (const MessageType type)
 //------------------------------------------------------------------------------
 std::string MessageStanza::get_thread ()
 {
-    return get_node("thread").get_content ();
+    return find_node("thread").get_content ();
 }
 
 
@@ -223,7 +223,7 @@ MessageStanza& MessageStanza::set_thread (const std::string& thread_id, const st
 //------------------------------------------------------------------------------
 std::string MessageStanza::get_parent_thread ()
 {
-    return get_node("thread").get_attribute ("parent");
+    return find_node("thread").get_attribute ("parent");
 }
 
 
@@ -320,7 +320,7 @@ MessageStanza& MessageStanza::set_body (const std::string& body, std::string lan
 //------------------------------------------------------------------------------
 ChatState MessageStanza::get_chat_state ()
 {
-    string state = get_ns_node(ChatStateNs).get_tag_name ();
+    string state = find_node_by_namespace(ChatStateNs).get_tag_name ();
 
     if (state == "active")
         return ChatState::active;

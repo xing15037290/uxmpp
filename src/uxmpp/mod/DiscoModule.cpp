@@ -110,7 +110,7 @@ void DiscoModule::module_unregistered (uxmpp::Session& session)
 //------------------------------------------------------------------------------
 void DiscoModule::handle_feature_request_result (IqStanza& iq)
 {
-    XmlObject query = iq.get_node (XmlDiscoInfoQueryTagFull, true);
+    XmlObject query = iq.find_node (XmlDiscoInfoQueryTagFull, true);
     if (!query)
         return;
 

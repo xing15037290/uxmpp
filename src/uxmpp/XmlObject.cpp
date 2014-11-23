@@ -493,7 +493,7 @@ std::vector<XmlObject>& XmlObject::get_nodes ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-XmlObject XmlObject::get_node (const std::string& name, bool full_name)
+XmlObject XmlObject::find_node (const std::string& name, bool full_name)
 {
     for (auto& node : get_nodes()) {
         std::string node_name = full_name ? node.get_full_name() : node.get_tag_name();
@@ -506,7 +506,7 @@ XmlObject XmlObject::get_node (const std::string& name, bool full_name)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-XmlObject XmlObject::get_ns_node (const std::string& name_space)
+XmlObject XmlObject::find_node_by_namespace (const std::string& name_space)
 {
     for (auto& node : get_nodes()) {
         if (name_space == xml_namespace)

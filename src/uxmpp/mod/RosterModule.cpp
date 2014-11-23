@@ -79,7 +79,7 @@ bool RosterModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObjec
         // Check for roster query result
         //
         if (iq.get_id()==roster_query_id && iq.get_type()==IqType::result) {
-            XmlObject node = iq.get_node ("jabber:iq:roster:query", true);
+            XmlObject node = iq.find_node ("jabber:iq:roster:query", true);
             if (node) {
                 uxmpp_log_trace (THIS_FILE, "Got roster query result");
                 roster = std::move (node);
@@ -109,9 +109,9 @@ bool RosterModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObjec
             //
             // Check for roster query push
             //
-            XmlObject query = iq.get_node ("jabber:iq:roster:query", true);
-            //XmlObject node = iq.getNode ("jabber:iq:roster", true);
-            XmlObject item = query.get_node ("jabber:iq:roster:item", true);
+            XmlObject query = iq.find_node ("jabber:iq:roster:query", true);
+            //XmlObject node = iq.find_node ("jabber:iq:roster", true);
+            XmlObject item = query.find_node ("jabber:iq:roster:item", true);
             if (query && item) {
                 //
                 // Check 'from' (RFC 6121, section 2.1.6)
