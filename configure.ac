@@ -113,8 +113,6 @@ AC_SEARCH_LIBS([res_query], [resolv], [
 #
 AC_SEARCH_LIBS([timer_create], [rt], [
 			    AC_DEFINE([UXMPP_HAVE_POSIX_TIMERS],[1],[Define to 1 if timer_create() is available])
-			    LIBS+=-lrt
-			    LIBS_IN_PC_FILE+=-lrt
 			    ])
 
 
@@ -131,6 +129,7 @@ AM_CONDITIONAL([ENABLE_TESTAPPS_SET], [test "x$enable_testapps" != "xno"])
 #
 # All libraries are added
 #
+LIBS_IN_PC_FILE+="$LIBS"
 AC_SUBST([LIBS_IN_PC_FILE])
 AC_SUBST([REQUIRE_IN_PC_FILE])
 AC_SUBST([PREDEFINED_IN_DOXYGEN])
