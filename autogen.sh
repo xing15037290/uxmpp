@@ -4,5 +4,5 @@
 # Boot autotools
 #
 echo "Boot autotools..."
-mkdir -p m4
 autoreconf --install
+automake --add-missing --copy
