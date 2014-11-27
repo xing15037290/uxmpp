@@ -29,6 +29,9 @@ namespace uxmpp {
 
 }
 
+#include <uxmpp/io/TimerException.hpp>
 #include <uxmpp/io/Timer.hpp>
+#include <uxmpp/io/Connection.hpp>
+#include <uxmpp/io/io_operation.hpp>
 
 #endif

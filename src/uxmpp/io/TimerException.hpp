@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -16,41 +16,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_UTILS_HPP
-#define UXMPP_UTILS_HPP
+#ifndef UXMPP_IO_TIMEREXCEPTION_HPP
+#define UXMPP_IO_TIMEREXCEPTION_HPP
 
 #include <uxmpp/types.hpp>
+#include <uxmpp/UxmppException.hpp>
 #include <string>
 
 
-namespace uxmpp {
-
-
-    /**
-     *
-     */
-    std::string base64_encode (const std::string& bindata);
-
+namespace uxmpp { namespace io {
 
     /**
-     *
+     * Timer exceptions.
      */
-    std::string base64_decode (const std::string& ascdata);
+    class TimerException : public uxmpp::UxmppException {
+    public:
 
+        /**
+         * Constructor.
+         */
+        TimerException (const std::string& description="") : uxmpp::UxmppException(description) {
+        }
 
-    /**
-     *
-     */
-    bool block_signal (int signal_number);
+        /**
+         * Destructor.
+         */
+        virtual ~TimerException () = default;
+    };
 
-
-    /**
-     *
-     */
-    bool unblock_signal (int signal_number);
-
-
-}
-
+}}
 
 #endif

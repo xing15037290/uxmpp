@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -16,41 +16,45 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_UTILS_HPP
-#define UXMPP_UTILS_HPP
+#ifndef UXMPP_IO_IOMANAGER_HPP
+#define UXMPP_IO_IOMANAGER_HPP
 
 #include <uxmpp/types.hpp>
-#include <string>
+#include <uxmpp/io/Connection.hpp>
+#include <uxmpp/io/io_operation.hpp>
+
+#include <queue>
+#include <map>
 
 
-namespace uxmpp {
+namespace uxmpp { namespace io {
 
+/**
+ *
+ */
+class IOManager {
+public:
+    /**
+     *
+     */
+    IOManager ();
 
     /**
      *
      */
-    std::string base64_encode (const std::string& bindata);
+    virtual ~IOManager ();
 
 
-    /**
-     *
-     */
-    std::string base64_decode (const std::string& ascdata);
+private:
+
+    struct connection_queue_t {
+        std::queue<io_operation_t> rx_ops;
+        std::queue<io_operation_t> tx_ops;
+    };
+
+    std::map<Connection*, connection_queue_t> connections;
+};
 
 
-    /**
-     *
-     */
-    bool block_signal (int signal_number);
-
-
-    /**
-     *
-     */
-    bool unblock_signal (int signal_number);
-
-
-}
-
-
+}}
 #endif

@@ -23,5 +23,8 @@
 /* Define to 1 if res_query() is available */
 #undef UXMPP_HAVE_BSD_RESOLVER
 
+/* Define to 1 if timer_create() is available */
+#undef UXMPP_HAVE_POSIX_TIMERS
+
 
 #endif

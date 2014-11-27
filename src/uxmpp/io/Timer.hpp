@@ -20,6 +20,7 @@
 #define UXMPP_IO_TIMER_HPP
 
 #include <uxmpp/types.hpp>
+#include <uxmpp/io/TimerException.hpp>
 #include <mutex>
 #include <functional>
 #include <signal.h>
@@ -30,40 +31,83 @@ namespace uxmpp { namespace io {
 
 
 /**
- *
+ * Class used to represent a timer.
+ * The timer is implemented using POSIX per-process timers.
  */
 class Timer {
 public:
 
     /**
-     *
+     * Callback that is called when a timer expires.
+     * @param timer The timed that has expired.
      */
-    Timer (std::function<void (Timer*)> cb, int signal_number=SIGRTMIN);
+    typedef std::function<void (Timer& timer)> timer_callback_t;
 
     /**
-     *
+     * Constructor.
+     * @param signal_number The signal timer that will be used by the process to
+     *                      handle the timer. Default is SIGRTMIN.
+     *                      One worker thread will be created for each signal to
+     *                      manage all threads that use the same signal number.
+     * @param cb Callback to be called when the timer expires. The parameter to
+     *           the callback is a reference to the timer that expired.
+     * @throws TimerException If unsuccessful to install a signal handler or
+     *                        create a system timer object.
+     */
+    Timer (int signal_number=SIGRTMIN, timer_callback_t cb=nullptr) throw (TimerException);
+
+    /**
+     * Constructor.
+     * @param cb Callback to be called when the timer expires. The parameter to
+     *           the callback is a reference to the timer that expired.
+     * @throws TimerException If unsuccessful to install a signal handler or
+     *                        create a system timer object.
+     */
+    Timer (timer_callback_t cb) throw (TimerException) : Timer (SIGRTMIN, cb) {}
+
+    /**
+     * Destructor.
+     * Stops an deinitializes the timer.
      */
     virtual ~Timer ();
 
     /**
      * Set the timer expration time.
+     * @param initial The initial time in milliseconds until the times shall expire.
+     * @param interval The inteval in milliseconds that the timer
+     *                 shall expire after the initial expiration.
+     *                 Set this to zero for a one-shot timer.
      */
     void set (unsigned initial, unsigned interval=0);
 
     /**
      * Cancel the timer.
+     * After this call the callback will not be called until the timer is set again.
      */
     void cancel () {
         set (0, 0);
     }
 
+    /**
+     * Set the callback that will be called when the timer expires.
+     */
+    void set_callback (timer_callback_t new_callback);
+
+    /**
+     * Get the current overrun count for the timer.
+     * @return The current overrun count for the timer.
+     */
+    int get_overrun ();
+
 
 private:
     timer_t id;
+    int signum;
     std::mutex set_mutex;
-    std::mutex destructor_mutex;
-    std::function<void (Timer* t)> callback;
-    static void initialize (int signal_number);
+    timer_callback_t callback;
+    unsigned initial;
+    unsigned interval;
+    static void initialize_controller (int signal_number) throw (TimerException);
 };
 
 

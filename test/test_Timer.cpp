@@ -17,6 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/Logger.hpp>
+#include <uxmpp/utils.hpp>
 #include <uxmpp/io/Timer.hpp>
 
 
@@ -35,25 +36,39 @@ using namespace uxmpp::io;
 //------------------------------------------------------------------------------
 int main (int argc, char* argv[])
 {
-    uxmpp_set_log_level (LogLevel::trace);
+    //block_signal (SIGRTMIN);
+    //block_signal (SIGRTMIN+1);
 
-    Timer t1 ([](Timer* t){
-            uxmpp_log_info (THIS_FILE, "t expired");
-        });
+    try {
+        uxmpp_set_log_level (LogLevel::trace);
 
-    Timer t3 ([](Timer* t){
-            uxmpp_log_info (THIS_FILE, "t3 expired");
-        });
+        Timer t1 ([](Timer& t){
+                uxmpp_log_info (THIS_FILE, "t1 expired - overrun: ", t.get_overrun());
+            });
 
-    Timer t2 ([&t3](Timer* t){
-            uxmpp_log_info (THIS_FILE, "t2 expired");
-        });
+        Timer t3 ([](Timer& t){
+                uxmpp_log_info (THIS_FILE, "t3 expired - overrun: ", t.get_overrun());
+                //t.cancel ();
+            });
 
-    t3.set (2000);
-    t1.set (500, 50);
-    t2.set (5000, 5000);
+        Timer t2 (SIGRTMIN+1, [&t3](Timer& t){
+                uxmpp_log_info (THIS_FILE, "t2 expired - overrun: ", t.get_overrun());
+                this_thread::sleep_for (chrono::milliseconds(400));
+                uxmpp_log_info (THIS_FILE, "t2 expired - done");
+            });
 
-    this_thread::sleep_for (chrono::seconds(11));
+        t3.set (1000, 40);
+        t1.set (1000, 500);
+        t2.set (1000, 500);
+
+        this_thread::sleep_for (chrono::seconds(4));
+    }
+    catch (UxmppException& ue) {
+        uxmpp_log_fatal (THIS_FILE, ue.what());
+    }
+    catch (...) {
+        uxmpp_log_fatal (THIS_FILE, "Unknown exception caught");
+    }
 
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -16,41 +16,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_UTILS_HPP
-#define UXMPP_UTILS_HPP
-
-#include <uxmpp/types.hpp>
-#include <string>
+#include <uxmpp/io/IOManager.hpp>
+#include <uxmpp/Logger.hpp>
 
 
-namespace uxmpp {
+UXMPP_START_NAMESPACE2(uxmpp, io)
+
+#define THIS_FILE "IOManager"
 
 
-    /**
-     *
-     */
-    std::string base64_encode (const std::string& bindata);
+using namespace std;
+using namespace uxmpp;
 
 
-    /**
-     *
-     */
-    std::string base64_decode (const std::string& ascdata);
-
-
-    /**
-     *
-     */
-    bool block_signal (int signal_number);
-
-
-    /**
-     *
-     */
-    bool unblock_signal (int signal_number);
-
-
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+IOManager::IOManager ()
+{
 }
 
 
-#endif
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+IOManager::~IOManager ()
+{
+}
+
+
+UXMPP_END_NAMESPACE2

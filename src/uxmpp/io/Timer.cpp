@@ -22,6 +22,8 @@
 #include <thread>
 #include <queue>
 #include <semaphore.h>
+#include <cstring>
+#include <map>
 
 
 UXMPP_START_NAMESPACE2(uxmpp, io)
@@ -33,29 +35,43 @@ using namespace std;
 using namespace uxmpp;
 
 
+
+
+/**
+ *
+ */
+struct timer_controller_t {
+    sem_t sig_sem;
+    std::thread worker_thread;
+    bool quit_worker_thread;
+    std::queue<Timer*> timer_queue;
+};
+
+
 static void signal_handler (int sig, siginfo_t* si, void* data);
-static bool initialized = false;
-static std::mutex initialize_mutex;
-static sem_t sig_sem;
-static std::thread worker_thread;
-static bool quit_worker_thread = false;
-static std::queue<Timer*> timer_queue;
+static std::mutex timer_controller_mutex;
+static map<int, timer_controller_t> signal_timer_map;
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Timer::Timer (function<void (Timer*)> cb, int signal_number)
-    : callback (cb)
+Timer::Timer (int signal_number, timer_callback_t cb) throw (TimerException)
+    :
+    signum   {signal_number},
+    callback {cb},
+    initial  {0},
+    interval {0}
 {
-    if (!initialized)
-        initialize (signal_number);
+    initialize_controller (signal_number);
 
     struct sigevent se;
     se.sigev_notify = SIGEV_SIGNAL;
     se.sigev_signo  = signal_number;
     se.sigev_value.sival_ptr = this;
     if (timer_create(CLOCK_REALTIME, &se, &id)) {
+        int errnum = errno;
         uxmpp_log_error (THIS_FILE, "Unable to create timer using signal ", signal_number);
+        throw TimerException (string("Unable to create timer: ") + string(strerror(errnum)));
         callback = nullptr;
     }
 }
@@ -65,7 +81,7 @@ Timer::Timer (function<void (Timer*)> cb, int signal_number)
 //------------------------------------------------------------------------------
 Timer::~Timer ()
 {
-    destructor_mutex.lock ();
+    cancel ();
     timer_delete (id);
 }
 
@@ -76,7 +92,13 @@ void Timer::set (unsigned initial, unsigned interval)
 {
     struct itimerspec ts;
 
-    set_mutex.lock ();
+    timer_controller_mutex.lock ();
+    timer_controller_t& tc = signal_timer_map[signum];
+    timer_controller_mutex.unlock ();
+
+    bool need_lock = this_thread::get_id() != tc.worker_thread.get_id();
+    if (need_lock)
+        set_mutex.lock ();
 
     ts.it_value.tv_sec  = (initial / 1000);
     ts.it_value.tv_nsec = (initial % 1000) * 1000000;
@@ -84,13 +106,52 @@ void Timer::set (unsigned initial, unsigned interval)
     ts.it_interval.tv_nsec = (interval % 1000) * 1000000;
 
     auto result = timer_settime (id, 0, &ts, NULL);
-    set_mutex.unlock ();
+    this->initial  = initial;
+    this->interval = interval;
+    if (need_lock)
+        set_mutex.unlock ();
+
     if (result) {
         if (initial==0 && interval==0)
             uxmpp_log_error (THIS_FILE, "Unable to cancel timer #", reinterpret_cast<unsigned long>(id));
         else
             uxmpp_log_error (THIS_FILE, "Unable to set timer #", reinterpret_cast<unsigned long>(id));
     }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Timer::set_callback (timer_callback_t new_callback)
+{
+    timer_controller_mutex.lock ();
+    timer_controller_t& tc = signal_timer_map[signum];
+    timer_controller_mutex.unlock ();
+
+    bool need_lock = this_thread::get_id() != tc.worker_thread.get_id();
+    if (need_lock)
+        set_mutex.lock ();
+
+    callback = new_callback;
+
+    if (need_lock)
+        set_mutex.unlock ();
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+int Timer::get_overrun ()
+{
+    int overrun;
+
+    overrun = timer_getoverrun (id);
+    if (overrun < 0) {
+        uxmpp_log_error (THIS_FILE, "Unable to get timer overrun for timer #",
+                         reinterpret_cast<unsigned long>(id));
+        return 0;
+    }
+    return overrun;
 }
 
 
@@ -103,24 +164,40 @@ void signal_handler (int sig, siginfo_t* si, void* data)
     if (!timer)
         return;
 
-    timer_queue.push (timer);
-    sem_post (&sig_sem);
+    timer_controller_mutex.lock ();
+    if (signal_timer_map.find(sig) == signal_timer_map.end()) {
+        timer_controller_mutex.unlock ();
+        return;
+    }
+    timer_controller_t& tc = signal_timer_map[sig];
+    timer_controller_mutex.unlock ();
+
+    tc.timer_queue.push (timer);
+    sem_post (&tc.sig_sem);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Timer::initialize (int signal_number)
+void Timer::initialize_controller (int signal_number) throw (TimerException)
 {
-    std::lock_guard<std::mutex> lock (initialize_mutex);
-    if (initialized)
+    lock_guard<mutex> lock (timer_controller_mutex);
+
+    if (signal_timer_map.find(signal_number) != signal_timer_map.end())
         return;
+
+    uxmpp_log_trace (THIS_FILE, "Initialize timer signal handler for signal ", signal_number);
+
+    signal_timer_map[signal_number].quit_worker_thread = false;
+    timer_controller_t& tc = signal_timer_map[signal_number];
 
     // Initialize the signal semaphore
     //
-    if (sem_init(&sig_sem, 0, 0)) {
+    if (sem_init(&tc.sig_sem, 0, 0)) {
+        int errnum = errno;
         uxmpp_log_error (THIS_FILE, "Unable to initialize semaphore");
-        return;
+        signal_timer_map.erase (signal_number);
+        throw TimerException (string("Unable to initialize semaphore: ") + string(strerror(errnum)));
     }
 
     // Block the signal
@@ -129,8 +206,10 @@ void Timer::initialize (int signal_number)
     sigemptyset (&mask);
     sigaddset (&mask, signal_number);
     if (sigprocmask(SIG_BLOCK, &mask, NULL)) {
+        int errnum = errno;
         uxmpp_log_error (THIS_FILE, "Unable to block signal ", signal_number);
-        return;
+        signal_timer_map.erase (signal_number);
+        throw TimerException (string("Unable to block signal: ") + string(strerror(errnum)));
     }
 
     // Install the signal handler
@@ -140,50 +219,71 @@ void Timer::initialize (int signal_number)
     sa.sa_sigaction = signal_handler;
     sigemptyset (&sa.sa_mask);
     if (sigaction(signal_number, &sa, NULL)) {
+        int errnum = errno;
         uxmpp_log_error (THIS_FILE, "Unable to install signal handler for signal ", signal_number);
-        return;
+        signal_timer_map.erase (signal_number);
+        throw TimerException (string("Unable to install signal handler: ") + string(strerror(errnum)));
     }
 
     // Start the timer worker thread
     //
-    worker_thread = thread ([signal_number](){
+    tc.worker_thread = thread ([signal_number, &tc](){
             // Unblock signal
             sigset_t mask;
             sigemptyset (&mask);
             sigaddset (&mask, signal_number);
-            if (sigprocmask(SIG_UNBLOCK, &mask, NULL) == -1) {
+            if (sigprocmask(SIG_UNBLOCK, &mask, NULL)) {
+                int errnum = errno;
                 uxmpp_log_error (THIS_FILE, "Unable to unblock signal ", signal_number);
-                return;
+                throw TimerException (string("Unable to unblock signal: ") + string(strerror(errnum)));
             }
 
-            while (!quit_worker_thread) {
-                if (sem_wait(&sig_sem)) {
+            while (!tc.quit_worker_thread) {
+                if (sem_wait(&tc.sig_sem)) {
                     continue;
                 }
-                if (quit_worker_thread)
+                if (tc.quit_worker_thread)
                     break;
 
-                Timer* timer = timer_queue.front ();
-                timer_queue.pop ();
+                Timer* timer = tc.timer_queue.front ();
+                tc.timer_queue.pop ();
 
-                if (timer && timer->callback) {
-                    if (timer->destructor_mutex.try_lock()) {
-                        timer->callback (timer);
-                        timer->destructor_mutex.unlock ();
+                if (timer) {
+                    timer->set_mutex.lock ();
+                    if (timer->callback && (timer->initial || timer->interval)) {
+                        // Block the signal while the timer callback runs
+                        if (sigprocmask(SIG_BLOCK, &mask, NULL))
+                            uxmpp_log_warning (THIS_FILE, "Unable to block signal ", signal_number);
+
+                        // Call the timer callback
+                        timer->callback (*timer);
+
+                        // Unblock the signal after the timer callback finished
+                        if (sigprocmask(SIG_UNBLOCK, &mask, NULL))
+                            uxmpp_log_warning (THIS_FILE, "Unable to unblock signal ", signal_number);
                     }
+                    timer->set_mutex.unlock ();
                 }
             }
         });
 
-    // Quit the worker thread at program exit
+    // Quit the worker thread(s) at program exit
     //
-    atexit ([](){
-            quit_worker_thread = true;
-            sem_post (&sig_sem);
-            worker_thread.join ();
-        });
-
-    initialized = true;
+    if (signal_timer_map.size() <= 1) {
+        uxmpp_log_trace (THIS_FILE, "Install 'atexit' function to clean up timer handlers");
+        atexit ([](){
+                // Signal the worker threads to stop
+                for (auto& i : signal_timer_map) {
+                    uxmpp_log_trace (THIS_FILE "(atexit)", "Stop timer signal handler for signal ", i.first);
+                    i.second.quit_worker_thread = true;
+                    sem_post (&i.second.sig_sem);
+                }
+                // Wait for the worker threads to stop
+                for (auto& i : signal_timer_map) {
+                    i.second.worker_thread.join ();
+                }
+            });
+    }
 }
 
 

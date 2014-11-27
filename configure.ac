@@ -108,6 +108,15 @@ AC_SEARCH_LIBS([res_query], [resolv], [
 			     ])
 			    ])
 
+#
+# Check for posix timers
+#
+AC_SEARCH_LIBS([timer_create], [rt], [
+			    AC_DEFINE([UXMPP_HAVE_POSIX_TIMERS],[1],[Define to 1 if timer_create() is available])
+			    LIBS+=-lrt
+			    LIBS_IN_PC_FILE+=-lrt
+			    ])
+
 
 #
 # Give the user an option to not build test applications

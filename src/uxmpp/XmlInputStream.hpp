@@ -20,7 +20,7 @@
 #define UXMPP_XMLINPUTSTREAM_HPP
 
 #include <uxmpp/types.hpp>
-#include <XmlObject.hpp>
+#include <uxmpp/XmlObject.hpp>
 #include <mutex>
 
 

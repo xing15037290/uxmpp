@@ -24,6 +24,9 @@
 #include <sstream>
 #include <event2/event.h>
 
+#include <unistd.h>
+#include <sys/syscall.h>
+
 
 UXMPP_START_NAMESPACE1(uxmpp)
 
@@ -145,7 +148,9 @@ void Logger::log (LogLevel level, const std::string& prefix, const std::string& 
 
         ss << timestring << "." << setfill('0') << setw(3)
 //           << (ms.count()%1000) << " - (" << to_string(level) << ") "
-           << (ms.count()%1000) << " (" << to_string(level) << ") "
+           << (ms.count()%1000)
+           << " (" << to_string(level) << ") "
+           << "[" << (unsigned)syscall(SYS_gettid) << "] "
            << prefix << ": " << message << endl;
 
         cerr << ss.str();

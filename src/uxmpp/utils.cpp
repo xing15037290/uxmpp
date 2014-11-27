@@ -1,13 +1,18 @@
-#include <uxmpp/types.hpp>
+#include <uxmpp/utils.hpp>
+#include <uxmpp/Logger.hpp>
+
 #include <string>
 #include <cassert>
 #include <limits>
 #include <stdexcept>
 #include <cctype>
-#include <uxmpp/utils.hpp>
+#include <signal.h>
+#include <cstring>
 
 
 UXMPP_START_NAMESPACE1(uxmpp)
+
+#define THIS_FILE "utils"
 
 using namespace std;
 
@@ -58,6 +63,7 @@ std::string base64_encode (const std::string &bindata)
     return retval;
 }
 
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 std::string base64_decode (const std::string &ascdata)
@@ -84,6 +90,36 @@ std::string base64_decode (const std::string &ascdata)
         }
     }
     return retval;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool block_signal (int signal_number)
+{
+    sigset_t mask;
+    sigemptyset (&mask);
+    sigaddset (&mask, signal_number);
+    if (sigprocmask(SIG_BLOCK, &mask, NULL)) {
+        uxmpp_log_error (THIS_FILE, "Unable to block signal ", signal_number, " - ", string(strerror(errno)));
+        return false;
+    }
+    return true;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool unblock_signal (int signal_number)
+{
+    sigset_t mask;
+    sigemptyset (&mask);
+    sigaddset (&mask, signal_number);
+    if (sigprocmask(SIG_UNBLOCK, &mask, NULL)) {
+        uxmpp_log_error (THIS_FILE, "Unable to unblock signal ", signal_number, " - ", string(strerror(errno)));
+        return false;
+    }
+    return true;
 }
 
 
