@@ -21,6 +21,7 @@
 #include <sstream>
 #include <iomanip>
 #include <arpa/inet.h>
+#include <sys/socket.h>
 
 
 UXMPP_START_NAMESPACE2(uxmpp, net)

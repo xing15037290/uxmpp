@@ -9,6 +9,10 @@
 #include <signal.h>
 #include <cstring>
 
+#include <thread>
+#include <sys/syscall.h>
+#include <unistd.h>
+
 
 UXMPP_START_NAMESPACE1(uxmpp)
 
@@ -120,6 +124,14 @@ bool unblock_signal (int signal_number)
         return false;
     }
     return true;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+unsigned long get_thread_id ()
+{
+    return static_cast<unsigned long> (syscall(SYS_gettid));
 }
 
 

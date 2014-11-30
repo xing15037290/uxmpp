@@ -17,15 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/Logger.hpp>
+#include <uxmpp/utils.hpp>
 #include <iostream>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <event2/event.h>
-
-#include <unistd.h>
-#include <sys/syscall.h>
 
 
 UXMPP_START_NAMESPACE1(uxmpp)
@@ -150,7 +148,7 @@ void Logger::log (LogLevel level, const std::string& prefix, const std::string& 
 //           << (ms.count()%1000) << " - (" << to_string(level) << ") "
            << (ms.count()%1000)
            << " (" << to_string(level) << ") "
-           << "[" << (unsigned)syscall(SYS_gettid) << "] "
+           << "[" << get_thread_id() << "] "
            << prefix << ": " << message << endl;
 
         cerr << ss.str();

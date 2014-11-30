@@ -68,7 +68,7 @@ PREDEFINED_IN_DOXYGEN=
 #
 PKG_CHECK_MODULES([expat],
 	[expat >= 2.1.0],
-	[REQUIRE_IN_PC_FILE+=expat],
+	[export REQUIRE_IN_PC_FILE="$REQUIRE_IN_PC_FILE expat"],
 	[AC_MSG_ERROR(Could not find expat)])
 
 ##
@@ -76,7 +76,7 @@ PKG_CHECK_MODULES([expat],
 ##
 #PKG_CHECK_MODULES([libgsasl],
 #	[libgsasl >= 1.8.0],
-#	[REQUIRE_IN_PC_FILE+=" libgsasl"],
+#	[export REQUIRE_IN_PC_FILE="$REQUIRE_IN_PC_FILE libgsasl"],
 #	[AC_MSG_ERROR(Could not find libgsasl)])
 
 #
@@ -84,7 +84,7 @@ PKG_CHECK_MODULES([expat],
 #
 PKG_CHECK_MODULES([openssl],
 	[openssl >= 1.0.1],
-	[REQUIRE_IN_PC_FILE+=" openssl"],
+	[export REQUIRE_IN_PC_FILE="$REQUIRE_IN_PC_FILE openssl"],
 	[AC_MSG_ERROR(Could not find openssl)])
 
 #
@@ -92,14 +92,12 @@ PKG_CHECK_MODULES([openssl],
 #
 PKG_CHECK_MODULES([libevent],
 	[libevent >= 2.0.0],
-	[REQUIRE_IN_PC_FILE+=" libevent"],
+	[export REQUIRE_IN_PC_FILE="$REQUIRE_IN_PC_FILE libevent"],
 	[AC_MSG_ERROR(Could not find libevent)])
 
 #
 # Check for libresolv
 #
-#LIBS+=-lresolv
-#LIBS_IN_PC_FILE+=-lresolv
 AC_SEARCH_LIBS([res_query], [resolv], [
 			    AC_DEFINE([UXMPP_HAVE_BSD_RESOLVER],[1],[Define to 1 if res_query() is available])
 			    ],
@@ -129,7 +127,7 @@ AM_CONDITIONAL([ENABLE_TESTAPPS_SET], [test "x$enable_testapps" != "xno"])
 #
 # All libraries are added
 #
-LIBS_IN_PC_FILE+="$LIBS"
+export LIBS_IN_PC_FILE="$LIBS_IN_PC_FILE $LIBS"
 AC_SUBST([LIBS_IN_PC_FILE])
 AC_SUBST([REQUIRE_IN_PC_FILE])
 AC_SUBST([PREDEFINED_IN_DOXYGEN])

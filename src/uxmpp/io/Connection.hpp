@@ -21,6 +21,7 @@
 
 #include <uxmpp/types.hpp>
 #include <functional>
+#include <cstdio>
 
 
 namespace uxmpp { namespace io {

@@ -50,6 +50,11 @@ namespace uxmpp {
     bool unblock_signal (int signal_number);
 
 
+    /**
+     *
+     */
+    unsigned long get_thread_id ();
+
 }
 
 
