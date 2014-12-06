@@ -59,6 +59,9 @@ test_ImpSession_SOURCES  = test_ImpSession.cpp
 noinst_bin_PROGRAMS     += test_Timer
 test_Timer_SOURCES  = test_Timer.cpp
 
+noinst_bin_PROGRAMS     += test_cores
+test_cores_SOURCES  = test_cores.cpp
+
 noinst_bin_PROGRAMS     += uxmpp
 uxmpp_SOURCES  = uxmpp.cpp
 

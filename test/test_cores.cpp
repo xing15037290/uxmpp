@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -16,50 +16,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_UTILS_HPP
-#define UXMPP_UTILS_HPP
+#include <uxmpp/utils.hpp>
 
-#include <uxmpp/types.hpp>
-#include <string>
+#include <iostream>
 
 
-namespace uxmpp {
+using namespace std;
+using namespace uxmpp;
+
+#define THIS_FILE "test_cores"
 
 
-    /**
-     *
-     */
-    std::string base64_encode (const std::string& bindata);
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+int main (int argc, char* argv[])
+{
+    cout << "Number of processor cores: " << get_num_cores() << endl;
 
-
-    /**
-     *
-     */
-    std::string base64_decode (const std::string& ascdata);
-
-
-    /**
-     *
-     */
-    bool block_signal (int signal_number);
-
-
-    /**
-     *
-     */
-    bool unblock_signal (int signal_number);
-
-
-    /**
-     *
-     */
-    unsigned long get_thread_id ();
-
-    /**
-     * Return the number of processor cores.
-     */
-    unsigned get_num_cores ();
+    return 0;
 }
-
-
-#endif

@@ -13,6 +13,11 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 
 UXMPP_START_NAMESPACE1(uxmpp)
 
@@ -132,6 +137,30 @@ bool unblock_signal (int signal_number)
 unsigned long get_thread_id ()
 {
     return static_cast<unsigned long> (syscall(SYS_gettid));
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+unsigned get_num_cores ()
+{
+#ifdef _WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo (&si);
+    return static_cast<unsigned> (si.dwNumberOfProcessors);
+#else
+#ifndef _SC_NPROCESSORS_CONF
+    uxmpp_log_warning (THIS_FILE, "Unable to determine number of processor cores");
+    return 1;
+#else
+    auto cores = sysconf (_SC_NPROCESSORS_CONF);
+    if (cores <= 0) {
+        uxmpp_log_warning (THIS_FILE, "Unable to get number of processor cores");
+        return 1;
+    }
+    return static_cast<unsigned> (cores);
+#endif
+#endif
 }
 
 
