@@ -149,11 +149,11 @@ unsigned get_num_cores ()
     GetSystemInfo (&si);
     return static_cast<unsigned> (si.dwNumberOfProcessors);
 #else
-#ifndef _SC_NPROCESSORS_CONF
+#ifndef _SC_NPROCESSORS_ONLN
     uxmpp_log_warning (THIS_FILE, "Unable to determine number of processor cores");
     return 1;
 #else
-    auto cores = sysconf (_SC_NPROCESSORS_CONF);
+    auto cores = sysconf (_SC_NPROCESSORS_ONLN);
     if (cores <= 0) {
         uxmpp_log_warning (THIS_FILE, "Unable to get number of processor cores");
         return 1;
