@@ -45,4 +45,7 @@ stamp-h*
 /test/test_Jid
 /test/test_ImpSession
 /test/test_Timer
+/test/test_cores
+/test/test_ConnectionManager
+/test/test_FileConnection
 /test/uxmpp
