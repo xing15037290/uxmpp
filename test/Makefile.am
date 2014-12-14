@@ -63,7 +63,7 @@ noinst_bin_PROGRAMS     += test_cores
 test_cores_SOURCES  = test_cores.cpp
 
 noinst_bin_PROGRAMS     += test_ConnectionManager
-test_connectionmanager_SOURCES  = test_ConnectionManager.cpp
+test_ConnectionManager_SOURCES  = test_ConnectionManager.cpp
 
 noinst_bin_PROGRAMS     += test_FileConnection
 test_FileConnection_SOURCES  = test_FileConnection.cpp
