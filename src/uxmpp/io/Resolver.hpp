@@ -16,16 +16,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_RESOLVER_HPP
-#define UXMPP_RESOLVER_HPP
+#ifndef UXMPP_IO_RESOLVER_HPP
+#define UXMPP_IO_RESOLVER_HPP
 
 #include <uxmpp/types.hpp>
-#include <uxmpp/net/IpHostAddr.hpp>
+#include <uxmpp/io/IpHostAddr.hpp>
 #include <string>
 #include <vector>
 
 
-namespace uxmpp { namespace net {
+namespace uxmpp { namespace io {
 
     /**
      * A DNS resolver.

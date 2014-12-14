@@ -16,28 +16,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_IO_HPP
-#define UXMPP_IO_HPP
-
-namespace uxmpp {
-
-    /**
-     * I/O primitives used by the XMPP stack.
-     */
-    namespace io {
-    }
-
-}
-
-#include <uxmpp/io/IpHostAddr.hpp>
-#include <uxmpp/io/Resolver.hpp>
-#include <uxmpp/io/BsdResolver.hpp>
-#include <uxmpp/io/TimerException.hpp>
-#include <uxmpp/io/Timer.hpp>
-#include <uxmpp/io/TlsConfig.hpp>
-#include <uxmpp/io/Connection.hpp>
-#include <uxmpp/io/io_operation.hpp>
-#include <uxmpp/io/FileConnection.hpp>
 #include <uxmpp/io/ConnectionManager.hpp>
+#include <uxmpp/Logger.hpp>
 
-#endif
+#include <iostream>
+#include <chrono>
+
+
+using namespace std;
+using namespace uxmpp;
+using namespace uxmpp::io;
+
+#define THIS_FILE "test_connectionmanager"
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+int main (int argc, char* argv[])
+{
+    uxmpp_set_log_level (LogLevel::trace);
+    ConnectionManager& cm = ConnectionManager::getInstance ();
+
+    uxmpp_log_info ("main", "Hej");
+    this_thread::sleep_for (chrono::seconds(4));
+
+    return 0;
+}

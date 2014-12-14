@@ -20,10 +20,10 @@
 #define UXMPP_XMLSTREAM_HPP
 
 #include <uxmpp/types.hpp>
-#include <uxmpp/net/IpHostAddr.hpp>
+#include <uxmpp/io/IpHostAddr.hpp>
 #include <uxmpp/XmlObject.hpp>
 #include <uxmpp/XmlStreamListener.hpp>
-#include <uxmpp/TlsConfig.hpp>
+#include <uxmpp/io/TlsConfig.hpp>
 #include <queue>
 #include <vector>
 #include <mutex>
@@ -73,7 +73,7 @@ namespace uxmpp {
          * @param addr The address used to open an XML stream to.
          * @return True if the connection was successful, otherwise false.
          */
-        virtual bool start (const uxmpp::net::IpHostAddr& addr);
+        virtual bool start (const uxmpp::io::IpHostAddr& addr);
 
         /**
          * Stop and close the stream.
@@ -103,12 +103,12 @@ namespace uxmpp {
         /**
          * Return the IP(v4|v6) address of the peer.
          */
-        uxmpp::net::IpHostAddr get_peer_addr () const;
+        uxmpp::io::IpHostAddr get_peer_addr () const;
 
         /**
          * Start TLS.
          */
-        bool enable_tls (const TlsConfig& tls_cfg, std::string& error_description);
+        bool enable_tls (const uxmpp::io::TlsConfig& tls_cfg, std::string& error_description);
 
         /**
          * Reset the stream.
@@ -157,9 +157,9 @@ namespace uxmpp {
         SSL* ssl;
 
         /**
-         * The IP(v4|v6) address of the peer.
+         * The IP address of the peer.
          */
-        uxmpp::net::IpHostAddr peer_addr;
+        uxmpp::io::IpHostAddr peer_addr;
 
         /**
          * A list of event listeners.

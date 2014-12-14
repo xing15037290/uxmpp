@@ -16,14 +16,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_TLSCONFIG_HPP
-#define UXMPP_TLSCONFIG_HPP
+#ifndef UXMPP_IO_TLSCONFIG_HPP
+#define UXMPP_IO_TLSCONFIG_HPP
 
 #include <uxmpp/types.hpp>
 #include <string>
 
 
-namespace uxmpp {
+namespace uxmpp { namespace io {
 
 
     /**
@@ -92,7 +92,7 @@ namespace uxmpp {
     };
 
 
-}
+}}
 
 
 #endif

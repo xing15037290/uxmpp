@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/Logger.hpp>
-#include <uxmpp/net/BsdResolver.hpp>
+#include <uxmpp/io/BsdResolver.hpp>
 
 #if (UXMPP_HAVE_BSD_RESOLVER)
 
@@ -41,7 +41,7 @@
 #define THIS_FILE "BsdResolver"
 
 
-UXMPP_START_NAMESPACE2(uxmpp, net)
+UXMPP_START_NAMESPACE2(uxmpp, io)
 
 using namespace std;
 

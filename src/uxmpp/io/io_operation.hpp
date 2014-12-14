@@ -29,12 +29,12 @@ namespace uxmpp { namespace io {
  * Input/output operation.
  */
 struct io_operation_t {
-    Connection*   connection; /**< The Connection object that is performing the operation. */
-    void*         buf;        /**< Buffer for reading/writing.*/
-    size_t        size;       /**< Number of bytes to read/write. */
-    off_t         offset;     /**< Offset from where to read/write. Mainly used for file operations. */
-    ssize_t       result;     /**< Result of the operation. If -1 an error ocurred, see errnum. */
-    int           errnum;     /**< The value of errno after the operation was performed. */
+    Connection*   connection;           /**< The Connection object that is performing the operation. */
+    void*         buf;                  /**< Buffer for reading/writing.*/
+    size_t        size;                 /**< Number of bytes to read/write. */
+    off_t         offset;               /**< Offset from where to read/write. Mainly used for file operations. */
+    ssize_t       result;               /**< Result of the operation. If -1 an error ocurred, see errnum. */
+    int           errnum;               /**< The value of errno after the operation was performed. */
     Connection::io_callback_t callback; /**< Callback to be called when the operation is done. */
 };
 

@@ -16,17 +16,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_NET_BSDRESOLVER_HPP
-#define UXMPP_NET_BSDRESOLVER_HPP
+#ifndef UXMPP_IO_BSDRESOLVER_HPP
+#define UXMPP_IO_BSDRESOLVER_HPP
 
 #include <uxmpp/types.hpp>
-#include <uxmpp/net/Resolver.hpp>
+#include <uxmpp/io/Resolver.hpp>
 #include <string>
 #include <vector>
 
 #if (UXMPP_HAVE_BSD_RESOLVER)
 
-namespace uxmpp { namespace net {
+namespace uxmpp { namespace io {
 
 
     /**

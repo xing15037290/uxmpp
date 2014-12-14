@@ -18,7 +18,7 @@
  */
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/Session.hpp>
-#include <uxmpp/net/BsdResolver.hpp>
+#include <uxmpp/io/BsdResolver.hpp>
 #include <uxmpp/StreamXmlObj.hpp>
 #include <uxmpp/utils.hpp>
 
@@ -29,7 +29,7 @@ UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
-using namespace uxmpp::net;
+using namespace uxmpp::io;
 
 
 //------------------------------------------------------------------------------

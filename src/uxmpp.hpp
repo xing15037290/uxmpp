@@ -48,7 +48,6 @@ namespace uxmpp {
 #include <uxmpp/MessageStanza.hpp>
 #include <uxmpp/PresenceStanza.hpp>
 #include <uxmpp/StreamError.hpp>
-#include <uxmpp/TlsConfig.hpp>
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/SessionState.hpp>
 #include <uxmpp/SessionConfig.hpp>
@@ -56,7 +55,6 @@ namespace uxmpp {
 #include <uxmpp/Session.hpp>
 
 #include <uxmpp/io.hpp>
-#include <uxmpp/net.hpp>
 #include <uxmpp/mod.hpp>
 
 #endif

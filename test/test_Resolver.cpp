@@ -21,7 +21,7 @@
 
 using namespace std;
 using namespace uxmpp;
-using namespace uxmpp::net;
+using namespace uxmpp::io;
 
 
 int main (int argc, char* argv[])

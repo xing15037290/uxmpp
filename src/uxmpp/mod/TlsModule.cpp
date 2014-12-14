@@ -30,7 +30,7 @@ UXMPP_START_NAMESPACE2(uxmpp, mod)
 
 using namespace std;
 using namespace uxmpp;
-using namespace uxmpp::net;
+using namespace uxmpp::io;
 
 
 static const std::string XmlStarttlsNs      = "urn:ietf:params:xml:ns:xmpp-tls";
@@ -51,7 +51,7 @@ TlsModule::TlsModule ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-TlsModule::TlsModule (const uxmpp::TlsConfig& tls_config)
+TlsModule::TlsModule (const uxmpp::io::TlsConfig& tls_config)
     : XmppModule ("mod_starttls"),
       tls_cfg    {tls_config}
 {

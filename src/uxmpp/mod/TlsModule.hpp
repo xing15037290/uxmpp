@@ -22,7 +22,7 @@
 #include <string>
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmppModule.hpp>
-#include <uxmpp/TlsConfig.hpp>
+#include <uxmpp/io/TlsConfig.hpp>
 
 
 namespace uxmpp { namespace mod {
@@ -42,7 +42,7 @@ namespace uxmpp { namespace mod {
         /**
          * Constructor.
          */
-        TlsModule (const uxmpp::TlsConfig& tls_config);
+        TlsModule (const uxmpp::io::TlsConfig& tls_config);
 
         /**
          * Destructor.
@@ -58,7 +58,7 @@ namespace uxmpp { namespace mod {
         /**
          * TLS configuration.
          */
-        uxmpp::TlsConfig tls_cfg;
+        uxmpp::io::TlsConfig tls_cfg;
     };
 
 

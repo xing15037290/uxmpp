@@ -16,28 +16,41 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_IO_HPP
-#define UXMPP_IO_HPP
+#ifndef UXMPP_IO_FILECONNECTION_HPP
+#define UXMPP_IO_FILECONNECTION_HPP
 
-namespace uxmpp {
+#include <uxmpp/types.hpp>
+#include <uxmpp/io/Connection.hpp>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
+namespace uxmpp { namespace io {
 
     /**
-     * I/O primitives used by the XMPP stack.
+     * File I/O connection.
      */
-    namespace io {
-    }
+    class FileConnection : public Connection {
+    public:
 
-}
+        /**
+         * Constructor.
+         */
+        FileConnection (const std::string& file, int flags);
 
-#include <uxmpp/io/IpHostAddr.hpp>
-#include <uxmpp/io/Resolver.hpp>
-#include <uxmpp/io/BsdResolver.hpp>
-#include <uxmpp/io/TimerException.hpp>
-#include <uxmpp/io/Timer.hpp>
-#include <uxmpp/io/TlsConfig.hpp>
-#include <uxmpp/io/Connection.hpp>
-#include <uxmpp/io/io_operation.hpp>
-#include <uxmpp/io/FileConnection.hpp>
-#include <uxmpp/io/ConnectionManager.hpp>
+        /**
+         * Constructor.
+         */
+        FileConnection (const std::string& file, int flags, int mode);
 
+        /**
+         * Destructor.
+         */
+        virtual ~FileConnection ();
+    };
+
+
+}}
 #endif

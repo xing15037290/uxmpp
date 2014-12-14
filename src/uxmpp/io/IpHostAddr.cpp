@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/types.hpp>
-#include <uxmpp/net/IpHostAddr.hpp>
+#include <uxmpp/io/IpHostAddr.hpp>
 #include <sstream>
 #include <iomanip>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
 
-UXMPP_START_NAMESPACE2(uxmpp, net)
+UXMPP_START_NAMESPACE2(uxmpp, io)
 
 
 //------------------------------------------------------------------------------

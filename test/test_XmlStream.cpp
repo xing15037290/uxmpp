@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace uxmpp;
-using namespace uxmpp::net;
+using namespace uxmpp::io;
 
 
 class XmlHandler : public XmlStreamListener {

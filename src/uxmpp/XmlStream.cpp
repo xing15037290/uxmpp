@@ -51,7 +51,7 @@ UXMPP_START_NAMESPACE1(uxmpp)
 
 
 using namespace std;
-using namespace uxmpp::net;
+using namespace uxmpp::io;
 
 
 static void start_stream_element (void* user_data,
@@ -356,7 +356,7 @@ XmlStream::~XmlStream ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool XmlStream::start (const uxmpp::net::IpHostAddr& addr)
+bool XmlStream::start (const uxmpp::io::IpHostAddr& addr)
 {
     std::lock_guard<std::mutex> lock (mutex);
 
@@ -708,7 +708,7 @@ bool XmlStream::is_open () const
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-uxmpp::net::IpHostAddr XmlStream::get_peer_addr () const
+uxmpp::io::IpHostAddr XmlStream::get_peer_addr () const
 {
     return peer_addr;
 }

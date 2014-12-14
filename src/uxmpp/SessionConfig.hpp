@@ -20,8 +20,6 @@
 #define UXMPP_SESSIONCONFIG_HPP
 
 #include <uxmpp/types.hpp>
-#include <uxmpp/net/IpHostAddr.hpp>
-#include <uxmpp/TlsConfig.hpp>
 #include <string>
 
 
@@ -58,12 +56,6 @@ namespace uxmpp {
          * Optional resource. Set this if you want to bind to a specific resource.
          */
         std::string resource;
-#if 0
-        /**
-         * TLS configuration.
-         */
-        TlsConfig tls;
-#endif
 
         /**
          * XMPP sever.
@@ -84,7 +76,7 @@ namespace uxmpp {
         /**
          * The protocol used when connecting to the server. Default is TCP (AddrProto::tcp).
          */
-        uxmpp::net::AddrProto protocol;
+        uxmpp::io::AddrProto protocol;
 
         /**
          * Don't do DNS SRV queries, only normal host queries (why would anyone want this?).

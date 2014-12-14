@@ -16,15 +16,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UXMPP_NET_IPHOSTADDR_HPP
-#define UXMPP_NET_IPHOSTADDR_HPP
+#ifndef UXMPP_IO_IPHOSTADDR_HPP
+#define UXMPP_IO_IPHOSTADDR_HPP
 
 #include <uxmpp/types.hpp>
 #include <array>
 #include <string>
 
 
-namespace uxmpp { namespace net {
+namespace uxmpp { namespace io {
 
     /**
      * A type of IP address.
