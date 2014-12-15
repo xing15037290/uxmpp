@@ -27,11 +27,30 @@
 namespace uxmpp {
 
 
+
     /**
      * An XML input stream.
      */
     class XmlInputStream {
     public:
+
+        /**
+         * XML object callback.
+         * Called when an XML object is received.
+         * @param stream The XML input stream object that received the XML object.
+         * @param xml_obj The received XML object.
+         */
+        typedef std::function<void (XmlInputStream& stream, XmlObject& xml_obj)> xml_func_t;
+
+
+        /**
+         * XML parse error callback.
+         * Called when a XML parse error ocurrs.
+         * @param stream The XML input stream object that generated the error.
+         * @param code An error code.
+         * @param msg An error message.
+         */
+        typedef std::function<void (XmlInputStream& stream, int code, const std::string& msg)> err_func_t;
 
         /**
          * Constructor.
@@ -48,12 +67,12 @@ namespace uxmpp {
         /**
          * Set the XML object input handler.
          */
-        void set_xml_handler (std::function<void (XmlInputStream&, XmlObject&)> xml_handler);
+        void set_xml_handler (xml_func_t xml_handler);
 
         /**
          * Set the XML error handler.
          */
-        void set_error_handler (std::function<void (XmlInputStream&)> err_handler);
+        void set_error_handler (err_func_t err_handler);
 
         /**
          * Reset the stream.
@@ -93,17 +112,21 @@ namespace uxmpp {
         /**
          * Callback for incoming XML object.
          */
-        std::function<void (XmlInputStream&, XmlObject&)> rx_func;
+        xml_func_t rx_func;
 
         /**
          * Callback for XML parse error.
          */
-        std::function<void (XmlInputStream&)> err_func;
+        err_func_t err_func;
 
         /**
          * XML parse data.
          */
         XmlParseData* parse_data;
+
+        /**
+         * The base of the XML document.
+         */
         XmlObject top_node;
 
         std::mutex mutex;

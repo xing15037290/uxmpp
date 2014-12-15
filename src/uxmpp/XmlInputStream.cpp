@@ -17,6 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/XmlInputStream.hpp>
+#include <uxmpp/Logger.hpp>
 #include <cstring>
 #include <stack>
 #include <unistd.h>
@@ -32,7 +33,7 @@
 
 #ifdef DEBUG_TRACE
 #include <uxmpp/Logger.hpp>
-#define TRACE(prefix, msg, ...) uxmppLogTrace(prefix, msg, ## __VA_ARGS__)
+#define TRACE(prefix, msg, ...) uxmpp_log_trace(prefix, msg, ## __VA_ARGS__)
 #else
 #define TRACE(prefix, msg, ...)
 #endif
@@ -167,7 +168,7 @@ void XmlInputStream::XmlParseData::parse_xml_attributes (const XML_Char** attrib
                 namespace_aliases[alias] = value;
 /*
                 if (alias == xml_obj.getNamespace()) {
-                    uxmppLogDebug (THIS_FILE, "Set namespace to: ->", value, "<-");
+                    uxmpp_log_debug (THIS_FILE, "Set namespace to: ->", value, "<-");
                     xml_obj.setNamespace (value);
                     if (xml_obj.getDefaultNamespaceAttr() == xml_obj.getNamespace())
                         xml_obj.isNamespaceDefault (true);
@@ -263,7 +264,7 @@ XmlInputStream::~XmlInputStream ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlInputStream::set_xml_handler (std::function<void (XmlInputStream&, XmlObject&)> xml_handler)
+void XmlInputStream::set_xml_handler (xml_func_t xml_handler)
 {
     std::lock_guard<std::mutex> lock (mutex);
     rx_func = xml_handler;
@@ -272,7 +273,7 @@ void XmlInputStream::set_xml_handler (std::function<void (XmlInputStream&, XmlOb
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void XmlInputStream::set_error_handler (std::function<void (XmlInputStream&)> err_handler)
+void XmlInputStream::set_error_handler (err_func_t err_handler)
 {
     std::lock_guard<std::mutex> lock (mutex);
     err_func = err_handler;
@@ -457,7 +458,7 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
     // Check if this is the XMPP start stream tag.
     //
     if (stream.top_node.get_full_name() == full_name) {
-        //uxmppLogDebug (THIS_FILE, "Got start stream element");
+        //uxmpp_log_debug (THIS_FILE, "Got start stream element");
         XML_SetElementHandler (pd->xml_parser,
                                XmlInputStream::XmlParseData::start_xml_node,
                                XmlInputStream::XmlParseData::end_xml_node);
@@ -473,7 +474,7 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
             stream.mutex.lock ();
         }
     }else{
-        //uxmppLogDebug (THIS_FILE, "Ignoring XML element: ", full_name);
+        //uxmpp_log_debug (THIS_FILE, "Ignoring XML element: ", full_name);
     }
 }
 
@@ -528,12 +529,12 @@ XmlInputStream& XmlInputStream::operator<< (const char ch)
 {
     std::lock_guard<std::mutex> lock (mutex);
     //std::lock_guard<std::mutex> lock (mutex);
-    //uxmppLogTrace (THIS_FILE, "RX:\n", input, "\n");
+    //uxmpp_log_trace (THIS_FILE, "RX:\n", input, "\n");
 
     // Ignore incoming data on error.
     //
     if (parse_data->error) {
-        //uxmppLogDebug (THIS_FILE, "Ignore XML input when a parse error has occurred");
+        //uxmpp_log_debug (THIS_FILE, "Ignore XML input when a parse error has occurred");
         return *this;
     }
 
@@ -541,7 +542,7 @@ XmlInputStream& XmlInputStream::operator<< (const char ch)
     //
     if (!XML_Parse(parse_data->xml_parser, &ch, 1, 0)) {
         parse_data->error = true;
-        //uxmppLogError (THIS_FILE, "RX XML parse error");
+        uxmpp_log_warning (THIS_FILE, "RX XML parse error");
         while (parse_data && !parse_data->element_stack.empty()) {
             delete parse_data->element_stack.front ();
             parse_data->element_stack.pop_front ();
@@ -549,7 +550,8 @@ XmlInputStream& XmlInputStream::operator<< (const char ch)
 
         if (err_func) {
             mutex.unlock ();
-            err_func (*this);
+            auto err_code = XML_GetErrorCode (parse_data->xml_parser);
+            err_func (*this, err_code, string(XML_ErrorString(err_code)));
             mutex.lock ();
         }
     }
@@ -564,12 +566,12 @@ XmlInputStream& XmlInputStream::operator<< (const std::string& input)
 {
     std::lock_guard<std::mutex> lock (mutex);
     //std::lock_guard<std::mutex> lock (mutex);
-    //uxmppLogTrace (THIS_FILE, "RX:\n", input, "\n");
+    //uxmpp_log_trace (THIS_FILE, "RX:\n", input, "\n");
 
     // Ignore incoming data on error.
     //
     if (parse_data->error) {
-        //uxmppLogDebug (THIS_FILE, "Ignore XML input when a parse error has occurred");
+        //uxmpp_log_debug (THIS_FILE, "Ignore XML input when a parse error has occurred");
         return *this;
     }
 
@@ -577,14 +579,15 @@ XmlInputStream& XmlInputStream::operator<< (const std::string& input)
     //
     if (!XML_Parse(parse_data->xml_parser, input.c_str(), input.length(), 0)) {
         parse_data->error = true;
-        //uxmppLogError (THIS_FILE, "RX XML parse error");
+        uxmpp_log_warning (THIS_FILE, "RX XML parse error");
         while (parse_data && !parse_data->element_stack.empty()) {
             delete parse_data->element_stack.front ();
             parse_data->element_stack.pop_front ();
         }
         if (err_func) {
             mutex.unlock ();
-            err_func (*this);
+            auto err_code = XML_GetErrorCode (parse_data->xml_parser);
+            err_func (*this, err_code, string(XML_ErrorString(err_code)));
             mutex.lock ();
         }
     }
