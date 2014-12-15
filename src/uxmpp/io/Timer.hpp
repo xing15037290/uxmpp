@@ -90,15 +90,6 @@ public:
     void uset (unsigned initial, unsigned interval=0);
 
     /**
-     * Set the timer expration time in nanoseconds.
-     * @param initial The initial time in nanoseconds until the times shall expire.
-     * @param interval The inteval in nanoseconds that the timer
-     *                 shall expire after the initial expiration.
-     *                 Set this to zero for a one-shot timer.
-     */
-    void nset (unsigned initial, unsigned interval=0);
-
-    /**
      * Cancel the timer.
      * After this call the callback will not be called until the timer is set again.
      */

@@ -95,6 +95,8 @@ void Timer::set (unsigned initial, unsigned interval)
     ts.it_value.tv_nsec = (initial % 1000) * 1000000;
     ts.it_interval.tv_sec  = (interval / 1000);
     ts.it_interval.tv_nsec = (interval % 1000) * 1000000;
+    this->initial  = initial;
+    this->interval = interval;
     set (ts);
 }
 
@@ -108,19 +110,8 @@ void Timer::uset (unsigned initial, unsigned interval)
     ts.it_value.tv_nsec = (initial % 1000000) * 1000;
     ts.it_interval.tv_sec  = (interval / 1000000);
     ts.it_interval.tv_nsec = (interval % 1000000) * 1000;
-    set (ts);
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void Timer::nset (unsigned initial, unsigned interval)
-{
-    struct itimerspec ts;
-    ts.it_value.tv_sec  = initial / 1000000000;
-    ts.it_value.tv_nsec = initial % 1000000000;
-    ts.it_interval.tv_sec  = interval / 1000000000;
-    ts.it_interval.tv_nsec = interval % 1000000000;
+    this->initial  = initial;
+    this->interval = interval;
     set (ts);
 }
 
@@ -138,8 +129,6 @@ void Timer::set (struct itimerspec& ts)
         set_mutex.lock ();
 
     auto result = timer_settime (id, 0, &ts, NULL);
-    this->initial  = initial;
-    this->interval = interval;
     if (need_lock)
         set_mutex.unlock ();
 

@@ -178,7 +178,7 @@ bool SocketConnection::open_socket (const IpHostAddr& addr,
                 if (connected_cb)
                     connected_cb (*this, EINVAL);
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return false;
     }
     errnum = errno;
@@ -193,7 +193,7 @@ bool SocketConnection::open_socket (const IpHostAddr& addr,
                 if (connected_cb)
                     connected_cb (*this, errnum);
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return false;
     }
 
@@ -275,7 +275,7 @@ bool SocketConnection::bind_socket ()
                 if (connected_cb)
                     connected_cb (*this, errnum);
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return false;
     }
 
@@ -342,7 +342,7 @@ void SocketConnection::connect (const IpHostAddr& addr, const TlsConfig& tls_cfg
                 if (connected_cb)
                     connected_cb (*this, errnum);
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return;
     }else{
         // Queue a write operation with zero bytes to write.
@@ -424,7 +424,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, "Socket not connected");
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return;
     }
     if (tls_enabled) {
@@ -478,7 +478,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, "Unable to create SSL context");
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return;
     }
 
@@ -499,7 +499,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, "Unable to create SSL object");
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return;
     }
 
@@ -522,7 +522,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, tls_error);
             });
-        msg_timer.nset (1);
+        msg_timer.uset (1);
         return;
     }
 
