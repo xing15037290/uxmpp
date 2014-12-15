@@ -72,13 +72,31 @@ public:
     virtual ~Timer ();
 
     /**
-     * Set the timer expration time.
+     * Set the timer expration time in milliseconds.
      * @param initial The initial time in milliseconds until the times shall expire.
      * @param interval The inteval in milliseconds that the timer
      *                 shall expire after the initial expiration.
      *                 Set this to zero for a one-shot timer.
      */
     void set (unsigned initial, unsigned interval=0);
+
+    /**
+     * Set the timer expration time in microseconds.
+     * @param initial The initial time in microseconds until the times shall expire.
+     * @param interval The inteval in microseconds that the timer
+     *                 shall expire after the initial expiration.
+     *                 Set this to zero for a one-shot timer.
+     */
+    void uset (unsigned initial, unsigned interval=0);
+
+    /**
+     * Set the timer expration time in nanoseconds.
+     * @param initial The initial time in nanoseconds until the times shall expire.
+     * @param interval The inteval in nanoseconds that the timer
+     *                 shall expire after the initial expiration.
+     *                 Set this to zero for a one-shot timer.
+     */
+    void nset (unsigned initial, unsigned interval=0);
 
     /**
      * Cancel the timer.
@@ -108,6 +126,7 @@ private:
     unsigned initial;
     unsigned interval;
     static void initialize_controller (int signal_number) throw (TimerException);
+    void set (struct itimerspec& ts);
 };
 
 

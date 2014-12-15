@@ -91,7 +91,44 @@ Timer::~Timer ()
 void Timer::set (unsigned initial, unsigned interval)
 {
     struct itimerspec ts;
+    ts.it_value.tv_sec  = (initial / 1000);
+    ts.it_value.tv_nsec = (initial % 1000) * 1000000;
+    ts.it_interval.tv_sec  = (interval / 1000);
+    ts.it_interval.tv_nsec = (interval % 1000) * 1000000;
+    set (ts);
+}
 
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Timer::uset (unsigned initial, unsigned interval)
+{
+    struct itimerspec ts;
+    ts.it_value.tv_sec  = (initial / 1000000);
+    ts.it_value.tv_nsec = (initial % 1000000) * 1000;
+    ts.it_interval.tv_sec  = (interval / 1000000);
+    ts.it_interval.tv_nsec = (interval % 1000000) * 1000;
+    set (ts);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Timer::nset (unsigned initial, unsigned interval)
+{
+    struct itimerspec ts;
+    ts.it_value.tv_sec  = initial / 1000000000;
+    ts.it_value.tv_nsec = initial % 1000000000;
+    ts.it_interval.tv_sec  = interval / 1000000000;
+    ts.it_interval.tv_nsec = interval % 1000000000;
+    set (ts);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Timer::set (struct itimerspec& ts)
+{
     timer_controller_mutex.lock ();
     timer_controller_t& tc = signal_timer_map[signum];
     timer_controller_mutex.unlock ();
@@ -99,11 +136,6 @@ void Timer::set (unsigned initial, unsigned interval)
     bool need_lock = this_thread::get_id() != tc.worker_thread.get_id();
     if (need_lock)
         set_mutex.lock ();
-
-    ts.it_value.tv_sec  = (initial / 1000);
-    ts.it_value.tv_nsec = (initial % 1000) * 1000000;
-    ts.it_interval.tv_sec  = (interval / 1000);
-    ts.it_interval.tv_nsec = (interval % 1000) * 1000000;
 
     auto result = timer_settime (id, 0, &ts, NULL);
     this->initial  = initial;
