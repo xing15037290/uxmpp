@@ -88,37 +88,63 @@ Timer::~Timer ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Timer::set (unsigned initial, unsigned interval)
+void Timer::set (unsigned initial, unsigned interval, timer_callback_t callback)
 {
     struct itimerspec ts;
-    ts.it_value.tv_sec  = (initial / 1000);
-    ts.it_value.tv_nsec = (initial % 1000) * 1000000;
+
+    // Trigger immediately ?
+    if (initial==0 && interval==0) {
+        set (ts, false, true, callback);
+        return;
+    }
+
+    if (initial == 0) {
+        // Make it trigger as soon as we can
+        ts.it_value.tv_sec  = 0;
+        ts.it_value.tv_nsec = 1;
+    }else{
+        ts.it_value.tv_sec  = (initial / 1000);
+        ts.it_value.tv_nsec = (initial % 1000) * 1000000;
+    }
     ts.it_interval.tv_sec  = (interval / 1000);
     ts.it_interval.tv_nsec = (interval % 1000) * 1000000;
     this->initial  = initial;
     this->interval = interval;
-    set (ts);
+    set (ts, false, false, callback);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Timer::uset (unsigned initial, unsigned interval)
+void Timer::uset (unsigned initial, unsigned interval, timer_callback_t callback)
 {
     struct itimerspec ts;
-    ts.it_value.tv_sec  = (initial / 1000000);
-    ts.it_value.tv_nsec = (initial % 1000000) * 1000;
+
+    // Trigger immediately ?
+    if (initial==0 && interval==0) {
+        set (ts, false, true, callback);
+        return;
+    }
+
+    if (initial == 0) {
+        // Make it trigger as soon as we can
+        ts.it_value.tv_sec  = 0;
+        ts.it_value.tv_nsec = 1;
+    }else{
+        ts.it_value.tv_sec  = (initial / 1000000);
+        ts.it_value.tv_nsec = (initial % 1000000) * 1000;
+    }
     ts.it_interval.tv_sec  = (interval / 1000000);
     ts.it_interval.tv_nsec = (interval % 1000000) * 1000;
     this->initial  = initial;
     this->interval = interval;
-    set (ts);
+    set (ts, false, false, callback);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Timer::set (struct itimerspec& ts)
+void Timer::set (struct itimerspec& ts, bool stop, bool now, timer_callback_t new_callback)
 {
     timer_controller_mutex.lock ();
     timer_controller_t& tc = signal_timer_map[signum];
@@ -128,6 +154,43 @@ void Timer::set (struct itimerspec& ts)
     if (need_lock)
         set_mutex.lock ();
 
+    // Cancel the timer?
+    //
+    if (stop) {
+        initial = interval = 0;
+        timer_settime (id, 0, &ts, NULL);
+        if (need_lock)
+            set_mutex.unlock ();
+        return;
+    }
+
+    // Trigger timer now?
+    //
+    if (now) {
+        // Cancel the POSIX timer first
+        ts.it_value.tv_sec  = 0;
+        ts.it_value.tv_nsec = 0;
+        ts.it_interval.tv_sec  = 0;
+        ts.it_interval.tv_nsec = 0;
+        timer_settime (id, 0, &ts, NULL);
+        if (new_callback)
+            callback = new_callback;
+        // Make sure the timer isn't ignored in the worker thread
+        initial = 1;
+        // Do a 'manual' trigger
+        tc.timer_queue.push (this);
+        sem_post (&tc.sig_sem);
+
+        if (need_lock)
+            set_mutex.unlock ();
+        return;
+    }
+
+    if (new_callback)
+        callback = new_callback;
+
+    // Arm the timer
+    //
     auto result = timer_settime (id, 0, &ts, NULL);
     if (need_lock)
         set_mutex.unlock ();
@@ -138,6 +201,19 @@ void Timer::set (struct itimerspec& ts)
         else
             uxmpp_log_error (THIS_FILE, "Unable to set timer #", reinterpret_cast<unsigned long>(id));
     }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Timer::cancel ()
+{
+    struct itimerspec ts;
+    ts.it_value.tv_sec  = 0;
+    ts.it_value.tv_nsec = 0;
+    ts.it_interval.tv_sec  = 0;
+    ts.it_interval.tv_nsec = 0;
+    set (ts, true, false, nullptr);
 }
 
 

@@ -353,6 +353,13 @@ void ConnectionManager::run_worker (ConnectionManager& cm)
 
     while (!done) {
         DEBUG_TRACE (THIS_FILE, "Poll ", nfds, " file descriptors");
+#ifdef UXMPP_IO_CONNECTIONMANAGER_DEBUG
+        for (auto i=1; i<nfds; ++i) {
+            DEBUG_TRACE (THIS_FILE, "fd ", cm.fds[i].fd, ":",
+                         (cm.fds[i].events & POLLIN ? " RX" : ""),
+                         (cm.fds[i].events & POLLOUT ? " TX" : ""));
+        }
+#endif
         auto result = poll (cm.fds, nfds, -1);
         if (result <= 0) {
             if (result==0 || errno==EINTR)
@@ -360,25 +367,32 @@ void ConnectionManager::run_worker (ConnectionManager& cm)
             uxmpp_log_error (THIS_FILE, "poll failed");
             continue;
         }
+        // Check the command pipe first
+        //
+        if (cm.fds[0].revents & POLLIN) {
+            cm.fds[0].revents &= ~POLLIN; // reset POLLIN result flag
+            done = cm.dispatch_command (nfds);
+            continue;
+        }
         for (auto i=1; i<nfds; ++i) {
             if (cm.fds[i].revents == 0)
                 continue;
             if (cm.fds[i].revents & POLLOUT) {
                 DEBUG_TRACE (THIS_FILE, "poll: fd ", cm.fds[i].fd, " ready for write");
-                cm.fds[i].revents &= ~POLLOUT; // reset flag
+                DEBUG_TRACE (THIS_FILE, "fd ", cm.fds[i].fd, ":",
+                             (cm.fds[i].events & POLLIN ? " RX" : ""),
+                             (cm.fds[i].events & POLLOUT ? " TX" : ""));
+                //cm.fds[i].revents &= ~POLLOUT; // reset flag
                 cm.handle_poll_io (cm.fds[i], nfds, false);
             }
             if (cm.fds[i].revents & POLLIN) {
                 DEBUG_TRACE (THIS_FILE, "poll: fd ", cm.fds[i].fd, " ready for read");
-                cm.fds[i].revents &= ~POLLOUT; // reset flag
+                DEBUG_TRACE (THIS_FILE, "fd ", cm.fds[i].fd, ":",
+                             (cm.fds[i].events & POLLIN ? " RX" : ""),
+                             (cm.fds[i].events & POLLOUT ? " TX" : ""));
+                //cm.fds[i].revents &= ~POLLIN; // reset flag
                 cm.handle_poll_io (cm.fds[i], nfds, true);
             }
-        }
-        // Check the command pipe last
-        //
-        if (cm.fds[0].revents & POLLIN) {
-            cm.fds[0].revents &= ~POLLIN; // reset POLLIN result flag
-            done = cm.dispatch_command (nfds);
         }
     }
 
@@ -452,7 +466,6 @@ void ConnectionManager::handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx)
         io_command_t cmd;
         cmd.op = rx ? io_command_op::del_rx : io_command_op::del_tx;
         cmd.conn = conn;
-        pfd.events = 0; // Make sure poll() ignores this
         auto result = ::write (cmd_pipe[pipe_tx], &cmd, sizeof(cmd));
         if (result <= 0) {
             uxmpp_log_debug (THIS_FILE, "Error sending command add_rx");
@@ -587,7 +600,7 @@ void ConnectionManager::del_poll_fd (Connection* conn, int& nfds, bool rx)
     //
     if (connections.find(conn) == connections.end()) {
         DEBUG_TRACE (THIS_FILE,
-                         "Connection not valid, don't remove ",rx?"RX":"TX"," file descriptor from poll list");
+                     "Connection not valid, don't remove ",rx?"RX":"TX"," file descriptor from poll list");
         return;
     }
 
@@ -605,6 +618,7 @@ void ConnectionManager::del_poll_fd (Connection* conn, int& nfds, bool rx)
             DEBUG_TRACE (THIS_FILE, "Found file descriptor in poll list, unset ", (rx?"POLLIN":"POLLOUT"));
             fds[i].events  &= ~poll_op;
             fds[i].revents &= ~poll_op;
+/*
             if ((fds[i].events & (POLLIN | POLLOUT)) == 0) {
                 DEBUG_TRACE (THIS_FILE, "Remove file descriptor from poll list");
                 fds[i].fd      = fds[nfds-1].fd;
@@ -612,6 +626,7 @@ void ConnectionManager::del_poll_fd (Connection* conn, int& nfds, bool rx)
                 fds[i].revents = fds[nfds-1].revents;
                 --nfds;
             }
+*/
             return;
         }
     }

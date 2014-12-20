@@ -36,7 +36,11 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 FileConnection::FileConnection (const std::string& file, int flags)
 {
-    int fd = ::open (file.c_str(), flags);
+    int fd;
+    if (flags | O_CREAT)
+        fd = ::open (file.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+    else
+        fd = ::open (file.c_str(), flags);
     if (fd < 0) {
         uxmpp_log_warning (THIS_FILE, "Unable to open file ", file);
     }else{

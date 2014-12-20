@@ -112,7 +112,7 @@ std::string StreamError::get_error_name ()
 void StreamError::set_app_error (const std::string& app_error, const std::string& text)
 {
     set_error_name ("undefined-condition");
-    add_node (XmlObject(app_error, XmlUxmppErrorNs));
+    add_node (XmlObject(app_error, XmlUxmppInternalErrorNs));
     set_text (text);
 }
 

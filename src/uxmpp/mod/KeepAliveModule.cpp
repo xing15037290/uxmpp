@@ -54,7 +54,7 @@ void KeepAliveModule::module_registered (uxmpp::Session& session)
     if (sess->get_state() == SessionState::bound) {
         // Start the keep-alive timer
         if (interval && sess)
-            sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
+            sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000);
     }
 }
 
@@ -74,13 +74,13 @@ bool KeepAliveModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlOb
 {
     // Check timer events
     //
-    if (xml_obj.get_full_name() == XmlUxmppTimerTagFull) {
+    if (xml_obj.get_full_name() == XmlUxmppInternalTimerTagFull) {
         //
         // Check the keep-alive timer
         //
         if (xml_obj.get_attribute("id") == "keep-alive") {
             if (interval)
-                sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
+                sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000);
             uxmpp_log_trace (THIS_FILE, "Send keep-alive");
             sess->get_xml_stream().write (keep_alive);
             return true;
@@ -100,12 +100,12 @@ void KeepAliveModule::on_state_change (uxmpp::Session& session,
     if (new_state == SessionState::bound) {
         // Start the keep-alive timer
         if (interval && sess)
-            sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
+            sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000);
     }
     else if (old_state == SessionState::bound) {
         // Stop the keep-alive timer
         if (sess)
-            sess->get_xml_stream().set_timeout ("keep-alive", 0);
+            sess->get_xml_stream().cancel_timeout ("keep-alive");
     }
 }
 
@@ -120,9 +120,9 @@ void KeepAliveModule::set_interval (unsigned new_interval)
         return;
 
     if (interval == 0)
-        sess->get_xml_stream().set_timeout ("keep-alive", 0, true);
+        sess->get_xml_stream().cancel_timeout ("keep-alive");
     else if (sess->get_state()==SessionState::bound)
-        sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000, true);
+        sess->get_xml_stream().set_timeout ("keep-alive", interval * 1000);
 }
 
 

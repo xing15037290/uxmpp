@@ -95,7 +95,7 @@ public:
 
 
 
-constexpr char namespace_delim {':'};
+static constexpr char namespace_delim {':'};
 
 
 
@@ -318,9 +318,22 @@ void XmlInputStream::XmlParseData::end_xml_node (void* user_data,
         TRACE (THIS_FILE, "end_xml_node - complete XML object fround (", element->xml_obj.get_name(), ")");
 
         if (stream.rx_func) {
-            stream.mutex.unlock ();
-            stream.rx_func (stream, element->xml_obj);
-            stream.mutex.lock ();
+            // We shall ignore namespace "http://ultramarin.se/uxmpp#internal-error"
+            // and "http://ultramarin.se/uxmpp#internal-timer"
+            // since those are only allowed from internal sources from
+            // within the app (i.e. added directly as an object and not parsed).
+            // Otherwise an attacker could send those XML objects to make the app
+            // believe a timer expired or an internal error occurred.
+            if (element->xml_obj.get_namespace() != "http://ultramarin.se/uxmpp#internal-error" &&
+                element->xml_obj.get_namespace() != "http://ultramarin.se/uxmpp#internal-timer")
+            {
+                stream.mutex.unlock ();
+                stream.rx_func (stream, element->xml_obj);
+                stream.mutex.lock ();
+            }else{
+                uxmpp_log_warning (THIS_FILE, "Ignoring XML object with namespace ",
+                                   element->xml_obj.get_namespace());
+            }
         }
     }else{
         XmlStreamParseElement* parent_element = pd->element_stack.front ();
@@ -524,6 +537,7 @@ void XmlInputStream::free_resources ()
 
 
 //------------------------------------------------------------------------------
+// Parse a character
 //------------------------------------------------------------------------------
 XmlInputStream& XmlInputStream::operator<< (const char ch)
 {
@@ -561,6 +575,7 @@ XmlInputStream& XmlInputStream::operator<< (const char ch)
 
 
 //------------------------------------------------------------------------------
+// Parse a string
 //------------------------------------------------------------------------------
 XmlInputStream& XmlInputStream::operator<< (const std::string& input)
 {
@@ -597,6 +612,7 @@ XmlInputStream& XmlInputStream::operator<< (const std::string& input)
 
 
 //------------------------------------------------------------------------------
+// Insert an XML object
 //------------------------------------------------------------------------------
 XmlInputStream& XmlInputStream::operator<< (const XmlObject& xml_obj)
 {

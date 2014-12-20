@@ -60,7 +60,7 @@ namespace uxmpp { namespace io {
 
         /**
          * Creates a SocketConnection object.
-         * The TCP connection is not bound to a local address nor connected to
+         * The connection is not bound to a local address nor connected to
          * a remote host.
          */
         SocketConnection ();
@@ -81,6 +81,11 @@ namespace uxmpp { namespace io {
          * @param peer_addr The address of the remote host. The protocol used
          *                  is determined by the type and proto attributes of
          *                  the address object.
+         *                  TLS will not be enabled even if the protocol of the
+         *                  peer address if TLS och DTLS. TCP respective UDP will
+         *                  be used instead.
+         *                  To enable TLS/DTLS, call enable_tls() once the
+         *                  socket is connected.
          *                  If the socket is bound to a local address the proto
          *                  attribute of the local address will be set to the
          *                  same as the peer address.
@@ -108,16 +113,12 @@ namespace uxmpp { namespace io {
         /**
          * Set connect callback.
          */
-        void set_connected_cb (connect_cb_t connected_cb) {
-            this->connected_cb = connected_cb;
-        }
+        connect_cb_t set_connected_cb (connect_cb_t connected_cb);
 
         /**
          * Set tls connect callback.
          */
-        void set_tls_connected_cb (tls_connected_cb_t tls_connected_cb) {
-            this->tls_connected_cb = tls_connected_cb;
-        }
+        tls_connected_cb_t set_tls_connected_cb (tls_connected_cb_t tls_connected_cb);
 
         /**
          * Get the address of the peer.
@@ -137,6 +138,13 @@ namespace uxmpp { namespace io {
          * Perform a TLS/DTLS handshake if not already done.
          */
         void enable_tls (const TlsConfig& tls_cfg);
+
+        /**
+         * Return true is TLS/DTLS is enabled.
+         */
+        bool is_tls_enabled () const {
+            return tls_enabled;
+        }
 
         /**
          * Do the actual reading from the file descriptor.

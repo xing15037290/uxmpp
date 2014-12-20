@@ -38,8 +38,8 @@ int main (int argc, char* argv[])
 
     //uxmpp_set_log_level (LogLevel::trace);
 
-    FileConnection in_file (argv[1], O_RDONLY|O_NONBLOCK);
-    FileConnection out_file (argv[2], O_WRONLY|O_CREAT|O_NONBLOCK, S_IRWXU|S_IRWXG);
+    FileConnection in_file (argv[1], O_RDONLY);
+    FileConnection out_file (argv[2], O_WRONLY|O_CREAT|O_TRUNC);
 
     bool rx_done = false;
     bool tx_done = true;

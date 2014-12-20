@@ -32,6 +32,9 @@ bin_PROGRAMS =
 #noinst_bin_PROGRAMS += test_prog
 #test_prog_SOURCES    = test_prog.cpp
 
+noinst_bin_PROGRAMS += test_Semaphore
+test_Semaphore_SOURCES  = test_Semaphore.cpp
+
 noinst_bin_PROGRAMS += test_Logger
 test_Logger_SOURCES  = test_Logger.cpp
 
@@ -50,8 +53,8 @@ test_XmlStream_SOURCES  = test_XmlStream.cpp
 noinst_bin_PROGRAMS += test_Jid
 test_Jid_SOURCES     = test_Jid.cpp
 
-noinst_bin_PROGRAMS  += test_Session
-test_Session_SOURCES  = test_Session.cpp
+#noinst_bin_PROGRAMS  += test_Session
+#test_Session_SOURCES  = test_Session.cpp
 
 noinst_bin_PROGRAMS     += test_ImpSession
 test_ImpSession_SOURCES  = test_ImpSession.cpp

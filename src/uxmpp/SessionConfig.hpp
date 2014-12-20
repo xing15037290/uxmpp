@@ -20,6 +20,7 @@
 #define UXMPP_SESSIONCONFIG_HPP
 
 #include <uxmpp/types.hpp>
+#include <uxmpp/io/IpHostAddr.hpp>
 #include <string>
 
 
@@ -44,6 +45,8 @@ namespace uxmpp {
 
         /**
          * XMPP domain.
+         * If a specific server is not set a DNS SRV lookup will be used for this
+         * domain to find the IP and port number to connect to.
          */
         std::string domain;
 
@@ -68,7 +71,7 @@ namespace uxmpp {
         /**
          * XMPP server port in host byte order.
          * Set this to 0 to use the default port, or the port returned by a DNS SRV query.
-         * Set this t0 non-zero override the default port or the port returned by a DNS SRV query.
+         * Set this to non-zero override the default port or the port returned by a DNS SRV query.
          * Default is 0.
          */
         uint16_t port;

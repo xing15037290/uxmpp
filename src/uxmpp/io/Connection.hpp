@@ -111,13 +111,15 @@ public:
 
     /**
      * Set RX callback.
+     * @return The old callback.
      */
-    void set_rx_cb (io_callback_t callback);
+    io_callback_t set_rx_cb (io_callback_t callback);
 
     /**
      * Set TX callback.
+     * @return The old callback.
      */
-    void set_tx_cb (io_callback_t callback);
+    io_callback_t set_tx_cb (io_callback_t callback);
 
     /**
      * Do the actual reading from the file descriptor.

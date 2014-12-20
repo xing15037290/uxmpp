@@ -26,127 +26,54 @@ using namespace uxmpp;
 using namespace uxmpp::io;
 
 
-class XmlHandler : public XmlStreamListener {
-public:
-    virtual void on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj) override {
-        cout << endl << "Got RX: ";
-        if (xml_obj.get_part() == XmlObjPart::start) {
-            cout << "(start-tag) ";
+static void rx_xml (XmlStream& stream, XmlObject& xml_obj)
+{
+    if (xml_obj.get_namespace() == XmlUxmppInternalErrorNs) {
+        if (xml_obj.get_tag_name() == "parse-error") {
+            uxmpp_log_error ("main", "XML parse error: ", xml_obj.get_content());
         }
-        else if (xml_obj.get_part() == XmlObjPart::end) {
-            cout << "(end-tag) ";
+        else if (xml_obj.get_tag_name() == "rx-error") {
+            uxmpp_log_error ("main", "RX faliure: ", xml_obj.get_attribute("errnum"));
+            //stream.stop ();
         }
-
-        cout << xml_obj.get_tag_name() << endl;
-
-
-        if (xml_obj.get_tag_name() == "error") {
-            cout << "Got error, close stream" << endl;
-            stream.stop ();
+        else {
+            uxmpp_log_error ("main", "RX faliure: ", xml_obj.get_tag_name());
         }
-
-        if (xml_obj.get_tag_name()=="stream" && xml_obj.get_part() == XmlObjPart::end) {
-            cout << "Got EOS, close stream" << endl;
-            stream.stop ();
-        }
-
-        if (xml_obj.get_tag_name() == "features") {
-            cout << "Got features, close stream" << endl;
-            stream.stop ();
-        }
-
+        //stream.stop ();
     }
-
-    virtual void on_open (XmlStream& xs) override {
-        cout << "Stream opened" << endl;
-        //StreamXmlObj stream_start ("ultramarin.se", "dan@ultramarin.se");
-/*
-        XmlObject stream_start ("stream:stream");
-        stream_start.setAttribute ("from", "dan@ultramarin.se");
-        stream_start.setAttribute ("to", "ultramarin.se");
-        stream_start.setAttribute ("version", "1.0");
-        stream_start.setAttribute ("xml:lang", "en");
-        //stream_start.setAttribute ("xmlns", "'jabber:client'");
-        //stream_start.setAttribute ("xmlns:stream", "'http://etherx.jabber.org/streams'");
-        stream_start.setPart (XmlObjPart::start);
-*/
-        //xs.write (stream_start);
-
-        //xs.stop ();
-        std::thread ([&xs](){
-                cerr << "Stop the stream from a thread" << endl;
-                xs.stop ();
-            }).detach ();
-    }
-
-    virtual void on_close (XmlStream& stream) override {
-        cout << "Stream closed" << endl;
-/*
-        BsdResolver resolver;
-        auto addr_list = resolver.lookup_srv ("ultramarin.se", AddrProto::tcp, "xmpp-client");
-        bool connected = false;
-        for (auto addr : addr_list) {
-            cout << "Open it again on " << to_string(addr) << endl;
-            connected = stream.start (addr);
-            if (connected) {
-                cout << "Failed to open it again!" << endl;
-                break;
-            }
+    else if (xml_obj.get_namespace() == XmlUxmppInternalTimerNs) {
+        if (xml_obj.get_tag_name() == "timeout") {
+            uxmpp_log_info ("main", "Got timeout: ", xml_obj.get_attribute("name"));
         }
-*/
+        stream.write (xml_obj);
+        stream.stop ();
+    }else{
+        //stream.set_timeout ("stop", 500);
+        //uxmpp_log_info ("main", "Receivec xml: ", to_string(xml_obj));
+        stream.write (xml_obj);
     }
-
-    virtual void on_rx_xml_error (XmlStream& stream) override {
-    }
-};
+}
 
 
 int main (int argc, char* argv[])
 {
-    uxmpp_set_log_level (LogLevel::trace);
 
-    if (argc < 2) {
-        cerr << "Usage: test_Resolver <domain>" << endl;
+    uxmpp_set_log_level (LogLevel::debug);
+
+    if (argc < 4) {
+        cerr << "Usage: test_XmlStream <xml_input_file> <xml_output_file> <top_node_name> [top_node_namespace]" << endl;
         return 1;
     }
 
-    BsdResolver resolver;
-    auto addr_list = resolver.lookup_srv (argv[1], AddrProto::tcp, "xmpp-client");
-    //auto addr_list = resolver.lookup_host (argv[1]);
+    FileConnection in_file (argv[1], O_RDONLY);
+    FileConnection out_file (argv[2], O_WRONLY|O_CREAT|O_TRUNC, S_IRWXU|S_IRWXG);
+    XmlStream xs (XmlObject(argv[3], argc>4 ? argv[4] : ""));
 
-    XmlStream xs (XmlObject("stream", "http://etherx.jabber.org/streams", false, false));
-    XmlHandler xh;
+    xs.set_rx_cb (rx_xml);
+    xs.set_timeout ("stop", 800);
+    xs.run (in_file, out_file);
 
-    xs.add_listener (xh);
-
-    for (int i=0; i<128; i++) {
-        bool connected = false;
-        for (auto addr : addr_list) {
-            connected = xs.start (addr);
-            if (!connected) {
-                cerr << "Failed to connect to " << to_string(addr) << endl;
-                break;
-            }
-        }
-        //cout << "#" << i << endl;
-        cerr << "#" << i << endl;
-    }
-
-/*
-    XmlObject stream_start ("stream:stream");
-    stream_start.setAttribute ("from", "dan@ultramarin.se");
-    stream_start.setAttribute ("to", "ultramarin.se");
-    stream_start.setAttribute ("version", "1.0");
-    stream_start.setAttribute ("xml:lang", "en");
-    //stream_start.setAttribute ("xmlns", "'jabber:client'");
-    //stream_start.setAttribute ("xmlns:stream", "'http://etherx.jabber.org/streams'");
-    stream_start.setPart (XmlObjPart::start);
-
-    xs.write (stream_start);
-
-    sleep (10);
-*/
-    //sleep (10);
+    cerr << "done" << endl;
 
     return 0;
 }

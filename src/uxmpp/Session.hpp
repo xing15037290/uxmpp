@@ -20,7 +20,6 @@
 #define UXMPP_SESSION_HPP
 
 #include <uxmpp/types.hpp>
-#include <uxmpp/XmlStreamListener.hpp>
 #include <uxmpp/XmlStream.hpp>
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/StreamXmlObj.hpp>
@@ -29,6 +28,8 @@
 #include <uxmpp/SessionListener.hpp>
 #include <uxmpp/StreamError.hpp>
 #include <uxmpp/Jid.hpp>
+#include <uxmpp/io/SocketConnection.hpp>
+
 #include <string>
 
 
@@ -41,7 +42,7 @@ namespace uxmpp {
     /**
      * A client to server XMPP session.
      */
-    class Session : public XmlStreamListener, XmppModule {
+    class Session : XmppModule {
     public:
 
         /**
@@ -55,10 +56,11 @@ namespace uxmpp {
         virtual ~Session ();
 
         /**
-         * Connect to an XMPP server.
+         * Connect to an XMPP server and run the session until it is closed.
+         * This call will block until the XMPP session is closed.
          * @param config Session configuration.
          */
-        void start (const SessionConfig& config);
+        void run (const SessionConfig& config);
 
         /**
          * Disconnect from the XMPP server.
@@ -68,27 +70,17 @@ namespace uxmpp {
         void stop (bool fast=false);
 
         /**
-         * Called when the stream is opened.
-         */
-        virtual void on_open (XmlStream& stream) override;
-
-        /**
-         * Called when the stream is closed.
-         */
-        virtual void on_close (XmlStream& stream) override;
-
-        /**
-         * Called whan an XML object is received.
-         */
-        virtual void on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj) override;
-
-        /**
-         * Called whan an XML object is received.
-         */
-        virtual void on_rx_xml_error (XmlStream& stream);
-
-        /**
          * Return a stream error object.
+         * When the session is closed, use this method to retrieve a
+         * StreamError object that describes an XMPP error, if any.
+         * Application specific errors 'undefined-condition':
+         * * resolve-error
+         * * connect-failed
+         * * timeout
+         * * parse-error
+         * * rx-error
+         * * tx-error
+         * * 
          */
         StreamError& get_error ();
 
@@ -111,22 +103,22 @@ namespace uxmpp {
         virtual void del_session_listener (SessionListener& listener);
 
         /**
-         *
+         * Return the session state.
          */
         SessionState get_state () const;
 
         /**
-         *
+         * Get the session jid.
          */
         Jid get_jid () const;
 
         /**
-         *
+         * Get the session domain.
          */
         Jid get_domain () const;
 
         /**
-         *
+         * Send an XMPP stanza to the server.
          */
         void send_stanza (const XmlObject& xml_obj);
 
@@ -170,19 +162,27 @@ namespace uxmpp {
         XmlStream& get_xml_stream ();
 
         /**
-         *
+         * Get the server features.
          */
         std::vector<XmlObject>& get_features ();
 
         /**
-         * Re-send a new XML 'stream' start tag.
+         * Reset the XML stream and re-send a new XML 'stream' start tag.
          */
         void reset ();
 
-        /*
+        /**
          * Set an application specific error condition.
          */
         void set_app_error (const std::string& app_error, const std::string& text="");
+
+        /**
+         * Get the socket used by the XML stream.
+         * Only use this if you know what you are doing!
+         */
+        io::SocketConnection& get_socket () {
+            return socket;
+        }
 
 
     protected:
@@ -191,6 +191,11 @@ namespace uxmpp {
          * Configuration.
          */
         SessionConfig cfg;
+
+        /**
+         * IP socket connection.
+         */
+        io::SocketConnection socket;
 
         /**
          * An XML stream.
@@ -213,7 +218,7 @@ namespace uxmpp {
         SessionState state;
 
         /**
-         * XML stream used for sending/receiving XML objects.
+         * Top-level XML object.
          */
         StreamXmlObj stream_xml_obj;
 
@@ -228,17 +233,17 @@ namespace uxmpp {
         std::vector<SessionListener*> listeners;
 
         /**
-         *
+         * An object to hold an eventual stream error.
          */
         StreamError stream_error;
 
         /**
-         *
+         * Set new session state.
          */
         virtual bool change_state (SessionState new_state);
 
         /**
-         *
+         * Session jid.
          */
         std::string jid;
 
@@ -253,6 +258,10 @@ namespace uxmpp {
          */
         virtual bool proccess_xml_object (Session& session, XmlObject& xml_obj) override;
 
+        /**
+         *
+         */
+        void on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj);
 
     private:
     };

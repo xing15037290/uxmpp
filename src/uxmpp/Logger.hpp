@@ -152,6 +152,17 @@ namespace uxmpp {
 
 
     /**
+     * Get the maximum log level when logging messages.
+     * Messages with a higher log level will not be logged.
+     * @return The current log level.
+     */
+    inline LogLevel uxmpp_get_log_level ()
+    {
+        return Logger::get_instance().get_log_level ();
+    }
+
+
+    /**
      * Log a message using the Logger class.
      * @param leve A log level.
      * @param prefix A prefix to the log message.

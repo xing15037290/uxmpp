@@ -88,14 +88,6 @@ PKG_CHECK_MODULES([openssl],
 	[AC_MSG_ERROR(Could not find openssl)])
 
 #
-# Check for libevent
-#
-PKG_CHECK_MODULES([libevent],
-	[libevent >= 2.0.0],
-	[export REQUIRE_IN_PC_FILE="$REQUIRE_IN_PC_FILE libevent"],
-	[AC_MSG_ERROR(Could not find libevent)])
-
-#
 # Check for libresolv
 #
 AC_SEARCH_LIBS([res_query], [resolv], [

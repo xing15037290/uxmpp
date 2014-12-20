@@ -138,20 +138,16 @@ extern const std::string XmlAmpDefNs;
 extern const std::string XmlAmperrorNs;
 extern const std::string XmlAmperrorDefNs;
 
-// uxmpp error namespace
+// uxmpp internal error namespace
 //
-extern const std::string XmlUxmppErrorNs;
-extern const std::string XmlUxmppErrorDefNs;
+extern const std::string XmlUxmppInternalErrorNs;
+extern const std::string XmlUxmppInternalErrorDefNs;
 
-// uxmpp timer namespace
+// uxmpp internal timer namespace
 //
-extern const std::string XmlUxmppTimerNs;
-extern const std::string XmlUxmppTimerDefNs;
-
-// uxmpp timer tag
-//
-extern const std::string XmlUxmppTimerTag;
-extern const std::string XmlUxmppTimerTagFull;
+extern const std::string XmlUxmppInternalTimerNs;
+extern const std::string XmlUxmppInternalTimerDefNs;
+extern const std::string XmlUxmppInternalTimerTagFull;
 
 
 

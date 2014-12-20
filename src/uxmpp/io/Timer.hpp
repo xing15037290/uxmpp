@@ -74,28 +74,54 @@ public:
     /**
      * Set the timer expration time in milliseconds.
      * @param initial The initial time in milliseconds until the times shall expire.
+     *                A value of zero means as soon as possible.
      * @param interval The inteval in milliseconds that the timer
      *                 shall expire after the initial expiration.
      *                 Set this to zero for a one-shot timer.
+     * @param callback If not nullptr, set the callback that will
+     *                 be called when the timer expires.
      */
-    void set (unsigned initial, unsigned interval=0);
+    void set (unsigned initial, unsigned interval, timer_callback_t callback=nullptr);
+
+    /**
+     * Set the timer expration time in milliseconds. This will set a one-shot timer.
+     * @param initial The initial time in milliseconds until the times shall expire.
+     *                A value of zero means as soon as possible.
+     * @param callback If not nullptr, set the callback that will
+     *                 be called when the timer expires.
+     */
+    void set (unsigned initial, timer_callback_t callback=nullptr) {
+        set (initial, 0, callback);
+    }
 
     /**
      * Set the timer expration time in microseconds.
      * @param initial The initial time in microseconds until the times shall expire.
+     *                A value of zero means as soon as possible.
      * @param interval The inteval in microseconds that the timer
      *                 shall expire after the initial expiration.
      *                 Set this to zero for a one-shot timer.
+     * @param callback If not nullptr, set the callback that will
+     *                 be called when the timer expires.
      */
-    void uset (unsigned initial, unsigned interval=0);
+    void uset (unsigned initial, unsigned interval, timer_callback_t callback=nullptr);
+
+    /**
+     * Set the timer expration time in microseconds. This will set a one-shot timer.
+     * @param initial The initial time in microseconds until the times shall expire.
+     *                A value of zero means as soon as possible.
+     * @param callback If not nullptr, set the callback that will
+     *                 be called when the timer expires.
+     */
+    void uset (unsigned initial, timer_callback_t callback=nullptr) {
+        uset (initial, 0, callback);
+    }
 
     /**
      * Cancel the timer.
      * After this call the callback will not be called until the timer is set again.
      */
-    void cancel () {
-        set (0, 0);
-    }
+    void cancel ();
 
     /**
      * Set the callback that will be called when the timer expires.
@@ -117,7 +143,7 @@ private:
     unsigned initial;
     unsigned interval;
     static void initialize_controller (int signal_number) throw (TimerException);
-    void set (struct itimerspec& ts);
+    void set (struct itimerspec& ts, bool stop, bool now, timer_callback_t new_callback);
 };
 
 

@@ -48,4 +48,5 @@ stamp-h*
 /test/test_cores
 /test/test_ConnectionManager
 /test/test_FileConnection
+/test/test_Semaphore
 /test/uxmpp

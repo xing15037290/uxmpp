@@ -46,8 +46,9 @@ int main (int argc, char* argv[])
                 uxmpp_log_info (THIS_FILE, "t1 expired - overrun: ", t.get_overrun());
             });
 
-        Timer t3 ([](Timer& t){
-                uxmpp_log_info (THIS_FILE, "t3 expired - overrun: ", t.get_overrun());
+        string name {"name"};
+        Timer t3 ([name](Timer& t){
+                uxmpp_log_info (THIS_FILE, "t3(", name, ") expired - overrun: ", t.get_overrun());
                 //t.cancel ();
             });
 
@@ -57,9 +58,15 @@ int main (int argc, char* argv[])
                 uxmpp_log_info (THIS_FILE, "t2 expired - done");
             });
 
-        t3.set (1000, 40);
+        t3.set (0); // As soon as possible
+        //t3.set (1000, 80);
         t1.set (1000, 500);
         t2.set (1000, 500);
+
+        this_thread::sleep_for (chrono::milliseconds(1));
+        t3.set (0, [](Timer& timer){
+                uxmpp_log_info (THIS_FILE, "t3 - run directly now!");
+            });
 
         this_thread::sleep_for (chrono::seconds(4));
     }

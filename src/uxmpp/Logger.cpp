@@ -23,7 +23,6 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
-#include <event2/event.h>
 
 
 UXMPP_START_NAMESPACE1(uxmpp)
@@ -87,43 +86,17 @@ Logger::~Logger ()
 
 //----------------------------------------------------------
 //----------------------------------------------------------
-static void event_logger (int severity, const char* msg)
-{
-    LogLevel level = LogLevel::trace;
-
-    switch (severity) {
-    case EVENT_LOG_DEBUG:
-        level = LogLevel::debug;
-        break;
-    case EVENT_LOG_MSG:
-        level = LogLevel::info;
-        break;
-    case EVENT_LOG_WARN:
-        level = LogLevel::warning;
-        break;
-    case EVENT_LOG_ERR:
-        level = LogLevel::error;
-        break;
-    }
-    Logger::get_instance().log (level, "libevent", msg);
-}
-
-
-//----------------------------------------------------------
-//----------------------------------------------------------
 Logger& Logger::get_instance ()
 {
-//    static std::mutex global_log_mutex;
-    //global_log_mutex.lock ();
+    static std::mutex log_instance_mutex;
     if (Logger::instance == nullptr) {
-        Logger::instance = new Logger;
-        Logger::instance->set_log_level (LogLevel::info);
-        //
-        // Install libevent log callback.
-        //
-        event_set_log_callback (event_logger);
+        log_instance_mutex.lock ();
+        if (Logger::instance == nullptr) {
+            Logger::instance = new Logger;
+            Logger::instance->set_log_level (LogLevel::info);
+        }
+        log_instance_mutex.unlock ();
     }
-    //global_log_mutex.unlock ();
 
     return *Logger::instance;
 }

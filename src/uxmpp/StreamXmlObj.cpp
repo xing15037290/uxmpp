@@ -32,26 +32,26 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-StreamXmlObj::StreamXmlObj ()
+StreamXmlObj::StreamXmlObj (const std::string& lang)
     : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
 {
     add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
     set_default_namespace_attr (XmlJabberClientNs);
     set_attribute ("version", "1.0");
-    set_attribute ("xml:lang", "en");
+    set_attribute ("xml:lang", lang);
     set_part (XmlObjPart::start);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-StreamXmlObj::StreamXmlObj (const std::string& to, const std::string& from)
+StreamXmlObj::StreamXmlObj (const std::string& to, const std::string& from, const std::string& lang)
     : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
 {
     add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
     set_default_namespace_attr (XmlJabberClientNs);
     set_attribute ("version", "1.0");
-    set_attribute ("xml:lang", "en");
+    set_attribute ("xml:lang", lang);
     set_part (XmlObjPart::start);
 
     set_to (to);

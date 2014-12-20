@@ -104,17 +104,21 @@ void Connection::set_fd (int fd)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Connection::set_rx_cb (io_callback_t callback)
+Connection::io_callback_t Connection::set_rx_cb (io_callback_t callback)
 {
+    io_callback_t old_cb {rx_cb};
     rx_cb = callback;
+    return old_cb;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void Connection::set_tx_cb (io_callback_t callback)
+Connection::io_callback_t Connection::set_tx_cb (io_callback_t callback)
 {
+    io_callback_t old_cb {tx_cb};
     tx_cb = callback;
+    return tx_cb;
 }
 
 

@@ -130,19 +130,16 @@ const std::string XmlAmperrorNs = "http://jabber.org/protocol/amp#errors";
 const std::string XmlAmperrorDefNs = XmlAmperrorNs;
 
 
-// uxmpp error namespace
+// uxmpp internal error namespace
 //
-const std::string XmlUxmppErrorNs = "http://ultramarin.se/uxmpp#errors";
+const std::string XmlUxmppInternalErrorNs = "http://ultramarin.se/uxmpp#internal-error";
+const std::string XmlUxmppInternalErrorDefNs = XmlUxmppInternalErrorNs;
 
-// uxmpp timer namespace
+// uxmpp internal timer namespace
 //
-const std::string XmlUxmppTimerNs = "http://ultramarin.se/uxmpp#timer";
-const std::string XmlUxmppTimerDefNs = XmlUxmppTimerNs;
-
-// uxmpp timer tag
-//
-extern const std::string XmlUxmppTimerTag = "timer";
-extern const std::string XmlUxmppTimerTagFull = XmlUxmppTimerNs + std::string(":") + XmlUxmppTimerTag;
+const std::string XmlUxmppInternalTimerNs = "http://ultramarin.se/uxmpp#internal-timer";
+const std::string XmlUxmppInternalTimerDefNs = XmlUxmppInternalTimerNs;
+const std::string XmlUxmppInternalTimerTagFull = XmlUxmppInternalTimerNs + std::string(":timeout");
 
 
 UXMPP_END_NAMESPACE1

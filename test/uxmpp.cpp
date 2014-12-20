@@ -203,19 +203,19 @@ void AppLogic::run ()
     sess.add_session_listener (*this);
 
     session_thread = thread ([this](){
-            sess.start (cfg);
+            sess.run (cfg);
             //
             // If TLS v1.2 is not supported, try TLS v1.1
             //
             if (sess.get_error().get_app_error() == "tls-error") {
                 mod_tls.tls_cfg.method = TlsMethod::tlsv1_1;
-                sess.start (cfg);
+                sess.run (cfg);
                 //
                 // If TLS v1.1 is not supported, try TLS v1.0
                 //
                 if (sess.get_error().get_app_error() == "tls-error") {
                     mod_tls.tls_cfg.method = TlsMethod::tlsv1;
-                    sess.start (cfg);
+                    sess.run (cfg);
                 }
             }
         });

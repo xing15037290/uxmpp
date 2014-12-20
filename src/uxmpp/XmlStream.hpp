@@ -20,35 +20,26 @@
 #define UXMPP_XMLSTREAM_HPP
 
 #include <uxmpp/types.hpp>
-#include <uxmpp/io/IpHostAddr.hpp>
+#include <uxmpp/io/Connection.hpp>
+#include <uxmpp/io/Timer.hpp>
 #include <uxmpp/XmlObject.hpp>
-#include <uxmpp/XmlStreamListener.hpp>
-#include <uxmpp/io/TlsConfig.hpp>
+#include <uxmpp/XmlInputStream.hpp>
 #include <queue>
 #include <vector>
 #include <mutex>
 #include <thread>
 #include <openssl/ssl.h>
 #include <condition_variable>
-#include <event2/event.h>
 #include <map>
 
 
 namespace uxmpp {
 
 
-    // Forward declaration.
-        //class XmlStream;
-
-    /**
-     * Opaque class to store the XML parsing state.
-     */
-    class XmlStreamParseData;
-
-    /**
-     * Opaque class to handle timer events.
-     */
-    class XmlTimerEvent;
+/**
+ * Maximum size of the input buffer when reading data from the input connection.
+ */
+#define UXMPP_MAX_RX_BUF_SIZE 2048
 
 
     /**
@@ -58,7 +49,26 @@ namespace uxmpp {
     public:
 
         /**
+         * Callback for received XML objects.
+         * This callback will be called when XML objects are received on
+         * the input connection.
+         * Two special XML objects can be received from the XmlStream
+         * object itself:
+         * <http://ultramarin.se/uxmpp#error:parse-error code='error-code'/>
+         * and
+         * <http://ultramarin.se/uxmpp#timeout:timeout name'timer-name'/>.
+         * "parse-error" will be received when an XML parsing error occurs
+         * on the input connection.
+         * "timeout" will be received when a timer set with method 'set_timeout'
+         * expires.
+         * @param stream The XmlStream object that received the XML object.
+         * @param xml_obj The XML object.
+         */
+        typedef std::function<void (XmlStream& stream, XmlObject& xml_obj)> rx_func_t;
+
+        /**
          * Constructor.
+         * @param top_element The top XML element of the XML stream.
          */
         XmlStream (const XmlObject& top_element);
 
@@ -68,15 +78,28 @@ namespace uxmpp {
         virtual ~XmlStream ();
 
         /**
-         * Start a new XML stream. This method does not return until the
-         * stream has ended.
-         * @param addr The address used to open an XML stream to.
+         * Run the XML stream. This method does not return until the
+         * stream has ended. The stream ends when one or both of the
+         * supplied connections closes (i.e. a read/write operation
+         * results in zero read/written bytes).
+         * In a read/write error occurs an XML object in namespace
+         * <code>http://ultramarin.se/uxmpp#internal-error</code> will
+         * be sent to the XML callback but it is up to the callback
+         * to stop the stream.
+         * The connections are assumed to be connected before this call.
+         * @param rx_connection The connection used for receiving XML objects.
+         * @param tx_connection The connection used for sending XML objects.
+         * @param tx_obj XML object to send once the stream is started.
+         *               If tx_obj evaluates to false, none is sent.
          * @return True if the connection was successful, otherwise false.
          */
-        virtual bool start (const uxmpp::io::IpHostAddr& addr);
+        virtual bool run (uxmpp::io::Connection& rx_connection,
+                          uxmpp::io::Connection& tx_connection,
+                          const XmlObject& tx_obj=XmlObject());
 
         /**
-         * Stop and close the stream.
+         * Stop stream.
+         * This will stop the XML stream if not already stopped.
          */
         virtual void stop ();
 
@@ -86,41 +109,16 @@ namespace uxmpp {
         virtual bool write (const XmlObject& xml_obj);
 
         /**
-         * Add a listener object that will receive events from the stream.
-         */
-        virtual void add_listener (XmlStreamListener& listener);
-
-        /**
-         * Remove a listener object that is receiving events from the stream.
-         */
-        virtual void del_listener (XmlStreamListener& listener);
-
-        /**
-         * Check if the stream is open.
-         */
-        bool is_open () const;
-
-        /**
-         * Return the IP(v4|v6) address of the peer.
-         */
-        uxmpp::io::IpHostAddr get_peer_addr () const;
-
-        /**
-         * Start TLS.
-         */
-        bool enable_tls (const uxmpp::io::TlsConfig& tls_cfg, std::string& error_description);
-
-        /**
          * Reset the stream.
          * This will reset the XML parser to the same state as when the stream
-         * was originally openend.
+         * was originally started.
          */
         void reset ();
 
         /**
          * Add/update/remove a timeout.
-         * This method will set a timeout that will cause an XmlObject to be sent to any
-         * registered XmlStreamListener when the timer expires. The xml object will have
+         * This method will set a timeout that will cause an XmlObject
+         * to be received when the timer expires. The xml object will have
          * the tag 'timer' and the XML namespace is 'http://ultramarin.se/uxmpp#timer'.<BR>
          * If, for example, the timer id is "timer-id", then the xml object sent when
          * the timer expires will look like this:<BR>
@@ -130,97 +128,57 @@ namespace uxmpp {
          * @param msec Amount on milliseconds in the future the timer will expire.
          *             If a timer with this id has already been added and has not yet expired,
          *             then it will be reset with this timeout value.
-         *             If 0, any timer with this id will be disabled if not already expired.
-         * @param cache_timer If set to true the internal timer object with this id
-         *                    will be cached to make the resource handling more efficient.
-         *                    Set this to true if you are reusing a timer id often. Set this
-         *                    to false if you are using many timers with different id's.
+         *             If 0, the timer will expire as soon as possible.
          */
-        void set_timeout (const std::string& id, unsigned msec, bool cache_timer=false);
-
-
-    protected:
+        void set_timeout (const std::string& id, unsigned msec);
 
         /**
-         * The network socket.
+         * Cancel a timeout.
+         * This will cancel a previously set timeout.
+         * @param id The ID of the timer to cancel.
          */
-        int sock;
+        void cancel_timeout (const std::string& id);
 
         /**
-         * SSL context.
+         * Set the XML receive callback function.
+         * @param callback The function to be called for received XML objects.
          */
-        SSL_CTX* ssl_ctx;
+        void set_rx_cb (rx_func_t callback);
 
         /**
-         * SSL connection object.
+         *
          */
-        SSL* ssl;
-
-        /**
-         * The IP address of the peer.
-         */
-        uxmpp::io::IpHostAddr peer_addr;
-
-        /**
-         * A list of event listeners.
-         */
-        std::vector<XmlStreamListener*> listeners;
-
-        /**
-         * Mutex protecting resources.
-         */
-        std::mutex mutex;
-
-        /**
-         * Thread object.
-         */
-        std::thread rx_thread;
-
-        /**
-         * Flag indicating if the thread is running of not.
-         */
-        bool running;
-
-        /**
-         * XML parse data.
-         */
-        XmlStreamParseData* parse_data;
-
-        /**
-         * Callback on RX data.
-         */
-        void on_rx (const char* buf, int size);
-
-        void initializeParseData ();
-
-        /**
-         * Method running in a separate thread (handling network traffic).
-         */
-        static void rx_queue_thread_func (XmlStream* stream);
-
-        /**
-         * Run the stream.
-         */
-        void run ();
+        bool is_running () const {
+            return running;
+        }
 
 
     private:
-        friend class XmlTimerEvent;
-
-        void freeResources ();
-
         XmlObject top_node;
+
+        rx_func_t rx_cb;
+        std::thread rx_thread;
+        std::mutex mutex;
+        bool running;
+        
         std::queue<XmlObject> rx_queue;
         std::condition_variable rx_cond;
         std::mutex rx_cond_mutex;
 
-        bool broken_socket;
-        char buf[2048];
-        static void event_rx_callback (evutil_socket_t fd, short what, void* stream);
-        struct event_base* ebase;
-        struct event* rx_event;
+        XmlInputStream xml_istream;
+        uxmpp::io::Connection* rx_conn;
+        uxmpp::io::Connection* tx_conn;
+        std::array<char*, UXMPP_MAX_RX_BUF_SIZE> rx_buf;
 
-        std::map<std::string, XmlTimerEvent*> timers;
+        std::map<std::string, io::Timer> timers;
+
+        std::mutex tx_buf_mutex;
+        std::map <const char*, std::string> tx_buffers;
+
+        static void rx_queue_thread_func (XmlStream* stream);
+        void timer_callback (io::Timer& timer, const std::string& name);
+        void rx_callback (io::Connection& conn, void* buf, ssize_t result, int errnum);
+        void tx_callback (io::Connection& conn, void* buf, ssize_t result, int errnum);
     };
 
 

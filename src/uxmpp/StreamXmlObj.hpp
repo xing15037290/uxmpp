@@ -35,12 +35,12 @@ namespace uxmpp {
         /**
          * Default Constructor.
          */
-        StreamXmlObj ();
+        StreamXmlObj (const std::string& lang="en");
 
         /**
          * Constructor.
          */
-        StreamXmlObj (const std::string& to, const std::string& from);
+        StreamXmlObj (const std::string& to, const std::string& from, const std::string& lang="en");
 
         /**
          * Destructor.

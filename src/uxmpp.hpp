@@ -37,6 +37,7 @@ namespace uxmpp {
 #include <uxmpp/UxmppException.hpp>
 #include <uxmpp/Logger.hpp>
 
+#include <uxmpp/Semaphore.hpp>
 #include <uxmpp/Jid.hpp>
 #include <uxmpp/XmlNames.hpp>
 #include <uxmpp/XmlObject.hpp>

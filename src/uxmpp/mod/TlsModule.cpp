@@ -20,6 +20,8 @@
 #include <uxmpp/mod/TlsModule.hpp>
 #include <uxmpp/Session.hpp>
 #include <uxmpp/XmlNames.hpp>
+#include <uxmpp/Semaphore.hpp>
+#include <uxmpp/io/SocketConnection.hpp>
 
 
 #define THIS_FILE "TlsModule"
@@ -70,7 +72,7 @@ bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& 
     //
     if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
         for (auto& node : xml_obj.get_nodes()) {
-            if (node.get_full_name() == XmlStarttlsTagFull && xs.get_peer_addr().proto != AddrProto::tls) {
+            if (node.get_full_name() == XmlStarttlsTagFull && !session.get_socket().is_tls_enabled()) {
                 start_tls = true;
                 break;
             }
@@ -85,8 +87,39 @@ bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& 
     //
     // Handle 'proceed'
     //
-    if (xml_obj.get_full_name() == XmlProceedTagFull && xs.get_peer_addr().proto != AddrProto::tls) {
+    if (xml_obj.get_full_name() == XmlProceedTagFull  && !session.get_socket().is_tls_enabled()) {
         uxmpp_log_info (THIS_FILE, "Restart the stream with TLS enabled");
+#if 1
+        bool connected = false;
+        Semaphore sem;
+        string error_text;
+        io::SocketConnection& s = session.get_socket ();
+        s.cancel (); // Cancel all I/O operations
+        s.set_tls_connected_cb ([this, &connected, &sem, &error_text](SocketConnection& connection,
+                                                                      int errnum,
+                                                                      const std::string& errstr) {
+                                    if (!errnum) {
+                                        connected = true;
+                                    }else{
+                                        connected = false;
+                                    }
+                                    error_text = errstr;
+                                    sem.post ();
+                                });
+        s.enable_tls (tls_cfg); // This is a non-blocking call
+        if (!sem.wait(chrono::seconds(5)) || !connected) {
+            //
+            // Timeout or connection failed
+            //
+            sem.try_wait (); // just to make sure
+            uxmpp_log_error (THIS_FILE, "Unable to restart the stream with TLS enabled");
+            session.set_app_error ("tls-error", error_text);
+            session.stop ();
+        }else{
+            session.reset ();
+        }
+        s.set_tls_connected_cb (nullptr);
+#else
         string error_text;
         if (xs.enable_tls(tls_cfg, error_text)) {
             session.reset ();
@@ -96,6 +129,7 @@ bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& 
             session.stop ();
             //changeState (SessionState::closing);
         }
+#endif
         return true;
     }
 
