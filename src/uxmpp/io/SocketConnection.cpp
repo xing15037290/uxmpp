@@ -288,7 +288,7 @@ bool SocketConnection::bind_socket ()
         }
     }
 
-    auto result = bind (get_fd(), saddr, saddr_len);
+    auto result = ::bind (get_fd(), saddr, saddr_len);
     if (result != 0) {
         int errnum = errno;
         uxmpp_log_warning (log_unit, "Error binding to ",
