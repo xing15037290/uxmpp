@@ -132,8 +132,7 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
     // Handle 'success'
     //
     if (xml_obj.get_full_name() == XmlSuccessTagFull) {
-#warning Get peer address
-        uxmpp_log_info (THIS_FILE, "Logged in to ");//, to_string(xs.get_peer_addr()));
+        uxmpp_log_info (THIS_FILE, "Logged in to ", to_string(session.get_socket().get_peer_addr()));
         session.reset ();
         return true;
     }
