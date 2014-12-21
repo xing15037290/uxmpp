@@ -31,6 +31,7 @@
 #include <openssl/ssl.h>
 #include <condition_variable>
 #include <map>
+#include <array>
 
 
 namespace uxmpp {
