@@ -19,7 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/KeepAliveModule.hpp>
 #include <uxmpp/Session.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/xml/names.hpp>
 
 
 #define THIS_FILE "KeepAliveModule"
@@ -74,7 +74,7 @@ bool KeepAliveModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlOb
 {
     // Check timer events
     //
-    if (xml_obj.get_full_name() == XmlUxmppInternalTimerTagFull) {
+    if (xml_obj.get_full_name() == xml::namespace_uxmpp_timer) {
         //
         // Check the keep-alive timer
         //

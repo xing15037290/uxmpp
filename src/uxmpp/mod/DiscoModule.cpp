@@ -19,6 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/DiscoModule.hpp>
 #include <uxmpp/Stanza.hpp>
+#include <uxmpp/xml/names.hpp>
 
 #define THIS_FILE "DiscoModule"
 
@@ -142,7 +143,7 @@ bool DiscoModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject
 
     // Only handle iq stanzas
     //
-    if (xml_obj.get_full_name() != XmlIqStanzaTagFull)
+    if (xml_obj.get_full_name() != xml::full_tag_iq_stanza)
         return false;
 
     IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);

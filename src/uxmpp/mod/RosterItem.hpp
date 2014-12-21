@@ -22,7 +22,6 @@
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmlObject.hpp>
 #include <uxmpp/Jid.hpp>
-#include <uxmpp/XmlNames.hpp>
 #include <string>
 #include <vector>
 

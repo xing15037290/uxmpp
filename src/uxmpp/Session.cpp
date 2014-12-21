@@ -23,8 +23,8 @@
 #include <uxmpp/StreamXmlObj.hpp>
 #include <uxmpp/utils.hpp>
 #include <uxmpp/IqStanza.hpp>
+#include <uxmpp/xml/names.hpp>
 #include <arpa/inet.h>
-
 
 UXMPP_START_NAMESPACE1(uxmpp)
 
@@ -67,7 +67,7 @@ static XmlObject* get_child_node (XmlObject& xml_obj, const string& name)
 Session::Session ()
     :
     XmppModule ("core"),
-    xs         (XmlObject(XmlStreamTag, XmlStreamNs, false, false)),
+    xs         (XmlObject(xml::tag_stream, xml::namespace_stream, false, false)),
     sess_id    {""},
     sess_from  {""},
     state      {SessionState::closed}
@@ -306,7 +306,7 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
 
     // Check for IQ stanza's
     //
-    if (xml_obj.get_full_name() == XmlIqStanzaTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_iq_stanza) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
         //
         // Respond to unknown 'set' and 'get' with an empty result.
@@ -322,11 +322,11 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
     //
     if (get_state() == SessionState::negotiating) {
         for (auto& feature : features) {
-            if (feature.get_tag_name() == "bind") {
+            if (feature.get_tag_name() == xml::tag_bind) {
                 IqStanza iq (IqType::set, "", "", "b#1");
-                XmlObject bind_node (XmlBindTag, XmlBindNs, true, true, 1);
+                XmlObject bind_node (xml::tag_bind, xml::namespace_bind, true, true, 1);
                 if (!cfg.resource.empty()) {
-                    bind_node.add_node (XmlObject("resource", XmlBindNs, false).set_content(cfg.resource));
+                    bind_node.add_node (XmlObject("resource", xml::namespace_bind, false).set_content(cfg.resource));
                 }
                 iq.add_node (bind_node);
                 xs.write (iq);
@@ -514,7 +514,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
 {
     // First, check for internal error codes (or end of stream)
     //
-    if (xml_obj.get_namespace() == XmlUxmppInternalErrorNs) {
+    if (xml_obj.get_namespace() == xml::namespace_uxmpp_error) {
         //
         // Check XML parse error
         //
@@ -552,7 +552,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
 
     // Check for XMPP stream errors before doing anything else.
     //
-    if (xml_obj.get_full_name() == XmlStreamErrorTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_error) {
         stream_error = xml_obj;
         uxmpp_log_error (log_unit, "Got stream error: ", stream_error.get_error_name());
         stop ();
@@ -561,7 +561,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
 
     // Check for end-of-stream before doing anything else
     //
-    if (xml_obj.get_full_name() == XmlStreamTagFull && xml_obj.get_part() == XmlObjPart::end) {
+    if (xml_obj.get_full_name() == xml::full_tag_stream && xml_obj.get_part() == XmlObjPart::end) {
         if (state==SessionState::closing) {
             uxmpp_log_trace (log_unit, "Session is already closing, stop XML stream");
             if (xs.is_running())
@@ -581,7 +581,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
 
     // Store features.
     //
-    if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_features) {
         features.clear ();
         for (auto& node : xml_obj.get_nodes()) {
             uxmpp_log_trace (log_unit, "Got feature: ", node.get_tag_name());
@@ -591,7 +591,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
 
     // Check timer events
     //
-    if (xml_obj.get_namespace() == XmlUxmppInternalTimerNs) {
+    if (xml_obj.get_namespace() == xml::namespace_uxmpp_timer) {
         if (xml_obj.get_tag_name() == "timeout") {
             //
             // Check the close timer
@@ -617,7 +617,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
     //
     // Handle 'stream'
     //
-    if (xml_obj.get_full_name() == XmlStreamTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_stream) {
         sess_id = xml_obj.get_attribute ("id");
         sess_from = xml_obj.get_attribute ("from");
         uxmpp_log_trace (log_unit, "Got session ID: ", sess_id);
@@ -627,7 +627,9 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
     //
     // Handle 'bind' and 'session'
     //
-    if (xml_obj.get_full_name() ==  XmlIqStanzaTagFull && get_state()==SessionState::negotiating) {
+    if (xml_obj.get_full_name() == xml::full_tag_iq_stanza &&
+        get_state() == SessionState::negotiating)
+    {
 
 /*
         // Check for 'session' result

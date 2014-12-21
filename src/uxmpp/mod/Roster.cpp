@@ -18,7 +18,8 @@
  */
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/Roster.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/xml/names.hpp>
+
 
 #define THIS_FILE "Roster"
 
@@ -33,7 +34,7 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Roster::Roster (const std::string& version)
-    : uxmpp::XmlObject ("query", XmlIqRosterNs, true, true, 1)
+    : uxmpp::XmlObject ("query", xml::namespace_iq_roster, true, true, 1)
 {
     if (!version.empty())
         set_attribute ("ver", version);

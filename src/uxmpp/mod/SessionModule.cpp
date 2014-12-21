@@ -21,6 +21,7 @@
 #include <uxmpp/Session.hpp>
 #include <uxmpp/utils.hpp>
 #include <uxmpp/IqStanza.hpp>
+#include <uxmpp/xml/names.hpp>
 
 
 #define THIS_FILE "SessionModule"
@@ -89,7 +90,7 @@ bool SessionModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
     //
     // Handle 'session' result
     //
-    if (xml_obj.get_full_name() ==  XmlIqStanzaTagFull) {
+    if (xml_obj.get_full_name() ==  xml::full_tag_iq_stanza) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
         if (iq.get_id() == iq_id) {
             if (iq.get_type() == IqType::result) {

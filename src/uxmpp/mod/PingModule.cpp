@@ -21,6 +21,7 @@
 #include <uxmpp/Session.hpp>
 #include <uxmpp/SessionState.hpp>
 #include <uxmpp/IqStanza.hpp>
+#include <uxmpp/xml/names.hpp>
 #include <chrono>
 
 #define THIS_FILE "PingModule"
@@ -73,7 +74,7 @@ bool PingModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
 
     // Handle iq stanzas
     //
-    if (xml_obj.get_full_name() ==  XmlIqStanzaTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_iq_stanza) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
 
         // Check for incoming ping

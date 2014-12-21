@@ -39,7 +39,6 @@ namespace uxmpp {
 
 #include <uxmpp/Semaphore.hpp>
 #include <uxmpp/Jid.hpp>
-#include <uxmpp/XmlNames.hpp>
 #include <uxmpp/XmlObject.hpp>
 #include <uxmpp/StreamXmlObj.hpp>
 #include <uxmpp/XmlStream.hpp>
@@ -55,6 +54,7 @@ namespace uxmpp {
 #include <uxmpp/SessionListener.hpp>
 #include <uxmpp/Session.hpp>
 
+#include <uxmpp/xml.hpp>
 #include <uxmpp/io.hpp>
 #include <uxmpp/mod.hpp>
 

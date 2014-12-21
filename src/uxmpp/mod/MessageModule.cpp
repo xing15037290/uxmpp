@@ -22,6 +22,7 @@
 #include <uxmpp/SessionState.hpp>
 #include <uxmpp/MessageStanza.hpp>
 #include <uxmpp/mod/RosterModule.hpp>
+#include <uxmpp/xml/names.hpp>
 
 
 #define THIS_FILE "MessageModule"
@@ -33,9 +34,6 @@ UXMPP_START_NAMESPACE2(uxmpp, mod)
 using namespace std;
 using namespace uxmpp;
 
-
-static const std::string XmlMessageTag     {"message"};
-static const std::string XmlMessageTagFull {"jabber:client:message"};
 
 
 //------------------------------------------------------------------------------
@@ -109,7 +107,7 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
 
     // Handle message stanzas
     //
-    if (xml_obj.get_full_name() == XmlMessageTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_message_stanza) {
         MessageStanza& msg = reinterpret_cast<MessageStanza&> (xml_obj);
 
         // Check if this is a receipt

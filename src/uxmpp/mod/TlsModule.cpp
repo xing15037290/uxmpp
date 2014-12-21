@@ -19,7 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/mod/TlsModule.hpp>
 #include <uxmpp/Session.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/xml/names.hpp>
 #include <uxmpp/Semaphore.hpp>
 #include <uxmpp/io/SocketConnection.hpp>
 
@@ -70,7 +70,7 @@ bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& 
     //
     // Handle 'features'
     //
-    if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_features) {
         for (auto& node : xml_obj.get_nodes()) {
             if (node.get_full_name() == XmlStarttlsTagFull && !session.get_socket().is_tls_enabled()) {
                 start_tls = true;

@@ -16,8 +16,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <uxmpp/XmlNames.hpp>
 #include <uxmpp/mod/RosterItem.hpp>
+#include <uxmpp/xml/names.hpp>
 
 #define THIS_FILE "RosterItem"
 
@@ -34,7 +34,7 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem ()
-    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
 {
 }
 
@@ -42,7 +42,7 @@ RosterItem::RosterItem ()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle)
-    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
 {
     std::string strjid = to_string (jid);
     if (!strjid.empty())
@@ -55,20 +55,20 @@ RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem (const uxmpp::Jid& jid, const std::vector<std::string>& groups)
-    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
 {
     std::string strjid = to_string (jid);
     if (!strjid.empty())
         set_attribute ("jid", strjid);
     for (auto group : groups)
-        add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
+        add_node (XmlObject("group", xml::namespace_iq_roster, false).set_content(group));
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle, const std::vector<std::string>& groups)
-    : uxmpp::XmlObject ("item", XmlIqRosterNs, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
 {
     std::string strjid = to_string (jid);
     if (!strjid.empty())
@@ -76,7 +76,7 @@ RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle, const 
     if (!handle.empty())
         set_attribute ("name", handle);
     for (auto group : groups)
-        add_node (XmlObject("group", XmlIqRosterNs, false).set_content(group));
+        add_node (XmlObject("group", xml::namespace_iq_roster, false).set_content(group));
 }
 
 
@@ -185,7 +185,7 @@ std::vector<std::string> RosterItem::get_groups ()
 {
     std::vector<std::string> g;
     for (auto& node : get_nodes()) {
-        if (node.get_full_name() == XmlRosterGroupTagFull) {
+        if (node.get_full_name() == xml::full_tag_roster_group) {
             string group_name = node.get_content ();
             if (group_name.length())
                 g.push_back (group_name);

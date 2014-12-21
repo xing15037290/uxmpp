@@ -19,6 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/utils.hpp>
 #include <uxmpp/MessageStanza.hpp>
+#include <uxmpp/xml/names.hpp>
 
 #define THIS_FILE "MessageStanza.cpp"
 
@@ -210,9 +211,9 @@ MessageStanza& MessageStanza::set_thread (const std::string& thread_id, const st
     }
     if (thread_id != "") {
         if (parent_thread_id == "")
-            add_node (XmlObject("thread", XmlJabberClientNs, false).set_content(thread_id));
+            add_node (XmlObject("thread", xml::namespace_jabber_client, false).set_content(thread_id));
         else
-            add_node (XmlObject("thread", XmlJabberClientNs, false).
+            add_node (XmlObject("thread", xml::namespace_jabber_client, false).
                       set_content(thread_id).set_attribute("parent", parent_thread_id));
     }
     return *this;
@@ -296,7 +297,7 @@ MessageStanza& MessageStanza::set_body (const std::string& body, std::string lan
         }
     }
     if (body != "") {
-        XmlObject body_node ("body", XmlJabberClientNs, false);
+        XmlObject body_node ("body", xml::namespace_jabber_client, false);
         if (lang!="" && lang!=configured_lang)
             body_node.set_attribute ("xml:lang", lang);
         body_node.set_content (body);

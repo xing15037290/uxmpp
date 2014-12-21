@@ -19,6 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/utils.hpp>
 #include <uxmpp/PresenceStanza.hpp>
+#include <uxmpp/xml/names.hpp>
 
 #define THIS_FILE "PresenceStanza.cpp"
 
@@ -148,7 +149,7 @@ PresenceStanza& PresenceStanza::set_show (const std::string& content)
         }
     }
     if (content != "")
-        add_node (XmlObject("show", XmlJabberClientNs, false).set_content(content));
+        add_node (XmlObject("show", xml::namespace_jabber_client, false).set_content(content));
     return *this;
 }
 
@@ -218,7 +219,7 @@ PresenceStanza& PresenceStanza::set_status (const std::string& status, const std
         }
     }
     if (status != "") {
-        XmlObject status_node ("status", XmlJabberClientNs, false);
+        XmlObject status_node ("status", xml::namespace_jabber_client, false);
         if (lang!="" && lang!=configured_lang)
             status_node.set_attribute ("xml:lang", lang);
         status_node.set_content (status);
@@ -267,7 +268,7 @@ PresenceStanza& PresenceStanza::set_priority (int prio)
     }
 
     if (prio != 0)
-        add_node (XmlObject("priority", XmlJabberClientNs, false).set_content(ss.str()));
+        add_node (XmlObject("priority", xml::namespace_jabber_client, false).set_content(ss.str()));
     return *this;
 }
 

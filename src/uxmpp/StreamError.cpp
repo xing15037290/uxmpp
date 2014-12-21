@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <uxmpp/StreamError.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/xml/names.hpp>
 #include <uxmpp/Logger.hpp>
 
 
@@ -33,7 +33,7 @@ using namespace std;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError ()
-    : XmlObject ("error", XmlStreamNsAlias, false, false, 2)
+    : XmlObject ("error", xml::alias_stream, false, false, 2)
 {
 }
 
@@ -41,7 +41,7 @@ StreamError::StreamError ()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError (XmlObject& xml_obj)
-    : XmlObject ("error", XmlStreamNsAlias, false, false, 2)
+    : XmlObject ("error", xml::alias_stream, false, false, 2)
 {
     set_error_name (xml_obj.get_nodes().empty() ? "" : xml_obj.get_nodes().begin()->get_tag_name());
     for (auto& node : xml_obj.get_nodes()) {
@@ -56,7 +56,7 @@ StreamError::StreamError (XmlObject& xml_obj)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError (const std::string& error)
-    : XmlObject ("error", XmlStreamNsAlias, false, false, 2)
+    : XmlObject ("error", xml::alias_stream, false, false, 2)
 {
     set_error_name (error);
 }
@@ -95,7 +95,7 @@ void StreamError::set_error_name (const std::string& error)
 {
     get_nodes().clear ();
     if (error.length())
-        add_node (XmlObject(error, XmlStreamErrortypeNs));
+        add_node (XmlObject(error, xml::namespace_xmpp_streams));
 }
 
 
@@ -112,7 +112,7 @@ std::string StreamError::get_error_name ()
 void StreamError::set_app_error (const std::string& app_error, const std::string& text)
 {
     set_error_name ("undefined-condition");
-    add_node (XmlObject(app_error, XmlUxmppInternalErrorNs));
+    add_node (XmlObject(app_error, xml::namespace_uxmpp_error));
     set_text (text);
 }
 
@@ -152,7 +152,7 @@ void StreamError::set_text (const std::string& text)
             return;
         }
     }
-    XmlObject text_node ("text", XmlStreamErrortypeNs);
+    XmlObject text_node ("text", xml::namespace_xmpp_streams);
     text_node.set_content (text);
     add_node (text_node);
 }

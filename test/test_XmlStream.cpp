@@ -28,7 +28,7 @@ using namespace uxmpp::io;
 
 static void rx_xml (XmlStream& stream, XmlObject& xml_obj)
 {
-    if (xml_obj.get_namespace() == XmlUxmppInternalErrorNs) {
+    if (xml_obj.get_namespace() == xml::namespace_uxmpp_error) {
         if (xml_obj.get_tag_name() == "parse-error") {
             uxmpp_log_error ("main", "XML parse error: ", xml_obj.get_content());
         }
@@ -41,7 +41,7 @@ static void rx_xml (XmlStream& stream, XmlObject& xml_obj)
         }
         //stream.stop ();
     }
-    else if (xml_obj.get_namespace() == XmlUxmppInternalTimerNs) {
+    else if (xml_obj.get_namespace() == xml::namespace_uxmpp_timer) {
         if (xml_obj.get_tag_name() == "timeout") {
             uxmpp_log_info ("main", "Got timeout: ", xml_obj.get_attribute("name"));
         }

@@ -18,7 +18,7 @@
  */
 #include <uxmpp/StreamXmlObj.hpp>
 #include <uxmpp/Logger.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/xml/names.hpp>
 
 
 #define THIS_FILE "StreamXmlObj.cpp"
@@ -33,10 +33,10 @@ using namespace std;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamXmlObj::StreamXmlObj (const std::string& lang)
-    : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
+    : XmlObject (xml::tag_stream, xml::alias_stream, false, false)
 {
-    add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
-    set_default_namespace_attr (XmlJabberClientNs);
+    add_namespace_alias (xml::alias_stream, xml::namespace_stream);
+    set_default_namespace_attr (xml::namespace_jabber_client);
     set_attribute ("version", "1.0");
     set_attribute ("xml:lang", lang);
     set_part (XmlObjPart::start);
@@ -46,10 +46,10 @@ StreamXmlObj::StreamXmlObj (const std::string& lang)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamXmlObj::StreamXmlObj (const std::string& to, const std::string& from, const std::string& lang)
-    : XmlObject (XmlStreamTag, XmlStreamNsAlias, false, false)
+    : XmlObject (xml::tag_stream, xml::alias_stream, false, false)
 {
-    add_namespace_alias (XmlStreamNsAlias, XmlStreamNs);
-    set_default_namespace_attr (XmlJabberClientNs);
+    add_namespace_alias (xml::alias_stream, xml::namespace_stream);
+    set_default_namespace_attr (xml::namespace_jabber_client);
     set_attribute ("version", "1.0");
     set_attribute ("xml:lang", lang);
     set_part (XmlObjPart::start);

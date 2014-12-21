@@ -21,9 +21,7 @@
 #include <uxmpp/Session.hpp>
 #include <uxmpp/SessionState.hpp>
 #include <uxmpp/PresenceStanza.hpp>
-
-
-#define THIS_FILE "PresenceModule"
+#include <uxmpp/xml/names.hpp>
 
 
 UXMPP_START_NAMESPACE2(uxmpp, mod)
@@ -32,8 +30,7 @@ UXMPP_START_NAMESPACE2(uxmpp, mod)
 using namespace std;
 using namespace uxmpp;
 
-static const string XmlPresenceTag     {"presence"};
-static const string XmlPresenceTagFull {"jabber:client:presence"};
+static const std::string log_module {"PresenceModule"};
 
 
 //------------------------------------------------------------------------------
@@ -75,7 +72,7 @@ bool PresenceModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObj
 
     // Handle iq stanzas
     //
-    if (xml_obj.get_full_name() == XmlPresenceTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_presence_stanza) {
         PresenceStanza& pr = reinterpret_cast<PresenceStanza&> (xml_obj);
         // Call registered presence handler
         if (presence_handler)
@@ -93,7 +90,7 @@ bool PresenceModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObj
 void PresenceModule::announce ()
 {
     if (!sess || sess->get_state()!=SessionState::bound) {
-        uxmpp_log_trace (THIS_FILE, "Can't announce our presence, no session or session not bound");
+        uxmpp_log_trace (log_module, "Can't announce our presence, no session or session not bound");
         return;
     }
     sess->send_stanza (PresenceStanza());
@@ -105,7 +102,7 @@ void PresenceModule::announce ()
 void PresenceModule::request_subscription (const uxmpp::Jid& jid)
 {
     if (!sess || sess->get_state()!=SessionState::bound) {
-        uxmpp_log_debug (THIS_FILE, "Can't request subscription, no session or session not bound");
+        uxmpp_log_debug (log_module, "Can't request subscription, no session or session not bound");
         return;
     }
 
@@ -119,7 +116,7 @@ void PresenceModule::request_subscription (const uxmpp::Jid& jid)
 void PresenceModule::accept_subscription (const uxmpp::Jid& jid)
 {
     if (!sess || sess->get_state()!=SessionState::bound) {
-        uxmpp_log_debug (THIS_FILE, "Can't accept subscription, no session or session not bound");
+        uxmpp_log_debug (log_module, "Can't accept subscription, no session or session not bound");
         return;
     }
 
@@ -135,7 +132,7 @@ void PresenceModule::accept_subscription (const uxmpp::Jid& jid)
 void PresenceModule::deny_subscription (const uxmpp::Jid& jid)
 {
     if (!sess || sess->get_state()!=SessionState::bound) {
-        uxmpp_log_debug (THIS_FILE, "Can't deny subscription, no session or session not bound");
+        uxmpp_log_debug (log_module, "Can't deny subscription, no session or session not bound");
         return;
     }
 
@@ -149,7 +146,7 @@ void PresenceModule::deny_subscription (const uxmpp::Jid& jid)
 void PresenceModule::cancel_subscription (const uxmpp::Jid& jid)
 {
     if (!sess || sess->get_state()!=SessionState::bound) {
-        uxmpp_log_debug (THIS_FILE, "Can't cancel subscription, no session or session not bound");
+        uxmpp_log_debug (log_module, "Can't cancel subscription, no session or session not bound");
         return;
     }
 

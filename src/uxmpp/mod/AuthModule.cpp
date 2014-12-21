@@ -20,7 +20,7 @@
 #include <uxmpp/mod/AuthModule.hpp>
 #include <uxmpp/Session.hpp>
 #include <uxmpp/utils.hpp>
-#include <uxmpp/XmlNames.hpp>
+#include <uxmpp/xml/names.hpp>
 
 
 #define THIS_FILE "AuthModule"
@@ -69,7 +69,7 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
     //
     // Handle 'features'
     //
-    if (xml_obj.get_full_name() ==  XmlFeaturesTagFull) {
+    if (xml_obj.get_full_name() == xml::full_tag_features) {
         for (auto& node : xml_obj.get_nodes()) {
             if (node.get_full_name() == XmlMechanismsTagFull) {
                 mechanisms.clear ();

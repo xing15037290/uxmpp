@@ -19,6 +19,7 @@
 #include <uxmpp/Logger.hpp>
 #include <uxmpp/Stanza.hpp>
 #include <uxmpp/utils.hpp>
+#include <uxmpp/xml/names.hpp>
 #include <random>
 
 
@@ -72,7 +73,7 @@ static std::string default_make_id ()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Stanza::Stanza (const std::string& to, const std::string& from, const std::string& id)
-    : XmlObject ("", XmlJabberClientNs, false, true, 1)
+    : XmlObject ("", xml::namespace_jabber_client, false, true, 1)
 {
     if (!to.empty())
         set_attribute ("to", to);
@@ -86,7 +87,7 @@ Stanza::Stanza (const std::string& to, const std::string& from, const std::strin
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Stanza::Stanza (const Jid& to, const Jid& from, const std::string& id)
-    : XmlObject ("", XmlJabberClientNs, false, true, 1)
+    : XmlObject ("", xml::namespace_jabber_client, false, true, 1)
 {
     set_to (to);
     set_from (from);
@@ -213,7 +214,7 @@ std::string Stanza::get_error_type ()
     if (!have_error())
         return "";
     for (XmlObject& node : get_nodes()) {
-        if (node.get_full_name() == XmlIqErrorStanzaTagFull) {
+        if (node.get_full_name() == xml::full_tag_error_stanza) {
             return node.get_attribute ("type");
         }
     }
@@ -227,7 +228,7 @@ int Stanza::get_error_code ()
 {
     if (!have_error())
         return 0;
-    auto node = find_node (XmlIqErrorStanzaTagFull, true);
+    auto node = find_node (xml::full_tag_error_stanza, true);
     return node ? atoi(node.get_attribute("code").c_str()) : 0;
 }
 
@@ -238,7 +239,7 @@ std::string Stanza::get_error_name ()
 {
     if (!have_error())
         return "";
-    auto node = find_node (XmlIqErrorStanzaTagFull, true);
+    auto node = find_node (xml::full_tag_error_stanza, true);
     if (node) {
         auto child_nodes = node.get_nodes ();
         if (!child_nodes.empty())
