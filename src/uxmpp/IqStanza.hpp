@@ -32,7 +32,10 @@ namespace uxmpp {
      * Type of IQ stanza.
      */
     enum class IqType {
-        get, set, result, error
+        get,    /**< The stanza requests information. */
+        set,    /**< The stanza provides data. */
+        result, /**< The stanza is a response to a successful get or set request. */
+        error   /**< The stanza reports an error that has occurred. */
     };
 
 

@@ -43,5 +43,6 @@ namespace uxmpp {
 #include <uxmpp/mod/MessageModule.hpp>
 #include <uxmpp/mod/SessionModule.hpp>
 #include <uxmpp/mod/PingModule.hpp>
+#include <uxmpp/mod/PrivateDataModule.hpp>
 
 #endif

@@ -82,17 +82,18 @@ public:
     virtual void on_message (MessageModule& module, uxmpp::MessageStanza& msg);
     virtual void on_receipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id);
 
-    Session         sess;
-    SessionConfig   cfg;
-    TlsModule       mod_tls;
-    AuthModule      mod_auth;
-    SessionModule   mod_session;
-    KeepAliveModule mod_alive;
-    RosterModule    mod_roster;
-    PresenceModule  mod_pr;
-    MessageModule   mod_msg;
-    PingModule      mod_ping;
-    DiscoModule     mod_disco;
+    Session           sess;
+    SessionConfig     cfg;
+    TlsModule         mod_tls;
+    AuthModule        mod_auth;
+    SessionModule     mod_session;
+    KeepAliveModule   mod_alive;
+    RosterModule      mod_roster;
+    PresenceModule    mod_pr;
+    MessageModule     mod_msg;
+    PingModule        mod_ping;
+    PrivateDataModule mod_priv_data;
+    DiscoModule       mod_disco;
 
     thread session_thread;
 };
@@ -192,6 +193,7 @@ void AppLogic::run ()
     sess.register_module (mod_msg);
     sess.register_module (mod_alive);
     sess.register_module (mod_ping);
+    sess.register_module (mod_priv_data);
     sess.register_module (mod_disco);
 
     mod_roster.set_roster_handler ([this](RosterModule& rm, Roster& r) { on_roster (rm, r); });
@@ -291,10 +293,13 @@ static void print_help ()
          << "| r-del <index>        - Remove a roster item" << endl
          << "|" << endl
          << "+----- Misc --------------------------------------------------------" << endl
+         << "| data-set [tag]       - Set private data on server." << endl
+         << "| data-get [tag]       - Get private data from server." << endl
          << "| ping [index|jid]     - Send XMPP ping." << endl
          << "| dq [index|jid]       - Send disco info query." << endl
          << "| ll <value>           - Set log level (0-5)."             << endl
          << "| ka <value>           - Set keep alive timer in seconds (0 to disable)." << endl
+         << "| help                 - Print this help." << endl
          << "| quit                 - Quit the application."            << endl
          << "+-------------------------------------------------------------------" << endl
          << endl;
@@ -470,7 +475,7 @@ int main (int argc, char* argv[])
     do {
         //if (cmd.length() > 0) {
         app.print_status ();
-        print_help ();
+        //print_help ();
         //}
 
         // Read command line
@@ -488,6 +493,11 @@ int main (int argc, char* argv[])
         //
         if (cmd == "quit") {
             quit = true;
+        }
+        // Command 'help'
+        //
+        if (cmd == "help") {
+            print_help ();
         }
         //
         // Command 'll' - set log level
@@ -644,6 +654,28 @@ int main (int argc, char* argv[])
                     app.mod_msg.send_message (jid, msg, true);
                 }
             }
+        }
+        else if (cmd == "data-set") {
+            string tag;
+            bool got_arg = get_string_argument ("Enter data tag: ", ss, tag);
+            if (!got_arg)
+                continue;
+            string content {""};
+            get_string_argument ("Enter data content: ", ss, content);
+            app.mod_priv_data.set (XmlObject(tag, "uxmpp:priv-data").set_content(content));
+        }
+        else if (cmd == "data-get") {
+            string tag;
+            bool got_arg = get_string_argument ("Enter data tag: ", ss, tag);
+            if (!got_arg)
+                continue;
+            app.mod_priv_data.get (tag, "uxmpp:priv-data", [](Session& session,
+                                                              const uxmpp::XmlObject& xml_obj,
+                                                              const std::string& stanza_id,
+                                                              const int error_code,
+                                                              const std::string& error_name){
+                                       cout << "Got private data: " << endl << to_string(xml_obj) << endl;
+                });
         }
         else if (cmd == "ping") {
             string jid;
