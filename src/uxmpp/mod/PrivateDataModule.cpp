@@ -220,17 +220,14 @@ bool PrivateDataModule::handle_get_result (const std::string& id, uxmpp::IqStanz
     get_ids.erase (id);
     string error_name {""};
     int error_code {0};
-    XmlObject xml_obj;
+    std::vector<uxmpp::XmlObject> priv_data;
 
     if (iq_result.get_type() == IqType::result) {
         // Ok
         uxmpp_log_debug (log_module, "Successfully got xml object ", data_tag);
         auto query_node = iq_result.find_node (tag_name_query, true);
-        if (query_node) {
-            auto nodes = query_node.get_nodes ();
-            if (!nodes.empty())
-                xml_obj = nodes[0];
-        }
+        if (query_node)
+            priv_data = std::move (query_node.get_nodes());
     }
     else if (iq_result.get_type() == IqType::error) {
         // Error
@@ -253,7 +250,7 @@ bool PrivateDataModule::handle_get_result (const std::string& id, uxmpp::IqStanz
     // Call callback
     //
     if (cb)
-        cb (*sess, xml_obj, id, error_code, error_name);
+        cb (*sess, priv_data, id, error_code, error_name);
 
     return true;
 }

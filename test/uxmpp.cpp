@@ -670,11 +670,14 @@ int main (int argc, char* argv[])
             if (!got_arg)
                 continue;
             app.mod_priv_data.get (tag, "uxmpp:priv-data", [](Session& session,
-                                                              const uxmpp::XmlObject& xml_obj,
+                                                              std::vector<uxmpp::XmlObject>& priv_data,
                                                               const std::string& stanza_id,
                                                               const int error_code,
                                                               const std::string& error_name){
-                                       cout << "Got private data: " << endl << to_string(xml_obj) << endl;
+                                       cout << "Got private data: " << endl;
+                                       for (auto& obj : priv_data) {
+                                           cout << to_string(obj) << endl;
+                                       }
                 });
         }
         else if (cmd == "ping") {
