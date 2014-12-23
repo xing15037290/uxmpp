@@ -96,7 +96,7 @@ std::string PrivateDataModule::set (const uxmpp::XmlObject& data,
     uxmpp_log_debug (log_module, "Set private XML object ", data.get_full_name());
     set_ids[id].first  = data.get_full_name ();
     set_ids[id].second = cb!=nullptr ? cb : set_cb;
-    sess->send_stanza (IqStanza(IqType::set, "", "", id).
+    sess->send_stanza (IqStanza(IqType::set, "", to_string(sess->get_jid()), id).
                        add_node(XmlObject("query", namespace_iq_private).
                                 add_node(data)));
     return id;
@@ -142,7 +142,7 @@ std::string PrivateDataModule::get (const std::string& tag_name,
     uxmpp_log_debug (log_module, "Get private xml obj ", xml_full_name);
     get_ids[id].first  = xml_full_name;
     get_ids[id].second = cb!=nullptr ? cb : get_cb;
-    sess->send_stanza (IqStanza(IqType::get, "", "", id).
+    sess->send_stanza (IqStanza(IqType::get, "", to_string(sess->get_jid()), id).
                        add_node(XmlObject("query", namespace_iq_private).
                                 add_node(xml_obj)));
     return id;
