@@ -309,11 +309,13 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
     if (xml_obj.get_full_name() == xml::full_tag_iq_stanza) {
         IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
         //
-        // Respond to unknown 'set' and 'get' with an empty result.
+        // Respond to unknown 'set' and 'get' with a 'service-unavailable' error.
         //
         if (iq.get_type()==IqType::set || iq.get_type()==IqType::get) {
             // Send result
-            send_stanza (IqStanza(IqType::result, iq.get_from(), iq.get_to(), iq.get_id()));
+            send_stanza (IqStanza(IqType::error, iq.get_from(), iq.get_to(), iq.get_id()).
+                         add_node(XmlObject("error").set_attribute("type", "cancel").
+                                  add_node(XmlObject("service-unavailable", xml::namespace_stanza_error))));
         }
     }
 
