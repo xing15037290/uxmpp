@@ -83,6 +83,11 @@ const std::string full_tag_presence_stanza {"jabber:client:presence"};
 const std::string full_tag_message_stanza {"jabber:client:message"};
 
 //
+// Namespace for stanza errors
+//
+const std::string namespace_stanza_error {"urn:ietf:params:xml:ns:xmpp-stanzas"};
+
+//
 // IQ roster namespace
 //
 const std::string namespace_iq_roster {"jabber:iq:roster"};

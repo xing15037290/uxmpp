@@ -132,6 +132,12 @@ const std::string XmlUxmppInternalTimerTagFull = XmlUxmppInternalTimerNs + std::
          */
         extern const std::string full_tag_message_stanza;
 
+        /**
+         * XML Namespace Name for Stanza Errors:
+         * <code>urn:ietf:params:xml:ns:xmpp-stanzas</code>.
+         */
+        extern const std::string namespace_stanza_error;
+
 
         /**
          * IQ roster namespace: <code>jabber:iq:roster</code>.
