@@ -29,14 +29,22 @@ namespace uxmpp {
     /**
      *
      */
-    std::string base64_encode (const std::string& bindata);
-
+    std::string to_base64 (const unsigned char* buf, size_t len);
 
     /**
      *
      */
-    std::string base64_decode (const std::string& ascdata);
+    std::string to_base64 (const std::string& text);
 
+    /**
+     *
+     */
+    size_t from_base64 (const std::string& encoded_string, char* buf, size_t buf_len);
+
+    /**
+     *
+     */
+    std::string from_base64 (const std::string& encoded_string);
 
     /**
      *

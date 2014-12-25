@@ -2,10 +2,6 @@
 #include <uxmpp/Logger.hpp>
 
 #include <string>
-#include <cassert>
-#include <limits>
-#include <stdexcept>
-#include <cctype>
 #include <signal.h>
 #include <cstring>
 
@@ -16,84 +12,132 @@
 
 UXMPP_START_NAMESPACE1(uxmpp)
 
-#define THIS_FILE "utils"
+static const std::string log_unit {"utils"};
 
 using namespace std;
 
 
-static const char b64_table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-static const char reverse_table[128] = {
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
-    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 64, 64, 64,
-    64,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64,
-    64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64
+static std::array<char, 64> b64_alphabet {
+    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+    'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+    'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+    'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
+};
+static std::array<char, 80> reverse_b64 = {
+    62, 65, 65, 65, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 65,
+    65, 65, 65, 65, 65, 65,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+    65, 65, 65, 65, 65, 65, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
 };
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string base64_encode (const std::string &bindata)
+std::string to_base64 (const unsigned char* buf, size_t len)
 {
-    if (bindata.size() > (numeric_limits<string::size_type>::max() / 4u) * 3u)
-        throw length_error ("Input buffer too large");
+    // Sanity check
+    if (buf == nullptr)
+        return "";
 
-    const size_t binlen = bindata.size ();
-    string retval ((((binlen + 2) / 3) * 4), '='); // Make sure the output is padded with '='
-    size_t outpos = 0;
-    int bits_collected = 0;
-    unsigned int accumulator = 0;
-    const string::const_iterator binend = bindata.end ();
+    string result (((len+2) / 3) * 4, '=');
+    unsigned buf_pos = 0;
+    unsigned result_pos = 0;
+    while (len >= 3) {
+        result[result_pos++] = b64_alphabet[buf[buf_pos]>>2];
+        result[result_pos++] = b64_alphabet[(buf[buf_pos]<<4 & 0x3f) | (buf[buf_pos+1]>>4)];
+        ++buf_pos;
+        result[result_pos++] = b64_alphabet[(buf[buf_pos]<<2 & 0x3f) | (buf[buf_pos+1]>>6)];
+        ++buf_pos;
+        result[result_pos++] = b64_alphabet[buf[buf_pos++] & 0x3f];
+        len -= 3;
+    }
+    if (len == 2) {
+        result[result_pos++] = b64_alphabet[buf[buf_pos]>>2];
+        result[result_pos++] = b64_alphabet[(buf[buf_pos]<<4 & 0x3f) | (buf[buf_pos+1]>>4)];
+        ++buf_pos;
+        result[result_pos++] = b64_alphabet[buf[buf_pos]<<2 & 0x3f];
+    }
+    else if (len == 1) {
+        result[result_pos++] = b64_alphabet[buf[buf_pos]>>2];
+        result[result_pos++] = b64_alphabet[buf[buf_pos]<<4 & 0x3f];
+    }
 
-    for (string::const_iterator i = bindata.begin(); i != binend; ++i) {
-        accumulator = (accumulator << 8) | (*i & 0xffu);
-        bits_collected += 8;
-        while (bits_collected >= 6) {
-            bits_collected -= 6;
-            retval[outpos++] = b64_table[(accumulator >> bits_collected) & 0x3fu];
-        }
-    }
-    if (bits_collected > 0) { // Any trailing bits that are missing.
-        assert (bits_collected < 6);
-        accumulator <<= 6 - bits_collected;
-        retval[outpos++] = b64_table[accumulator & 0x3fu];
-    }
-    assert (outpos >= (retval.size() - 2));
-    assert (outpos <= retval.size());
-    return retval;
+    return std::move (result);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string base64_decode (const std::string &ascdata)
+std::string to_base64 (const string& text)
 {
-    string retval;
-    const string::const_iterator last = ascdata.end ();
-    int bits_collected = 0;
-    unsigned int accumulator = 0;
+    return to_base64 (reinterpret_cast<const unsigned char*>(text.c_str()), text.length());
+}
 
-    for (string::const_iterator i = ascdata.begin(); i != last; ++i) {
-        const int c = *i;
-        if (isspace(c) || c == '=') {
-            // Skip whitespace and padding. Be liberal in what you accept.
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+size_t from_base64 (const string& encoded_string, char* buf, size_t buf_len)
+{
+    size_t result_len = 0;
+    char data = 0;
+    int index = 0;
+    char code;
+    for (auto c : encoded_string) {
+        code = 65;
+        if (isspace(c)) {
+            // Ignore whitespace
             continue;
+        }else if (c>='+' && c<='z') {
+            code = reverse_b64[c-'+'];
         }
-        if ((c > 127) || (c < 0) || (reverse_table[c] > 63)) {
-            throw invalid_argument("Not base64 encoded");
+        if (code == 65) {
+            // Stop at invalid base64 character
+            break;
         }
-        accumulator = (accumulator << 6) | reverse_table[c];
-        bits_collected += 6;
-        if (bits_collected >= 8) {
-            bits_collected -= 8;
-            retval += (char)((accumulator >> bits_collected) & 0xffu);
+
+        switch (index) {
+        case 0:
+            data = code << 2;
+            ++index;
+            break;
+        case 1:
+            data |= code >> 4;
+            buf[result_len++] = data;
+            data = (code & 0x0f) << 4;
+            ++index;
+            break;
+        case 2:
+            data |= code >> 2;
+            buf[result_len++] = data;
+            data = (code & 0x03) << 6;
+            ++index;
+            break;
+        case 3:
+            data |= code;
+            buf[result_len++] = data;
+            index = 0;
+            break;
         }
     }
-    return retval;
+    if (index != 0)
+        buf[result_len++] = data;
+
+    return result_len;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string from_base64 (const string& encoded_string)
+{
+    size_t expected_len = ((encoded_string.length()+3) / 4) * 3;
+    string result (expected_len, '\0');
+    auto actual_len = from_base64 (encoded_string,
+                                   const_cast<char*>(result.c_str()),
+                                   expected_len);
+    result.resize (actual_len);
+    return result;
 }
 
 
@@ -105,7 +149,7 @@ bool block_signal (int signal_number)
     sigemptyset (&mask);
     sigaddset (&mask, signal_number);
     if (sigprocmask(SIG_BLOCK, &mask, NULL)) {
-        uxmpp_log_error (THIS_FILE, "Unable to block signal ", signal_number, " - ", string(strerror(errno)));
+        uxmpp_log_error (log_unit, "Unable to block signal ", signal_number, " - ", string(strerror(errno)));
         return false;
     }
     return true;
@@ -120,7 +164,7 @@ bool unblock_signal (int signal_number)
     sigemptyset (&mask);
     sigaddset (&mask, signal_number);
     if (sigprocmask(SIG_UNBLOCK, &mask, NULL)) {
-        uxmpp_log_error (THIS_FILE, "Unable to unblock signal ", signal_number, " - ", string(strerror(errno)));
+        uxmpp_log_error (log_unit, "Unable to unblock signal ", signal_number, " - ", string(strerror(errno)));
         return false;
     }
     return true;

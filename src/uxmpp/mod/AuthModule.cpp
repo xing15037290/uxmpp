@@ -102,7 +102,7 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
             string challange_str = string("_") + auth_user + string("_") + auth_pass;
             challange_str[0] = '\0';
             challange_str[auth_user.length()+1] = '\0';
-            auth.set_content (base64_encode(challange_str));
+            auth.set_content (to_base64(challange_str));
 
             xs.write (auth);
             return true;
@@ -123,7 +123,7 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
         challange_str[0] = '\0';
         challange_str[auth_user.length()+1] = '\0';
         XmlObject response ("response", XmlSaslNs);
-        response.set_content (base64_encode(challange_str));
+        response.set_content (to_base64(challange_str));
         xs.write (response);
         return true;
     }
