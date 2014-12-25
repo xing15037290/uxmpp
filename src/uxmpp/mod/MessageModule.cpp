@@ -152,7 +152,7 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
 //------------------------------------------------------------------------------
 std::vector<std::string> MessageModule::get_disco_features ()
 {
-    return {"urn:xmpp:receipts"};
+    return {"urn:xmpp:receipts"}; // XEP-0184 - Message Delivery Receipts
 }
 
 
