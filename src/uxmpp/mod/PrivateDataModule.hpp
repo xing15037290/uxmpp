@@ -44,30 +44,26 @@ namespace uxmpp { namespace mod {
          * @param full_xml_name The name of the XML object that was stored including
          *                      the namespace.
          * @param stanza_id The ID of the IQ stanza that was sent to the server.
-         * @param error_code If not zero, the server has reported an error.
-         * @param error_name This is the description of the error if
+         * @param error_cond This is the error condition if
          *                   <code>error_code</code> is non-zero.
          */
         typedef std::function<void (Session& session,
                                     const std::string& full_xml_name,
                                     const std::string& stanza_id,
-                                    const int error_code,
-                                    const std::string& error_name)> priv_data_set_callback_t;
+                                    const std::string& error_cond)> priv_data_set_callback_t;
 
         /**
          * Callback that's called when private data has been retrieved from the XMPP server.
          * @param session The XMPP session in which the data was retrieved the server.
          * @param priv_data The private data retrieved from the server.
          * @param stanza_id The ID of the IQ stanza that was sent to the server.
-         * @param error_code If not zero, the server has reported an error.
-         * @param error_name This is the description of the error if
+         * @param error_cond This is the error condition if
          *                   <code>error_code</code> is non-zero.
          */
         typedef std::function<void (Session& session,
                                     std::vector<uxmpp::XmlObject>& priv_data,
                                     const std::string& stanza_id,
-                                    const int error_code,
-                                    const std::string& error_name)> priv_data_get_callback_t;
+                                    const std::string& error_cond)> priv_data_get_callback_t;
 
         /**
          * Default Constructor.

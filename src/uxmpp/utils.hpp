@@ -49,6 +49,11 @@ namespace uxmpp {
     /**
      *
      */
+    std::string make_uuid_v4 ();
+
+    /**
+     *
+     */
     bool block_signal (int signal_number);
 
 

@@ -22,12 +22,14 @@
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmlObject.hpp>
 #include <uxmpp/Jid.hpp>
+#include <uxmpp/StanzaError.hpp>
 #include <string>
 #include <cstdlib>
 #include <functional>
 
 
 namespace uxmpp {
+
 
     /**
      * Base class for xmpp stanzas.
@@ -115,19 +117,14 @@ namespace uxmpp {
         bool have_error () const;
 
         /**
-         * It the IQ type is 'error' this will return the error type.
+         * Get the stanza error (if any).
          */
-        std::string get_error_type ();
+        StanzaError get_error ();
 
         /**
-         * It the IQ type is 'error' this will return the error code.
+         * Set a stanza error.
          */
-        int get_error_code ();
-
-        /**
-         * It the IQ type is 'error' this will return the error name.
-         */
-        std::string get_error_name ();
+        void set_error (const StanzaError& error);
 
         /**
          * Generate a pseudo random id string.

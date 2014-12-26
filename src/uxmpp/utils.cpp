@@ -4,6 +4,8 @@
 #include <string>
 #include <signal.h>
 #include <cstring>
+#include <sstream>
+#include <random>
 
 #include <thread>
 #include <sys/syscall.h>
@@ -138,6 +140,52 @@ std::string from_base64 (const string& encoded_string)
                                    expected_len);
     result.resize (actual_len);
     return result;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string make_uuid_v4 ()
+{
+    static std::random_device rd;
+    static std::default_random_engine re (rd());
+    static std::uniform_int_distribution<int> random_digit (0, 15);  // Random between 0 .. 15
+
+    std::stringstream ss;
+    ss << std::hex;
+
+    // ........-....-4...-a...-............
+    // ^^^^^^^^
+    for (auto i=0; i<8; i++)
+        ss << random_digit (re);
+    ss << '-';
+
+    // ........-....-4...-a...-............
+    //          ^^^^
+    for (auto i=0; i<4; i++)
+        ss << random_digit (re);
+    ss << '-';
+
+    // ........-....-4...-a...-............
+    //                ^^^
+    ss << '4';
+    for (auto i=0; i<3; i++)
+        ss << random_digit (re);
+    ss << '-';
+
+    // ........-....-4...-a...-............
+    //                     ^^^
+    ss << 'a';
+    for (auto i=0; i<3; i++)
+        ss << random_digit (re);
+    ss << '-';
+
+    // ........-....-4...-a...-............
+    //                         ^^^^^^^^^^^^
+    for (auto i=0; i<12; i++)
+        ss << random_digit (re);
+
+    return std::move (ss.str());
 }
 
 

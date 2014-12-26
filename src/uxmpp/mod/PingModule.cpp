@@ -102,7 +102,7 @@ bool PingModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
                 else if (iq.get_type() == IqType::error) {
                     uxmpp_log_info (THIS_FILE, "Got ping error from ",
                                     to_string(i->second.first), ": ",
-                                    iq.get_error_name(), " (", iq.get_error_code(), ")");
+                                    iq.get_error().get_condition());
                 }
 
                 ping_map.erase (i);

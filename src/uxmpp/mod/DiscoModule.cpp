@@ -156,8 +156,7 @@ bool DiscoModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject
             return true;
         }
         else if (iq.get_type() == IqType::error) {
-            uxmpp_log_info (THIS_FILE, "Got disco query error: ",
-                            iq.get_error_name(), " (", iq.get_error_code(), ")");
+            uxmpp_log_info (THIS_FILE, "Got disco query error: ", iq.get_error().get_condition());
         }
         server_feature_request_id = "";
         return true;

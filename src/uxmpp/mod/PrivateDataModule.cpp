@@ -177,8 +177,7 @@ bool PrivateDataModule::handle_set_result (const std::string& id, uxmpp::IqStanz
     string data_tag = set_ids[id].first;
     priv_data_set_callback_t cb = set_ids[id].second;
     set_ids.erase (id);
-    string error_name {""};
-    int error_code {0};
+    string error_cond {""};
 
     if (iq_result.get_type() == IqType::result) {
         // Ok
@@ -186,26 +185,19 @@ bool PrivateDataModule::handle_set_result (const std::string& id, uxmpp::IqStanz
     }
     else if (iq_result.get_type() == IqType::error) {
         // Error
-        error_name = iq_result.get_error_name ();
-        error_code = iq_result.get_error_code ();
-        if (!error_code) {
-            error_code = 404;
-            uxmpp_log_warning (log_module, "Missing error code in IQ error, set it to ", error_code);
-        }
-        uxmpp_log_warning (log_module, "Error setting private data ", data_tag, " - ",
-                           error_name, " (", error_code, ")");
+        error_cond = iq_result.get_error().get_condition ();
+        uxmpp_log_warning (log_module, "Error setting private data ", data_tag, " - ", error_cond);
     }
     else {
         // Undefined error
-        error_name = "undefined-condition";
-        error_code = 404;
+        error_cond = "undefined-condition";
         uxmpp_log_warning (log_module, "Unexpected result setting xml object ", data_tag);
     }
 
     // Call callback
     //
     if (cb)
-        cb (*sess, data_tag, id, error_code, error_name);
+        cb (*sess, data_tag, id, error_cond);
 
     return true;
 }
@@ -218,8 +210,7 @@ bool PrivateDataModule::handle_get_result (const std::string& id, uxmpp::IqStanz
     string data_tag = get_ids[id].first;
     priv_data_get_callback_t cb = get_ids[id].second;
     get_ids.erase (id);
-    string error_name {""};
-    int error_code {0};
+    string error_cond {""};
     std::vector<uxmpp::XmlObject> priv_data;
 
     if (iq_result.get_type() == IqType::result) {
@@ -231,26 +222,19 @@ bool PrivateDataModule::handle_get_result (const std::string& id, uxmpp::IqStanz
     }
     else if (iq_result.get_type() == IqType::error) {
         // Error
-        error_name = iq_result.get_error_name ();
-        error_code = iq_result.get_error_code ();
-        if (!error_code) {
-            error_code = 404;
-            uxmpp_log_warning (log_module, "Missing error code in IQ error, set it to ", error_code);
-        }
-        uxmpp_log_warning (log_module, "Error setting private data ", data_tag, " - ",
-                           error_name, " (", error_code, ")");
+        error_cond = iq_result.get_error().get_condition ();
+        uxmpp_log_warning (log_module, "Error setting private data ", data_tag, " - ", error_cond);
     }
     else {
         // Undefined error
-        error_name = "undefined-condition";
-        error_code = 404;
+        error_cond = "undefined-condition";
         uxmpp_log_warning (log_module, "Unexpected result setting xml object ", data_tag);
     }
 
     // Call callback
     //
     if (cb)
-        cb (*sess, priv_data, id, error_code, error_name);
+        cb (*sess, priv_data, id, error_cond);
 
     return true;
 }

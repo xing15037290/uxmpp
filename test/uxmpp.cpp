@@ -24,7 +24,6 @@
 #include <cstdio>
 #include <cstring>
 #include <sstream>
-#include <random>
 
 #include <termios.h>
 #include <unistd.h>
@@ -308,52 +307,6 @@ static void print_help ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-static std::string generate_uuid_v4 ()
-{
-    static std::random_device rd;
-    static std::default_random_engine re (rd());
-    static std::uniform_int_distribution<int> random_digit (0, 15);  // Random between 0 .. 15
-
-    std::stringstream ss;
-    ss << std::hex;
-
-    // ........-....-4...-a...-............
-    // ^^^^^^^^
-    for (auto i=0; i<8; i++)
-        ss << random_digit (re);
-    ss << '-';
-
-    // ........-....-4...-a...-............
-    //          ^^^^
-    for (auto i=0; i<4; i++)
-        ss << random_digit (re);
-    ss << '-';
-
-    // ........-....-4...-a...-............
-    //                ^^^
-    ss << '4';
-    for (auto i=0; i<3; i++)
-        ss << random_digit (re);
-    ss << '-';
-
-    // ........-....-4...-a...-............
-    //                     ^^^
-    ss << 'a';
-    for (auto i=0; i<3; i++)
-        ss << random_digit (re);
-    ss << '-';
-
-    // ........-....-4...-a...-............
-    //                         ^^^^^^^^^^^^
-    for (auto i=0; i<12; i++)
-        ss << random_digit (re);
-
-    return std::move (ss.str());
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 static bool get_int_argument (const string& message, stringstream& ss, int& value)
 {
     if (ss.eof()) {
@@ -455,10 +408,6 @@ int main (int argc, char* argv[])
     //
     if (cfg.pass.length() == 0)
         read_passphrase (to_string(cfg.jid.bare()), cfg.pass);
-
-    // Set Stanza id generator
-    //
-    Stanza::make_id = generate_uuid_v4;
 
     // Create and start the XMPP application object
     //
@@ -672,7 +621,6 @@ int main (int argc, char* argv[])
             app.mod_priv_data.get (tag, "uxmpp:priv-data", [](Session& session,
                                                               std::vector<uxmpp::XmlObject>& priv_data,
                                                               const std::string& stanza_id,
-                                                              const int error_code,
                                                               const std::string& error_name){
                                        cout << "Got private data: " << endl;
                                        for (auto& obj : priv_data) {

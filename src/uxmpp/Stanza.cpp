@@ -31,43 +31,8 @@ UXMPP_START_NAMESPACE1(uxmpp)
 
 using namespace std;
 
-static std::string default_make_id ();
 
-
-std::function<std::string (void)> Stanza::make_id = default_make_id;
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-static std::string default_make_id ()
-{
-    static random_device rd;
-    static default_random_engine re (rd());
-    //static uniform_int_distribution<int> dlen (12, 16);  // Random between 12 .. 16
-    static uniform_int_distribution<int> d0 (0, 2);  // Random between 0 .. 2
-    static uniform_int_distribution<int> d1 (0, 9);  // Random between 0 .. 9
-    static uniform_int_distribution<int> d2 (0, 25); // Random between 0 .. 25
-
-    string id = "";
-    char ch;
-    int len = 16;//dlen (re);
-
-    for (auto i=0; i<len; ++i) {
-        switch (d0(re)) {
-        case 0:
-            ch = '0' + d1(re);
-            break;
-        case 1:
-            ch = 'a' + d2(re);
-            break;
-        case 2:
-            ch = 'A' + d2(re);
-            break;
-        }
-        id += ch;
-    }
-    return id;
-}
+std::function<std::string (void)> Stanza::make_id = make_uuid_v4;
 
 
 //------------------------------------------------------------------------------
@@ -209,45 +174,33 @@ bool Stanza::have_error () const
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string Stanza::get_error_type ()
+StanzaError Stanza::get_error ()
 {
-    if (!have_error())
-        return "";
-    for (XmlObject& node : get_nodes()) {
+    for (auto& node : get_nodes()) {
         if (node.get_full_name() == xml::full_tag_error_stanza) {
-            return node.get_attribute ("type");
+            StanzaError& err = reinterpret_cast<StanzaError&> (node);
+            return err;
         }
     }
-    return "";
+    StanzaError err ("","");
+    err.set_tag_name ("");
+    return err;
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-int Stanza::get_error_code ()
+void Stanza::set_error (const StanzaError& error)
 {
-    if (!have_error())
-        return 0;
-    auto node = find_node (xml::full_tag_error_stanza, true);
-    return node ? atoi(node.get_attribute("code").c_str()) : 0;
-}
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-std::string Stanza::get_error_name ()
-{
-    if (!have_error())
-        return "";
-    auto node = find_node (xml::full_tag_error_stanza, true);
-    if (node) {
-        auto child_nodes = node.get_nodes ();
-        if (!child_nodes.empty())
-            return child_nodes.begin()->get_tag_name ();
-        else
-            return "";
+    // Add/replace the error node
+    //
+    for (auto& node : get_nodes()) {
+        if (node.get_full_name() == xml::full_tag_error_stanza) {
+            node = error;
+            return;
+        }
     }
-    return "";
+    add_node (error);
 }
 
 
