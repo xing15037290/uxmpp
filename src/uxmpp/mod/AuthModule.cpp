@@ -105,7 +105,6 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
             }
             else if (node.get_full_name() == XmlAuthTagFull) {
                 start_auth = true;
-                break;
             }
         }
     }
