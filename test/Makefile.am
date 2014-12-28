@@ -71,6 +71,9 @@ test_ConnectionManager_SOURCES  = test_ConnectionManager.cpp
 noinst_bin_PROGRAMS     += test_FileConnection
 test_FileConnection_SOURCES  = test_FileConnection.cpp
 
+noinst_bin_PROGRAMS     += test_RegisterModule
+test_RegisterModule_SOURCES  = test_RegisterModule.cpp
+
 noinst_bin_PROGRAMS     += uxmpp
 uxmpp_SOURCES  = uxmpp.cpp
 

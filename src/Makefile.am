@@ -74,6 +74,7 @@ libuxmpp_la_SOURCES += uxmpp/mod/MessageModule.cpp
 libuxmpp_la_SOURCES += uxmpp/mod/SessionModule.cpp
 libuxmpp_la_SOURCES += uxmpp/mod/PingModule.cpp
 libuxmpp_la_SOURCES += uxmpp/mod/PrivateDataModule.cpp
+libuxmpp_la_SOURCES += uxmpp/mod/RegisterModule.cpp
 
 # Header files
 #libuxmppdir = $(includedir)/uxmpp
@@ -132,6 +133,8 @@ nobase_libuxmpp_HEADERS += uxmpp/mod/MessageModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/SessionModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/PingModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/PrivateDataModule.hpp
+nobase_libuxmpp_HEADERS += uxmpp/mod/RegistrationInfo.hpp
+nobase_libuxmpp_HEADERS += uxmpp/mod/RegisterModule.hpp
 
 
 # Header files that is not to be installed

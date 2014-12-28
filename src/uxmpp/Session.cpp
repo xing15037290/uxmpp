@@ -88,12 +88,12 @@ Session::~Session ()
 //------------------------------------------------------------------------------
 void Session::run (const SessionConfig& config)
 {
+    uxmpp_log_debug (log_unit, "Starting XMPP session");
+
     if (!change_state(SessionState::connecting)) {
         uxmpp_log_warning (log_unit, "Unable to connect stream in state ", to_string(state));
         return;
     }
-
-    uxmpp_log_debug (log_unit, "Starting XMPP session");
 
     // Initialize session data
     //
@@ -137,7 +137,6 @@ void Session::run (const SessionConfig& config)
                 uxmpp_log_info (log_unit, "XML stream is connected to ",
                                 to_string(connection.get_peer_addr()));
                 connected = true;
-                change_state (SessionState::negotiating);
             }else{
                 uxmpp_log_info (log_unit, "XML stream failed to connect to ",
                                 to_string(connection.get_peer_addr()));
@@ -266,6 +265,7 @@ bool Session::change_state (SessionState new_state)
 
     // Inform listeners
     //
+    uxmpp_log_trace (log_unit, "Call session state listeners - on_state_change");
     for (auto& listener : listeners)
         listener->on_state_change (*this, new_state, old_state);
 
@@ -314,8 +314,7 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
         if (iq.get_type()==IqType::set || iq.get_type()==IqType::get) {
             // Send result
             send_stanza (IqStanza(IqType::error, iq.get_from(), iq.get_to(), iq.get_id()).
-                         add_node(XmlObject("error").set_attribute("type", "cancel").
-                                  add_node(XmlObject("service-unavailable", xml::namespace_stanza_error))));
+                         add_node(StanzaError(StanzaError::type_cancel, StanzaError::service_unavailable)));
         }
     }
 
@@ -589,30 +588,33 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
             uxmpp_log_trace (log_unit, "Got feature: ", node.get_tag_name());
             features.push_back (node);
         }
+        // Inform listeners about the feature update
+        //
+        uxmpp_log_trace (log_unit, "Call session state listeners - on_features");
+        for (auto& listener : listeners)
+            listener->on_features (*this, features);
     }
 
     // Check timer events
     //
-    if (xml_obj.get_namespace() == xml::namespace_uxmpp_timer) {
-        if (xml_obj.get_tag_name() == "timeout") {
-            //
-            // Check the close timer
-            //
-            if (xml_obj.get_attribute("id") == "close") {
-                uxmpp_log_info (log_unit, "Timeout, close connection");
-                stream_error.set_app_error ("timeout", string("Timeout"));
-                stop ();
-                return true;
-            }
-            //
-            // Check the stop_session timer
-            //
-            else if (xml_obj.get_attribute("id") == "stop_session") {
-                uxmpp_log_debug (log_unit, "Timeout while waiting for XML session end tag, close XML stream.");
-                if (xs.is_running())
-                    xs.stop ();
-                return true;
-            }
+    if (xml_obj.get_full_name() == xml::full_tag_uxmpp_timeout) {
+        //
+        // Check the close timer
+        //
+        if (xml_obj.get_attribute("id") == "close") {
+            uxmpp_log_info (log_unit, "Timeout, close connection");
+            stream_error.set_app_error ("timeout", string("Timeout"));
+            stop ();
+            return true;
+        }
+        //
+        // Check the stop_session timer
+        //
+        else if (xml_obj.get_attribute("id") == "stop_session") {
+            uxmpp_log_debug (log_unit, "Timeout while waiting for XML session end tag, close XML stream.");
+            if (xs.is_running())
+                xs.stop ();
+            return true;
         }
     }
 
@@ -623,6 +625,7 @@ bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
         sess_id = xml_obj.get_attribute ("id");
         sess_from = xml_obj.get_attribute ("from");
         uxmpp_log_trace (log_unit, "Got session ID: ", sess_id);
+        change_state (SessionState::negotiating);
         return true;
     }
 

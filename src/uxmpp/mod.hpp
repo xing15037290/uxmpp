@@ -44,5 +44,7 @@ namespace uxmpp {
 #include <uxmpp/mod/SessionModule.hpp>
 #include <uxmpp/mod/PingModule.hpp>
 #include <uxmpp/mod/PrivateDataModule.hpp>
+#include <uxmpp/mod/RegistrationInfo.hpp>
+#include <uxmpp/mod/RegisterModule.hpp>
 
 #endif

@@ -24,8 +24,9 @@ UXMPP_START_NAMESPACE2(uxmpp, xml)
 //
 // Uxmpp internal
 //
-const std::string namespace_uxmpp_error {"http://ultramarin.se/uxmpp#internal-error"};
-const std::string namespace_uxmpp_timer {"http://ultramarin.se/uxmpp#internal-timer"};
+const std::string namespace_uxmpp_error  {"http://ultramarin.se/uxmpp#internal-error"};
+const std::string namespace_uxmpp_timer  {"http://ultramarin.se/uxmpp#internal-timer"};
+const std::string full_tag_uxmpp_timeout {"http://ultramarin.se/uxmpp#internal-timer:timeout"};
 
 //
 // stream

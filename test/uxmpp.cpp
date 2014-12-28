@@ -93,6 +93,7 @@ public:
     PingModule        mod_ping;
     PrivateDataModule mod_priv_data;
     DiscoModule       mod_disco;
+    RegisterModule    mod_register;
 
     thread session_thread;
 };
@@ -194,6 +195,7 @@ void AppLogic::run ()
     sess.register_module (mod_ping);
     sess.register_module (mod_priv_data);
     sess.register_module (mod_disco);
+    sess.register_module (mod_register);
 
     mod_roster.set_roster_handler ([this](RosterModule& rm, Roster& r) { on_roster (rm, r); });
     mod_roster.set_roster_push_handler ([this](RosterModule& rm, RosterItem& ri) { on_roster_push (rm, ri); });
@@ -291,6 +293,8 @@ static void print_help ()
          << "| r-add <jid>          - Add a roster item" << endl
          << "| r-del <index>        - Remove a roster item" << endl
          << "|" << endl
+         << "+----- Account------------------------------------------------------" << endl
+         << "| reg-info             - Send registration info query." << endl
          << "+----- Misc --------------------------------------------------------" << endl
          << "| data-set [tag]       - Set private data on server." << endl
          << "| data-get [tag]       - Get private data from server." << endl
@@ -603,6 +607,25 @@ int main (int argc, char* argv[])
                     app.mod_msg.send_message (jid, msg, true);
                 }
             }
+        }
+        else if (cmd == "reg-info") {
+            app.mod_register.set_info_callback (
+                [](Session& session, RegistrationInfo& ri)
+                {
+                    if (ri.error) {
+                        cout << "Error getting registration info: " << ri.error.get_condition() << endl;
+                    }
+                    else {
+                        cout << "Registration info:" << endl;
+                        cout << (ri.registered ? "Already registered" : "Not registered") << endl;
+                        cout << "Registration fields: " << endl;
+                        for (auto& field : ri.fields) {
+                            cout << "\t" << field.first << ": " << field.second << endl;
+                        }
+                        cout << "Registration instructions: " << endl << "\t" << ri.instructions << endl;
+                    }
+                });
+            app.mod_register.request_info ();
         }
         else if (cmd == "data-set") {
             string tag;

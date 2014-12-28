@@ -74,7 +74,7 @@ bool KeepAliveModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlOb
 {
     // Check timer events
     //
-    if (xml_obj.get_full_name() == xml::namespace_uxmpp_timer) {
+    if (xml_obj.get_full_name() == xml::full_tag_uxmpp_timeout) {
         //
         // Check the keep-alive timer
         //

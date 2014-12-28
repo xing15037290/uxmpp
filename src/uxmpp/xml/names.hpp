@@ -36,16 +36,13 @@ namespace uxmpp { namespace xml {
          * <code>http://ultramarin.se/uxmpp#internal-timer</code>.
          */
         extern const std::string namespace_uxmpp_timer;
-/*
-const std::string XmlUxmppInternalErrorNs = "http://ultramarin.se/uxmpp#internal-error";
-const std::string XmlUxmppInternalErrorDefNs = XmlUxmppInternalErrorNs;
 
-// uxmpp internal timer namespace
-//
-const std::string XmlUxmppInternalTimerNs = "http://ultramarin.se/uxmpp#internal-timer";
-const std::string XmlUxmppInternalTimerDefNs = XmlUxmppInternalTimerNs;
-const std::string XmlUxmppInternalTimerTagFull = XmlUxmppInternalTimerNs + std::string(":timeout");
-*/
+        /**
+         * XML tag name for uxmpp internal timers.
+         * <code>http://ultramarin.se/uxmpp#internal-timer:timeout</code>.
+         */
+        extern const std::string full_tag_uxmpp_timeout;
+
         /**
          * XML namespace for the 'stream' tag: <code>http://etherx.jabber.org/streams</code>.
          */

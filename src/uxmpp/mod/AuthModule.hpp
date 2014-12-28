@@ -45,10 +45,25 @@ namespace uxmpp { namespace mod {
         virtual ~AuthModule () = default;
 
         /**
+         * Called when the module is registered to a session.
+         */
+        virtual void module_registered (uxmpp::Session& session) override;
+
+        /**
+         * Called when the module is unregistered from a session.
+         */
+        virtual void module_unregistered (uxmpp::Session& session) override;
+
+        /**
          * Called whan an XML object is received.
          * @return Return true if this XML object was processed and no further work should be done.
          */
         virtual bool proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj) override;
+
+        /**
+         * Start authentication.
+         */
+        virtual void authenticate ();
 
         /**
          * User name used for authentication.
@@ -60,8 +75,17 @@ namespace uxmpp { namespace mod {
          */
         std::string auth_pass;
 
+        /**
+         * Automatically authenticate.
+         */
+        bool auto_login;
+
 
     protected:
+        /**
+         *
+         */
+        Session* sess;
 
         /**
          * Authentication mechanisms

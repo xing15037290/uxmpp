@@ -53,8 +53,27 @@ static const std::string XmlAuthTagFull = XmlIqAuthNs + string(":") + XmlAuthTag
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 AuthModule::AuthModule ()
-    : uxmpp::XmppModule ("mod_auth")
+    :
+    uxmpp::XmppModule ("mod_auth"),
+    auto_login {true},
+    sess {nullptr}
 {
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void AuthModule::module_registered (uxmpp::Session& session)
+{
+    sess = &session;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void AuthModule::module_unregistered (uxmpp::Session& session)
+{
+    sess = nullptr;
 }
 
 
@@ -90,28 +109,10 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
             }
         }
     }
-    if (start_auth || have_mechanisms/*some brain dead servers sends 'mechanisms' without 'auth'*/) {
-        //
-        // Right now we only support PLAIN
-        //
-        if (mechanisms.find("PLAIN") != mechanisms.end()) {
-            XmlObject auth ("auth", XmlSaslNs);
-            auth.set_attribute ("mechanism", "PLAIN");
-
-            uxmpp_log_trace (THIS_FILE, "Authenticate user: ", auth_user);
-            string challange_str = string("_") + auth_user + string("_") + auth_pass;
-            challange_str[0] = '\0';
-            challange_str[auth_user.length()+1] = '\0';
-            auth.set_content (to_base64(challange_str));
-
-            xs.write (auth);
-            return true;
-        }else{
-            uxmpp_log_warning (THIS_FILE, "No supported authorization mechanism found");
-            session.set_app_error ("unsupported-authorization-mechanism",
-                                   "No supported authentication method found");
-            session.stop ();
-        }
+    if (auto_login &&
+        (start_auth || have_mechanisms/*some brain dead servers sends 'mechanisms' without 'auth'*/))
+    {
+        authenticate ();
     }
 
     //
@@ -149,11 +150,40 @@ bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
         return true;
     }
 
-
-
     return false;
 }
 
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void AuthModule::authenticate ()
+{
+    if (!sess)
+        return;
+
+    XmlStream& xs = sess->get_xml_stream ();
+
+    //
+    // Right now we only support PLAIN
+    //
+    if (mechanisms.find("PLAIN") != mechanisms.end()) {
+        XmlObject auth ("auth", XmlSaslNs);
+        auth.set_attribute ("mechanism", "PLAIN");
+
+        uxmpp_log_trace (THIS_FILE, "Authenticate user: ", auth_user);
+        string challange_str = string("_") + auth_user + string("_") + auth_pass;
+        challange_str[0] = '\0';
+        challange_str[auth_user.length()+1] = '\0';
+        auth.set_content (to_base64(challange_str));
+
+        xs.write (auth);
+    }else{
+        uxmpp_log_warning (THIS_FILE, "No supported authorization mechanism found");
+        sess->set_app_error ("unsupported-authorization-mechanism",
+                               "No supported authentication method found");
+        sess->stop ();
+    }
+}
 
 
 UXMPP_END_NAMESPACE2

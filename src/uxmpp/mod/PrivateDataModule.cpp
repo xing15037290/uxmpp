@@ -37,6 +37,7 @@ static const string tag_name_query       {"jabber:iq:private:query"};
 //------------------------------------------------------------------------------
 PrivateDataModule::PrivateDataModule () : XmppModule ("PrivateDataModule")
 {
+    sess = nullptr;
 }
 
 

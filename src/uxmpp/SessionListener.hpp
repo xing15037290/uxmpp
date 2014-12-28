@@ -21,6 +21,8 @@
 
 #include <uxmpp/types.hpp>
 #include <uxmpp/SessionState.hpp>
+#include <uxmpp/XmlObject.hpp>
+#include <vector>
 
 
 namespace uxmpp {
@@ -51,6 +53,12 @@ namespace uxmpp {
          * Called when the state if the session changes.
          */
         virtual void on_state_change (Session& session, SessionState new_state, SessionState old_state) = 0;
+
+        /**
+         * Called when feature list updated.
+         */
+        virtual void on_features (Session& session, std::vector<XmlObject>& features) {
+        }
     };
 
 
