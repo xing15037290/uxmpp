@@ -65,12 +65,17 @@ public:
     TlsModule      mod_tls;
     AuthModule     mod_auth;
     RegisterModule mod_register;
+    SearchModule   mod_search;
     SessionModule  mod_session;
 
     thread session_thread;
 
     Semaphore reg_info_sem;
     RegistrationInfo reg_info;
+
+    Semaphore search_info_sem;
+    string search_instructions;
+    list<string> search_fields;
 };
 
 
@@ -95,8 +100,6 @@ AppLogic::AppLogic (app_config_t& app_cfg)
             if (ri.error) {
                 cout << "Error getting registration info: "
                      << ri.error.get_condition() << endl;
-                stop ();
-                return;
             }
             reg_info = std::move (ri);
             reg_info_sem.post ();
@@ -115,6 +118,12 @@ AppLogic::AppLogic (app_config_t& app_cfg)
             }else{
                 cout << "failure - " << error.get_condition() << endl;
             }
+        });
+
+    mod_search.set_fields_info_callback ([this](Session& session, string& instructions, list<string>& fields){
+            search_instructions = instructions;
+            search_fields = std::move (fields);
+            search_info_sem.post ();
         });
 
     // Configure xmpp session
@@ -192,6 +201,7 @@ void AppLogic::run ()
     sess.register_module (mod_tls);
     sess.register_module (mod_auth);
     sess.register_module (mod_register);
+    sess.register_module (mod_search);
     sess.register_module (mod_session);
 
     sess.add_session_listener (*this);
@@ -455,10 +465,13 @@ int main (int argc, char* argv[])
         // register
         //
         else if (cmd == "register") {
-            app.reg_info.fields.clear ();
-            app.mod_register.request_info (cfg.jid.get_domain());
             if (app.reg_info.fields.empty()) {
+                app.mod_register.request_info (cfg.jid.get_domain());
                 app.reg_info_sem.wait ();
+            }
+            if (app.reg_info.error) {
+                quit = true;
+                continue;
             }
             cout << app.reg_info.instructions << endl;
             for (auto& field : app.reg_info.fields) {
@@ -499,6 +512,24 @@ int main (int argc, char* argv[])
                 app.mod_auth.auth_pass = cfg.pass;
             }
             app.mod_auth.authenticate ();
+        }
+        //
+        // Search
+        //
+        else if (cmd == "search") {
+            if (app.search_fields.empty()) {
+                app.mod_search.request_fields ();
+                app.search_info_sem.wait ();
+            }
+            if (app.search_fields.empty())
+                continue;
+            cout << endl;
+            if (!app.search_instructions.empty())
+                cout << app.search_instructions << endl;
+            cout << "Search fields: " << endl;
+            for (auto& field : app.search_fields) {
+                cout << "\t" << field << endl;
+            }
         }
         else if (cmd == "") {
         }

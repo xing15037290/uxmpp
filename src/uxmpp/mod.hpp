@@ -46,5 +46,6 @@ namespace uxmpp {
 #include <uxmpp/mod/PrivateDataModule.hpp>
 #include <uxmpp/mod/RegistrationInfo.hpp>
 #include <uxmpp/mod/RegisterModule.hpp>
+#include <uxmpp/mod/SearchModule.hpp>
 
 #endif
