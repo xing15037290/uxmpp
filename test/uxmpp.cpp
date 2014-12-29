@@ -94,6 +94,7 @@ public:
     PrivateDataModule mod_priv_data;
     DiscoModule       mod_disco;
     RegisterModule    mod_register;
+    VcardModule       mod_vcard;
 
     thread session_thread;
 };
@@ -123,6 +124,15 @@ AppLogic::AppLogic (app_config_t& app_cfg)
     mod_tls.tls_cfg.verify_server = false;
     mod_auth.auth_user            = app_cfg.jid.get_local ();
     mod_auth.auth_pass            = app_cfg.pass;
+
+    mod_vcard.set_vcard_callback ([](Session& s, Jid& j, XmlObject& vc, StanzaError& e){
+            cout << endl;
+            if (e) {
+                cout << "Error getting vCard for " << to_string(j) << ": " << e.get_condition() << endl;
+                return;
+            }
+            cout << "Got vCard for " << to_string(j) << ": " << to_string(vc, true) << endl;
+        });
 
     // Configure xmpp session
     //
@@ -196,6 +206,7 @@ void AppLogic::run ()
     sess.register_module (mod_priv_data);
     sess.register_module (mod_disco);
     sess.register_module (mod_register);
+    sess.register_module (mod_vcard);
 
     mod_roster.set_roster_handler ([this](RosterModule& rm, Roster& r) { on_roster (rm, r); });
     mod_roster.set_roster_push_handler ([this](RosterModule& rm, RosterItem& ri) { on_roster_push (rm, ri); });
@@ -283,6 +294,8 @@ static void print_help ()
          << "| buddy-del <index>    - Remove a buddy" << endl
          << "| msg <index|jid>      - Send a message to a buddy" << endl
          << "| bn <index> <name>    - Set buddy name." << endl
+         << "| get-vcard <jid>      - Get vCard for jid (empty for own vCard)." << endl
+         << "| set-vcard            - Set own vCard." << endl
          << "|" << endl
          << "+----- Presence (low level) ----------------------------------------" << endl
          << "| pr-subscribe <jid>   - Request presence subscription" << endl
@@ -501,6 +514,26 @@ int main (int argc, char* argv[])
             }
             items[index].set_handle (name);
             app.mod_roster.update_item (items[index]);
+        }
+        //
+        // Command 'get-vcard' - Get vCard
+        //
+        else if (cmd == "get-vcard") {
+            string str_jid;
+            get_string_argument ("Enter JID (empty for own JID): ", ss, str_jid);
+            if (str_jid.empty())
+                app.mod_vcard.request_vcard ();
+            else
+                app.mod_vcard.request_vcard (Jid(str_jid));
+        }
+        //
+        // Command 'set-vcard' - Get vCard
+        //
+        else if (cmd == "set-vcard") {
+            string full_name;
+            get_string_argument ("Enter full name: ", ss, full_name);
+            app.mod_vcard.set_vcard (XmlObject("vCard", "vcard-temp").
+                                     add_node(XmlObject("FN").set_content(full_name)));
         }
         //
         // Command 'r-add' - Add roster item

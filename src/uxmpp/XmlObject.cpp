@@ -432,6 +432,14 @@ std::string XmlObject::get_full_name () const
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+const bool XmlObject::have_attribute (const std::string& name) const
+{
+    return attributes.find(name) != attributes.end();
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 const std::string XmlObject::get_attribute (const std::string& name) const
 {
     auto value = attributes.find (name);

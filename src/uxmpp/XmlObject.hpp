@@ -268,6 +268,13 @@ namespace uxmpp {
         std::string get_full_name () const;
 
         /**
+         * Check if an attribute is present.
+         * @return Returns <code>true</code> if the attribute
+         *         is present, <code>false</code> otherwise.
+         */
+        const bool have_attribute (const std::string& name) const;
+
+        /**
          * Return the value of an attribute.
          * @return The value of an attribute, or an empty
          *         string if the attribute doesn't exits.
