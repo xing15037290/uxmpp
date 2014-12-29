@@ -78,37 +78,7 @@ bool SearchModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObjec
         handle_fields_query_result (iq);
         return true;
     }
-/*
-    // Check for registration result
-    //
-    if (!registration_id.empty() && iq.get_id()==registration_id) {
-        if (reg_result_cb) {
-            StanzaError error = iq.get_error ();
-            reg_result_cb (*sess, "register", error);
-        }
-        return true;
-    }
 
-    // Check for un-registration result
-    //
-    if (!unregistration_id.empty() && iq.get_id()==unregistration_id) {
-        if (reg_result_cb) {
-            StanzaError error = iq.get_error ();
-            reg_result_cb (*sess, "unregister", error);
-        }
-        return true;
-    }
-
-    // Check for password change result
-    //
-    if (!pass_change_id.empty() && iq.get_id()==pass_change_id) {
-        if (reg_result_cb) {
-            StanzaError error = iq.get_error ();
-            reg_result_cb (*sess, "password", error);
-        }
-        return true;
-    }
-*/
     return false;
 }
 
