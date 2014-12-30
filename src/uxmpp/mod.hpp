@@ -48,5 +48,6 @@ namespace uxmpp {
 #include <uxmpp/mod/RegisterModule.hpp>
 #include <uxmpp/mod/SearchModule.hpp>
 #include <uxmpp/mod/VcardModule.hpp>
+#include <uxmpp/mod/IBBModule.hpp>
 
 #endif
