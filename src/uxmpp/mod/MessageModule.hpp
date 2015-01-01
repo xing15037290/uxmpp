@@ -95,6 +95,14 @@ namespace uxmpp { namespace mod {
                                   on_receipt);
 
 
+        /**
+         * If true, a message receipt (XEP-0184) will always be sent even if the sender
+         * if not authorized to view our presence (violating section 8 in XEP-0184).
+         * Default is <code>false</code>.
+         */
+        bool always_send_receipt;
+
+
     protected:
         uxmpp::Session* sess;
 

@@ -39,10 +39,12 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 MessageModule::MessageModule ()
-    : uxmpp::XmppModule ("mod_message"),
-      sess (nullptr),
-      message_handler (nullptr),
-      receipt_handler (nullptr)
+    :
+    uxmpp::XmppModule ("mod_message"),
+    always_send_receipt {false},
+    sess {nullptr},
+    message_handler {nullptr},
+    receipt_handler {nullptr}
 {
 }
 
@@ -134,7 +136,7 @@ bool MessageModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObje
         // Don't send a receipt if the sender is not authorized to view our presence (XEP-0184, section 8).
         //
         XmlObject request = msg.find_node ("urn:xmpp:receipts:request", true);
-        if (request && is_jid_authorized(session, msg.get_from().bare())) {
+        if (request && (always_send_receipt || is_jid_authorized(session, msg.get_from().bare()))) {
             sess->send_stanza (MessageStanza(msg.get_from(), sess->get_jid()).
                                remove_attribute("type").
                                add_node(XmlObject("received", "urn:xmpp:receipts").

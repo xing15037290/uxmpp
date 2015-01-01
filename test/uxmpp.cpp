@@ -52,6 +52,7 @@ struct app_config_t {
     string   pass;
     LogLevel log_level;
     int      keep_alive;
+    bool     always_receipt;
     string   dir;
     string   server;
     unsigned short    port;
@@ -124,6 +125,7 @@ AppLogic::AppLogic (app_config_t& app_cfg)
     mod_tls.tls_cfg.verify_server = false;
     mod_auth.auth_user            = app_cfg.jid.get_local ();
     mod_auth.auth_pass            = app_cfg.pass;
+    mod_msg.always_send_receipt   = app_cfg.always_receipt;
 
     mod_vcard.set_vcard_callback ([](Session& s, Jid& j, XmlObject& vc, StanzaError& e){
             cout << endl;
@@ -740,6 +742,7 @@ static void print_cmdline_help ()
         "                               default port number and any port number received from a DNS SRV result.\n"
         "  -l, --log-level <level>      Log level (0-5). Default is 3.\n"
         "  -a, --keep-alive <interval>  Keep-alive interval in seconds, 0 to disable. Default is 300.\n"
+        "  -r, --always-receipt         Always send message receipts even if sender isn't authorized.\n"
         "  -d, --dir <directory>        Directory where to store cache files. Default is $HOME/.uxmpp\n"
         "      --help                   Print this help text.\n\n";
 }
@@ -753,25 +756,27 @@ static int handle_arguments (int argc, char* argv[], app_config_t& cfg)
     //
     cfg.log_level  = LogLevel::info;
     cfg.keep_alive = 300;
+    cfg.always_receipt = false;
     cfg.dir = "~/.uxmpp";
     cfg.server = "";
     cfg.port = 0;
 
     static struct option long_options[] {
-        { "password",   required_argument, NULL, 'p' },
-        { "server",     required_argument, NULL, 's' },
-        { "port",       required_argument, NULL, 'o' },
-        { "log-level",  required_argument, NULL, 'l' },
-        { "keep-alive", required_argument, NULL, 'a' },
-        { "dir",        required_argument, NULL, 'd' },
-        { "help",       no_argument,       NULL,  0  },
+        { "password",       required_argument, NULL, 'p' },
+        { "server",         required_argument, NULL, 's' },
+        { "port",           required_argument, NULL, 'o' },
+        { "log-level",      required_argument, NULL, 'l' },
+        { "keep-alive",     required_argument, NULL, 'a' },
+        { "always-receipt", no_argument,       NULL, 'r' },
+        { "dir",            required_argument, NULL, 'd' },
+        { "help",           no_argument,       NULL,  0  },
     };
 
     while (true) {
         int option_index {0};
         int c;
 
-        c = getopt_long (argc, argv, "p:s:o:l:a:d:", long_options, &option_index);
+        c = getopt_long (argc, argv, "p:s:o:l:a:rd:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -808,6 +813,10 @@ static int handle_arguments (int argc, char* argv[], app_config_t& cfg)
                 cerr << "Invalid keep-alive argument." << endl;
                 return 1;
             }
+            break;
+
+        case 'r':
+            cfg.always_receipt = true;
             break;
 
         case 'd':
