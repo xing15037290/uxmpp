@@ -42,7 +42,6 @@ namespace uxmpp {
 #include <uxmpp/XmlObject.hpp>
 #include <uxmpp/StreamXmlObj.hpp>
 #include <uxmpp/XmlStream.hpp>
-#include <uxmpp/XmlStreamListener.hpp>
 #include <uxmpp/Stanza.hpp>
 #include <uxmpp/IqStanza.hpp>
 #include <uxmpp/MessageStanza.hpp>

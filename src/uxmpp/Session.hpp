@@ -90,7 +90,7 @@ namespace uxmpp {
          * if the session was closed due to an error.
          * @see getError.
          */
-        const bool have_error ();
+        bool have_error ();
 
         /**
          * Add a listener object that will receive events from the session.

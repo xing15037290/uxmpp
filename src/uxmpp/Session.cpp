@@ -348,7 +348,7 @@ StreamError& Session::get_error ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-const bool Session::have_error ()
+bool Session::have_error ()
 {
     return stream_error.have_error ();
 }

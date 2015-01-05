@@ -272,7 +272,7 @@ namespace uxmpp {
          * @return Returns <code>true</code> if the attribute
          *         is present, <code>false</code> otherwise.
          */
-        const bool have_attribute (const std::string& name) const;
+        bool have_attribute (const std::string& name) const;
 
         /**
          * Return the value of an attribute.

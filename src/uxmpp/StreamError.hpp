@@ -61,7 +61,7 @@ namespace uxmpp {
         /**
          * Is there an error message available.
          */
-        const bool have_error ();
+        bool have_error ();
 
         /**
          * Set the error condition.

@@ -86,6 +86,7 @@ nobase_libuxmpp_HEADERS  =
 nobase_libuxmpp_HEADERS += uxmpp.hpp
 nobase_libuxmpp_HEADERS += uxmpp/uxmpp_config.hpp
 nobase_libuxmpp_HEADERS += uxmpp/types.hpp
+nobase_libuxmpp_HEADERS += uxmpp/utils.hpp
 nobase_libuxmpp_HEADERS += uxmpp/Semaphore.hpp
 nobase_libuxmpp_HEADERS += uxmpp/Logger.hpp
 nobase_libuxmpp_HEADERS += uxmpp/UxmppException.hpp
@@ -109,7 +110,6 @@ nobase_libuxmpp_HEADERS += uxmpp/XmlObject.hpp
 nobase_libuxmpp_HEADERS += uxmpp/StreamXmlObj.hpp
 nobase_libuxmpp_HEADERS += uxmpp/XmlInputStream.hpp
 nobase_libuxmpp_HEADERS += uxmpp/XmlStream.hpp
-#nobase_libuxmpp_HEADERS += uxmpp/XmlStreamListener.hpp
 nobase_libuxmpp_HEADERS += uxmpp/XmppModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/StanzaError.hpp
 nobase_libuxmpp_HEADERS += uxmpp/Stanza.hpp
@@ -145,5 +145,4 @@ nobase_libuxmpp_HEADERS += uxmpp/mod/IBBModule.hpp
 
 # Header files that is not to be installed
 noinst_HEADERS  = config.h
-noinst_HEADERS += uxmpp/utils.hpp
 noinst_HEADERS += uxmpp/io/android_resolver_glue.h

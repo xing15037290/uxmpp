@@ -83,7 +83,7 @@ StreamError& StreamError::operator= (const XmlObject& xml_obj)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-const bool StreamError::have_error ()
+bool StreamError::have_error ()
 {
     return get_nodes().size() != 0;
 }
