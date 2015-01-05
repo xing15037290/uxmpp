@@ -20,6 +20,7 @@
 #define UXMPP_SESSIONSTATE_HPP
 
 #include <uxmpp/types.hpp>
+#include <string>
 
 
 namespace uxmpp {

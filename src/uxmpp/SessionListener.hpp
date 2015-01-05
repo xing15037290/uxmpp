@@ -57,8 +57,7 @@ namespace uxmpp {
         /**
          * Called when feature list updated.
          */
-        virtual void on_features (Session& session, std::vector<XmlObject>& features) {
-        }
+        virtual void on_features (Session& session, std::vector<XmlObject>& features);
     };
 
 
