@@ -568,10 +568,7 @@ void SocketConnection::handle_tls_connection_result (Connection& c, void* p, ssi
     }
     else if (result==-1 && (err==SSL_ERROR_WANT_READ || err==SSL_ERROR_WANT_WRITE)) {
         uxmpp_log_trace (log_unit, "TLS handshake in progress");
-/*
-        op.type = err == SSL_ERROR_WANT_READ ? OpType::read : OpType::write;
-        iom.queue_op (op); // Wait unitl readable or writeable
-*/
+
         if (err == SSL_ERROR_WANT_READ) {
             read (nullptr, 0, [this](Connection& c, void* p, ssize_t r, int e){
                     handle_tls_connection_result (c, p, r, e);
