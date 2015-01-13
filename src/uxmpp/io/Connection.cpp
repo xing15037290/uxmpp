@@ -126,15 +126,7 @@ Connection::io_callback_t Connection::set_tx_cb (io_callback_t callback)
 //------------------------------------------------------------------------------
 ssize_t Connection::do_read (void* buf, size_t size, off_t offset, int& errnum)
 {
-    if (offset != -1) {
-        auto result = ::lseek (fd, offset, SEEK_SET);
-        if (result < 0) {
-            errnum = errno;
-            return -1;
-        }
-    }
-
-    ssize_t result = ::read (fd, buf, size);
+    ssize_t result = offset==-1 ? ::read(fd, buf, size) : ::pread(fd, buf, size, offset);
     errnum = result<0 ? errno : 0;
     return result;
 }
@@ -144,15 +136,7 @@ ssize_t Connection::do_read (void* buf, size_t size, off_t offset, int& errnum)
 //------------------------------------------------------------------------------
 ssize_t Connection::do_write (void* buf, size_t size, off_t offset, int& errnum)
 {
-    if (offset != -1) {
-        auto result = ::lseek (fd, offset, SEEK_SET);
-        if (result < 0) {
-            errnum = errno;
-            return -1;
-        }
-    }
-
-    ssize_t result = ::write (fd, buf, size);
+    ssize_t result = offset==-1 ? ::write(fd, buf, size) : ::pwrite(fd, buf, size, offset);
     errnum = result<0 ? errno : 0;
     return result;
 }
