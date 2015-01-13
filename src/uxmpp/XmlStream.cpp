@@ -333,6 +333,10 @@ void XmlStream::reset ()
     uxmpp_log_debug (THIS_FILE, "Reset the XML stream");
     xml_istream.reset ();
 
+    // Clear I/O operations
+    //
+    rx_conn->cancel ();
+
     // Clear any lingering timeout
     if (rx_conn) {
         for (auto i=timers.begin(); i!=timers.end(); ++i)
