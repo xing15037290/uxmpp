@@ -30,6 +30,34 @@ UXMPP_START_NAMESPACE1(uxmpp)
 using namespace std;
 
 
+const std::string StreamError::bad_format               {"bad-format"};
+const std::string StreamError::bad_namespace_prefix     {"bad-namespace-prefix"};
+const std::string StreamError::conflict                 {"conflict"};
+const std::string StreamError::connection_timeout       {"connection-timeout"};
+const std::string StreamError::host_gone                {"host-gone"};
+const std::string StreamError::host_unknown             {"host-unknown"};
+const std::string StreamError::improper_addressing      {"improper-addressing"};
+const std::string StreamError::internal_server_error    {"internal-server-error"};
+const std::string StreamError::invalid_from             {"invalid-from"};
+const std::string StreamError::invalid_namespace        {"invalid-namespace"};
+const std::string StreamError::invalid_xml              {"invalid-xml"};
+const std::string StreamError::not_authorized           {"not-authorized"};
+const std::string StreamError::not_well_formed          {"not-well-formed"};
+const std::string StreamError::policy_violation         {"policy-violation"};
+const std::string StreamError::remote_connection_failed {"remote-connection-failed"};
+const std::string StreamError::reset                    {"reset"};
+const std::string StreamError::resource_constraint      {"resource-constraint"};
+const std::string StreamError::restricted_xml           {"restricted-xml"};
+const std::string StreamError::see_other_host           {"see-other-host"};
+const std::string StreamError::system_shutdown          {"system-shutdown"};
+const std::string StreamError::undefined_condition      {"undefined-condition"};
+const std::string StreamError::unsupported_encoding     {"unsupported-encoding"};
+const std::string StreamError::unsupported_feature      {"unsupported-feature"};
+const std::string StreamError::unsupported_stanza_type  {"unsupported-stanza-type"};
+const std::string StreamError::unsupported_version      {"unsupported-version"};
+
+
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError ()
