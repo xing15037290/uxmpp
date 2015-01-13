@@ -121,14 +121,16 @@ private:
 
     static void run_worker (ConnectionManager& cm);
     bool dispatch_command (int& nfds);
-    void handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx);
+    int handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx);
     void add_poll_fd (Connection* conn, int& nfds, bool rx);
     void del_poll_fd (Connection* conn, int& nfds, bool rx);
     void del_poll_fd (int fd, int& nfds);
 
     int cmd_pipe[2];
     struct pollfd* fds;
-    int fds_size;
+    bool*          fds_tx_more;
+    bool*          fds_rx_more;
+    int            fds_size;
 };
 
 

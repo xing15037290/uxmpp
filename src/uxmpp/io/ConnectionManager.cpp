@@ -31,6 +31,9 @@ UXMPP_START_NAMESPACE2(uxmpp, io)
 
 #define THIS_FILE "ConnectionManager"
 
+#define WHILE_HELL_BURNS -1
+#define FASTER_THAN_LIGHT 0
+
 #ifdef DEBUG_TRACE
 #undef DEBUG_TRACE
 #endif
@@ -337,8 +340,10 @@ void ConnectionManager::cancel (Connection& conn)
 //------------------------------------------------------------------------------
 void ConnectionManager::run_worker (ConnectionManager& cm)
 {
-    cm.fds_size = 8;
-    cm.fds = new struct pollfd[cm.fds_size];
+    cm.fds_size    = 8;
+    cm.fds         = new struct pollfd[cm.fds_size];
+    cm.fds_rx_more = new bool[cm.fds_size];
+    cm.fds_tx_more = new bool[cm.fds_size];
     int nfds;
     bool done = false;
 
@@ -349,55 +354,61 @@ void ConnectionManager::run_worker (ConnectionManager& cm)
     cm.fds[0].fd      = cm.cmd_pipe[pipe_rx];
     cm.fds[0].events  = POLLIN;
     cm.fds[0].revents = 0;
+    cm.fds_rx_more[0] = false;
+    cm.fds_tx_more[0] = false;
     nfds = 1;
 
+    int poll_timeout = WHILE_HELL_BURNS;
     while (!done) {
-        DEBUG_TRACE (THIS_FILE, "Poll ", nfds, " file descriptors");
-#ifdef UXMPP_IO_CONNECTIONMANAGER_DEBUG
-        for (auto i=1; i<nfds; ++i) {
-            DEBUG_TRACE (THIS_FILE, "fd ", cm.fds[i].fd, ":",
-                         (cm.fds[i].events & POLLIN ? " RX" : ""),
-                         (cm.fds[i].events & POLLOUT ? " TX" : ""));
-        }
-#endif
-        auto result = poll (cm.fds, nfds, -1);
+        // Poll file descriptors
+        //
+        DEBUG_TRACE (THIS_FILE, "Poll ", nfds, " file descriptors, timeout: ", poll_timeout);
+        auto result = poll (cm.fds, nfds, poll_timeout);
         if (result <= 0) {
-            if (result==0 || errno==EINTR)
+            // Check for errors or timeout
+            //
+            if (result<0 || poll_timeout!=FASTER_THAN_LIGHT) {
+                if (result==0 || errno==EINTR)
+                    continue;
+                uxmpp_log_error (THIS_FILE, "poll failed");
                 continue;
-            uxmpp_log_error (THIS_FILE, "poll failed");
-            continue;
+            }
         }
+
         // Check the command pipe first
         //
-        if (cm.fds[0].revents & POLLIN) {
-            cm.fds[0].revents &= ~POLLIN; // reset POLLIN result flag
+        if (cm.fds[0].revents & POLLIN)
             done = cm.dispatch_command (nfds);
-            continue;
-        }
+
+        // Check file descriptors
+        //
+        int new_timeout = WHILE_HELL_BURNS;
         for (auto i=1; i<nfds; ++i) {
-            if (cm.fds[i].revents == 0)
-                continue;
-            if (cm.fds[i].revents & POLLOUT) {
-                DEBUG_TRACE (THIS_FILE, "poll: fd ", cm.fds[i].fd, " ready for write");
-                DEBUG_TRACE (THIS_FILE, "fd ", cm.fds[i].fd, ":",
-                             (cm.fds[i].events & POLLIN ? " RX" : ""),
-                             (cm.fds[i].events & POLLOUT ? " TX" : ""));
-                //cm.fds[i].revents &= ~POLLOUT; // reset flag
-                cm.handle_poll_io (cm.fds[i], nfds, false);
+            bool have_tx = cm.fds_tx_more[i] || ((cm.fds[i].revents & POLLOUT) != 0);
+            bool have_rx = cm.fds_rx_more[i] || ((cm.fds[i].revents & POLLIN)  != 0);
+
+            if (have_tx && cm.handle_poll_io(cm.fds[i], nfds, false) == FASTER_THAN_LIGHT) {
+                cm.fds_tx_more[i] = true;
+                new_timeout = FASTER_THAN_LIGHT;
+            }else{
+                cm.fds_tx_more[i] = false;
             }
-            if (cm.fds[i].revents & POLLIN) {
-                DEBUG_TRACE (THIS_FILE, "poll: fd ", cm.fds[i].fd, " ready for read");
-                DEBUG_TRACE (THIS_FILE, "fd ", cm.fds[i].fd, ":",
-                             (cm.fds[i].events & POLLIN ? " RX" : ""),
-                             (cm.fds[i].events & POLLOUT ? " TX" : ""));
-                //cm.fds[i].revents &= ~POLLIN; // reset flag
-                cm.handle_poll_io (cm.fds[i], nfds, true);
+
+            if (have_rx && cm.handle_poll_io(cm.fds[i], nfds, true) == FASTER_THAN_LIGHT) {
+                cm.fds_rx_more[i] = true;
+                new_timeout = FASTER_THAN_LIGHT;
+            }else{
+                cm.fds_rx_more[i] = false;
             }
         }
+        poll_timeout = new_timeout;
     }
 
     delete[] cm.fds;
+    delete[] cm.fds_rx_more;
+    delete[] cm.fds_tx_more;
     cm.fds = nullptr;
+    cm.fds_rx_more = cm.fds_tx_more = nullptr;
     cm.fds_size = 0;
 
     DEBUG_TRACE (THIS_FILE, "Worker thread ending");
@@ -407,8 +418,9 @@ void ConnectionManager::run_worker (ConnectionManager& cm)
 //------------------------------------------------------------------------------
 // Called from worker thread
 //------------------------------------------------------------------------------
-void ConnectionManager::handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx)
+int ConnectionManager::handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx)
 {
+    int retval = WHILE_HELL_BURNS;
     lock_guard<mutex> lock (map_mutex);
     Connection* conn = poll_fd_map[pfd.fd];
 
@@ -423,38 +435,49 @@ void ConnectionManager::handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx)
         if (result <= 0) {
             uxmpp_log_debug (THIS_FILE, "Error sending command del_fd for fd ", cmd.fd);
         }
-        return;
+        return retval;
     }
 
     ConnectionInfo& ci = connections[conn];
     std::queue<io_operation_t>& queue = rx ? ci.rx_queue : ci.tx_queue;
+#ifdef UXMPP_IO_CONNECTIONMANAGER_DEBUG
+    if (rx)
+        uxmpp_log_trace (THIS_FILE, "RX available on ", pfd.fd, ", RX ops in queue: ", queue.size());
+    else
+        uxmpp_log_trace (THIS_FILE, "TX ready on ", pfd.fd, ", TX ops in queue: ", queue.size());
+#endif
     if (!queue.empty()) {
         io_operation_t& op = queue.front ();
-        if (op.connection->get_fd()==-1 || (op.size && op.buf==nullptr)) {
-            // Invalid file descriptor or buffer null pointer
-            op.result = -1;
-            op.errnum = op.connection->get_fd()==-1 ? EBADF : EINVAL;
-        }else if (op.size) {
-            ssize_t result;
-            if (rx)
-                result = op.connection->do_read (op.buf, op.size, op.offset, op.errnum);
-            else
-                result = op.connection->do_write (op.buf, op.size, op.offset, op.errnum);
-            if (result==-1 && op.errnum==EAGAIN)
-                return;
-            op.result = result;
-            op.errnum = errno;
+        ssize_t result;
+        size_t requested_size = op.size;
+        if (rx) {
+            result = op.connection->do_read (op.buf, op.size, op.offset, op.errnum);
+            DEBUG_TRACE (THIS_FILE, "RX result from ", pfd.fd, ": ", result);
         }else{
-            op.result = 0;
-            op.errnum = 0;
+            result = op.connection->do_write (op.buf, op.size, op.offset, op.errnum);
+            DEBUG_TRACE (THIS_FILE, "TX result from ", pfd.fd, ": ", result);
         }
+        if (result==-1 && op.errnum==EAGAIN)
+            return retval;
+
+        if (op.size>0 && (size_t)result==requested_size) {
+            // We assume there is more data to read/write
+            DEBUG_TRACE (THIS_FILE, "There are probably bytes left to ", (rx?"read":"write"));
+            retval = FASTER_THAN_LIGHT;
+        }
+        op.result = result;
+        op.errnum = errno;
+
         if (op.callback) {
             map_mutex.unlock ();
+            DEBUG_TRACE (THIS_FILE, "Call RX/TX callback");
             op.callback (*conn, op.buf, op.result, op.errnum);
             map_mutex.lock ();
         }
-        if (!queue.empty())
+        if (!queue.empty()) {
             queue.pop ();
+            DEBUG_TRACE (THIS_FILE, "Remove RX/TX op, ", queue.size(), " operations left");
+        }
     }
 
     if (queue.empty()) {
@@ -468,10 +491,13 @@ void ConnectionManager::handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx)
         cmd.conn = conn;
         auto result = ::write (cmd_pipe[pipe_tx], &cmd, sizeof(cmd));
         if (result <= 0) {
-            uxmpp_log_debug (THIS_FILE, "Error sending command add_rx");
+            uxmpp_log_error (THIS_FILE, "Error sending command add_rx");
         }
     }
+
+    return retval;
 }
+
 
 //------------------------------------------------------------------------------
 // Called from worker thread
@@ -562,6 +588,10 @@ void ConnectionManager::add_poll_fd (Connection* conn, int& nfds, bool rx)
             DEBUG_TRACE (THIS_FILE, "Found file descriptor in poll list, set ", (rx?"POLLIN":"POLLOUT"));
             fds[i].events  |=  poll_op;
             fds[i].revents &= ~poll_op;
+            if (rx)
+                fds_rx_more[i] = false;
+            else
+                fds_tx_more[i] = false;
             return;
         }
     }
@@ -581,6 +611,8 @@ void ConnectionManager::add_poll_fd (Connection* conn, int& nfds, bool rx)
     fds[nfds].fd      = conn->get_fd ();
     fds[nfds].events  = poll_op;
     fds[nfds].revents = 0;
+    fds_rx_more[nfds] = false;
+    fds_tx_more[nfds] = false;
     poll_fd_map[fds[nfds].fd] = conn;
     ++nfds;
 }
@@ -618,15 +650,10 @@ void ConnectionManager::del_poll_fd (Connection* conn, int& nfds, bool rx)
             DEBUG_TRACE (THIS_FILE, "Found file descriptor in poll list, unset ", (rx?"POLLIN":"POLLOUT"));
             fds[i].events  &= ~poll_op;
             fds[i].revents &= ~poll_op;
-/*
-            if ((fds[i].events & (POLLIN | POLLOUT)) == 0) {
-                DEBUG_TRACE (THIS_FILE, "Remove file descriptor from poll list");
-                fds[i].fd      = fds[nfds-1].fd;
-                fds[i].events  = fds[nfds-1].events;
-                fds[i].revents = fds[nfds-1].revents;
-                --nfds;
-            }
-*/
+            if (rx)
+                fds_rx_more[i] = false;
+            else
+                fds_tx_more[i] = false;
             return;
         }
     }
@@ -646,6 +673,8 @@ void ConnectionManager::del_poll_fd (int fd, int& nfds)
             fds[i].fd      = fds[nfds-1].fd;
             fds[i].events  = fds[nfds-1].events;
             fds[i].revents = fds[nfds-1].revents;
+            fds_rx_more[i] = fds_rx_more[nfds-1];
+            fds_tx_more[i] = fds_tx_more[nfds-1];
             --nfds;
             break;
         }
