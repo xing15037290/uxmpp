@@ -89,7 +89,6 @@ bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& 
     //
     if (xml_obj.get_full_name() == XmlProceedTagFull  && !session.get_socket().is_tls_enabled()) {
         uxmpp_log_info (THIS_FILE, "Restart the stream with TLS enabled");
-#if 1
         bool connected = false;
         Semaphore sem;
         string error_text;
@@ -119,17 +118,6 @@ bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& 
             session.reset ();
         }
         s.set_tls_connected_cb (nullptr);
-#else
-        string error_text;
-        if (xs.enable_tls(tls_cfg, error_text)) {
-            session.reset ();
-        }else{
-            uxmpp_log_error (THIS_FILE, "Unable to restart the stream with TLS enabled");
-            session.set_app_error ("tls-error", error_text);
-            session.stop ();
-            //changeState (SessionState::closing);
-        }
-#endif
         return true;
     }
 
