@@ -71,13 +71,8 @@ StreamError::StreamError ()
 StreamError::StreamError (XmlObject& xml_obj)
     : XmlObject ("error", xml::alias_stream, false, false, 2)
 {
-    set_error_name (xml_obj.get_nodes().empty() ? "" : xml_obj.get_nodes().begin()->get_tag_name());
-    for (auto& node : xml_obj.get_nodes()) {
-        if (node.get_tag_name() == "text") {
-            set_text (node.get_content());
-            break;
-        }
-    }
+    nodes   = xml_obj.get_nodes ();
+    content = xml_obj.get_content ();
 }
 
 
@@ -97,14 +92,9 @@ StreamError& StreamError::operator= (const XmlObject& xml_obj)
     if (&xml_obj == this)
         return *this;
 
-    XmlObject& obj = const_cast<XmlObject&> (xml_obj);
-    set_error_name (obj.get_nodes().empty() ? "": obj.get_nodes().begin()->get_tag_name());
-    for (auto& node : obj.get_nodes()) {
-        if (node.get_tag_name() == "text") {
-            set_text (node.get_content());
-            break;
-        }
-    }
+    nodes = (const_cast<XmlObject&>(xml_obj)).get_nodes ();
+    set_content (xml_obj.get_content());
+
     return *this;
 }
 
@@ -132,6 +122,23 @@ void StreamError::set_error_name (const std::string& error)
 std::string StreamError::get_error_name ()
 {
     return get_nodes().empty() ? "": get_nodes().begin()->get_tag_name();
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void StreamError::set_error_content (const std::string& content)
+{
+    if (!get_nodes().empty())
+        get_nodes().begin()->set_content (content);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string StreamError::get_error_content ()
+{
+    return get_nodes().empty() ? "" : get_nodes().begin()->get_content();
 }
 
 

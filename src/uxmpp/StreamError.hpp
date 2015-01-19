@@ -74,6 +74,16 @@ namespace uxmpp {
         std::string get_error_name ();
 
         /**
+         * Set the error content.
+         */
+        void set_error_content (const std::string& content);
+
+        /**
+         * Return the error content.
+         */
+        std::string get_error_content ();
+
+        /**
          * Set the application specific condition.
          */
         void set_app_error (const std::string& app_error, const std::string& text="");
