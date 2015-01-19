@@ -353,7 +353,7 @@ void SocketConnection::connect (const IpHostAddr& addr, const TlsConfig& tls_cfg
 
     // Connect the socket
     //
-    uxmpp_log_info (log_unit, "Connect to ", to_string(peer_addr));
+    uxmpp_log_debug (log_unit, "Connect to ", to_string(peer_addr));
     int result = ::connect (get_fd(), saddr, saddr_len);
     if (result == -1 && errno != EINPROGRESS) {
         errnum = errno;
@@ -415,10 +415,10 @@ void SocketConnection::handle_connection_result ()
             }
         }
         connected = true;
-        uxmpp_log_info (log_unit, "Connected from ",
-                        to_string(local_addr),
-                        " to ",
-                        to_string(peer_addr));
+        uxmpp_log_debug (log_unit, "Connected from ",
+                         to_string(local_addr),
+                         " to ",
+                         to_string(peer_addr));
     }
     // Notify the connection result.
     if (connected_cb)
@@ -444,7 +444,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
         return;
     }
 
-    uxmpp_log_info (log_unit, "Start TLS handshake");
+    uxmpp_log_debug (log_unit, "Start TLS handshake");
     this->tls_cfg = tls_cfg;
 
     // Initialize the SSL library
@@ -560,7 +560,7 @@ void SocketConnection::handle_tls_connection_result (Connection& c, void* p, ssi
     int err = SSL_get_error (ssl, result);
 
     if (result == 1) {
-        uxmpp_log_info (log_unit, "TLS handshake successful");
+        uxmpp_log_debug (log_unit, "TLS handshake successful");
         if (tls_connected_cb) {
             tls_enabled = true;
             tls_connected_cb (*this, 0, ""); // Yay, success :)

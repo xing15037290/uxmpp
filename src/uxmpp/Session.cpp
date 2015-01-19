@@ -182,6 +182,7 @@ void Session::run (const SessionConfig& config)
     //
     change_state (SessionState::closed);
     socket.set_connected_cb (nullptr);
+    socket.close ();
     xs.set_rx_cb (nullptr);
     stream_xml_obj.set_to ("");
     stream_xml_obj.set_from ("");
@@ -189,7 +190,7 @@ void Session::run (const SessionConfig& config)
     sess_from = "";
     jid = "";
 
-    uxmpp_log_debug (log_unit, "XMPP session ended");
+    uxmpp_log_info (log_unit, "XMPP session ended");
 }
 
 
@@ -443,7 +444,7 @@ void Session::register_module (XmppModule& module)
     }
     xmpp_modules.push_back (&module);
     module.module_registered (*this);
-    uxmpp_log_info (log_unit, string("XMPP module '") + module.get_name() + "' - registered");
+    uxmpp_log_debug (log_unit, string("XMPP module '") + module.get_name() + "' - registered");
 }
 
 
@@ -455,7 +456,7 @@ void Session::unregister_module (XmppModule& module)
         if (*i == &module) {
             xmpp_modules.erase (i);
             module.module_unregistered (*this);
-            uxmpp_log_info (log_unit, string("XMPP module '") + module.get_name() + "' - unregistered");
+            uxmpp_log_debug (log_unit, string("XMPP module '") + module.get_name() + "' - unregistered");
             return;
         }
     }
@@ -703,6 +704,7 @@ static std::vector<IpHostAddr> get_server_address_list (const SessionConfig& cfg
     std::vector<IpHostAddr> addr_list;
 
     if (!cfg.disable_srv) {
+        uxmpp_log_trace (log_unit, "Looking up host ", server, " using DNS SRV lookup");
         // Select protocol(s) to test in the SRV query
         //
         vector<AddrProto> protocols_to_test;
@@ -730,8 +732,12 @@ static std::vector<IpHostAddr> get_server_address_list (const SessionConfig& cfg
         //
         // DNS SRV failed(or not used), fallback to normal host resolution
         //
-        uxmpp_log_debug (log_unit, std::string("DNS SRV query gave no response, "
-                                                "using normal address resolution for ") + server);
+        if (cfg.disable_srv) {
+            uxmpp_log_trace (log_unit, "Looking up host ", server, " using normal address resolution");
+        }else{
+            uxmpp_log_debug (log_unit, std::string("DNS SRV query gave no response, "
+                                                   "using normal address resolution for ") + server);
+        }
         addr_list = resolver.lookup_host (server,
                                           cfg.port==0 ? 5222 : cfg.port,
                                           cfg.protocol==AddrProto::any ? AddrProto::tcp : cfg.protocol);
