@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -134,7 +134,7 @@ void DiscoModule::handle_feature_request_result (IqStanza& iq)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool DiscoModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool DiscoModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Sanity check
     //

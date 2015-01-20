@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -57,7 +57,7 @@ void XmppModule::module_unregistered (Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool XmppModule::proccess_xml_object (Session& session, XmlObject& xml_obj)
+bool XmppModule::process_xml_object (Session& session, XmlObject& xml_obj)
 {
     return false;
 }

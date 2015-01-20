@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -62,7 +62,7 @@ TlsModule::TlsModule (const uxmpp::io::TlsConfig& tls_config)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool TlsModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool TlsModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     XmlStream& xs = session.get_xml_stream ();
     bool start_tls = false;

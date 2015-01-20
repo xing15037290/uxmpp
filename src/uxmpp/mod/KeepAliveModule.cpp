@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -70,7 +70,7 @@ void KeepAliveModule::module_unregistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool KeepAliveModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool KeepAliveModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     // Check timer events
     //

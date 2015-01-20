@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -79,7 +79,7 @@ void AuthModule::module_unregistered (uxmpp::Session& session)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool AuthModule::proccess_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
+bool AuthModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject& xml_obj)
 {
     XmlStream& xs = session.get_xml_stream ();
     bool start_auth = false;

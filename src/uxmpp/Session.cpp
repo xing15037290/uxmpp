@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -285,7 +285,7 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
     bool handled = false;
     for (XmppModule* module : xmpp_modules) {
         uxmpp_log_trace (log_unit, string("Call module ") + module->get_name());
-        if (module->proccess_xml_object(*this, xml_obj)) {
+        if (module->process_xml_object(*this, xml_obj)) {
             uxmpp_log_debug (log_unit, string("XML object handled by module ") + module->get_name());
             handled = true;
             break;
@@ -512,7 +512,7 @@ void Session::set_app_error (const std::string& app_error, const std::string& te
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool Session::proccess_xml_object (Session& session, XmlObject& xml_obj)
+bool Session::process_xml_object (Session& session, XmlObject& xml_obj)
 {
     // First, check for internal error codes (or end of stream)
     //
