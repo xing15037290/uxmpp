@@ -42,6 +42,7 @@ MessageModule::MessageModule ()
     :
     uxmpp::XmppModule ("mod_message"),
     always_send_receipt {false},
+    correction_supported {true},
     sess {nullptr},
     message_handler {nullptr},
     receipt_handler {nullptr}
@@ -120,16 +121,20 @@ bool MessageModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObjec
             if (receipt_handler)
                 receipt_handler (*this, msg.get_from(), receipt.get_attribute("id"));
 
+            /*
             // The receipt should not include a message body, but if it does we
             // call the registered message handler
             if (msg.find_node("body")) {
                 if (message_handler)
                     message_handler (*this, msg);
             }
+            */
         }else{
             // Call registered message handler
-            if (message_handler)
-                message_handler (*this, msg);
+            if (message_handler) {
+                string corr_id = msg.find_node("urn:xmpp:message-correct:0:replace", true).get_attribute ("id");
+                message_handler (*this, msg, !corr_id.empty(), corr_id);
+            }
         }
 
         // Check for requested receipt (XEP-0184)
@@ -185,6 +190,16 @@ void MessageModule::send_message (const MessageStanza& msg, bool want_receipt)
         }
     }
 
+    if (correction_supported) {
+        if (!ms.get_to().is_bare()) {
+            // If we send a message to a non-bare JID, we will not
+            // be able to correct a previous message to a bare JID.
+            correctable_messages.erase (to_string(ms.get_to().bare()));
+        }
+        // Keep the last message sent to this JID.
+        correctable_messages[to_string(ms.get_to())] = ms;
+    }
+
     // Send the message
     sess->send_stanza (std::move(ms));
     return;
@@ -193,26 +208,86 @@ void MessageModule::send_message (const MessageStanza& msg, bool want_receipt)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void MessageModule::send_message (const uxmpp::Jid& to, const std::string& body, bool want_receipt)
+void MessageModule::send_message (const uxmpp::Jid& to,
+                                  const std::string& body,
+                                  bool want_receipt,
+                                  const std::string& lang)
 {
-    // Sanity check
-    //
-    if (!sess)
-        return;
-
-    MessageStanza ms (to, sess->get_jid(), body);
-    if (want_receipt)
-        ms.add_node (XmlObject("request", "urn:xmpp:receipts"));
-
-    // Send the message
-    sess->send_stanza (std::move(ms));
-    return;
+    MessageStanza ms (to, sess->get_jid(), body, MessageType::normal, ChatState::none, "", lang);
+    send_message (ms, want_receipt);
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void MessageModule::set_message_handler (std::function<void (MessageModule&, uxmpp::MessageStanza&)>
+void MessageModule::support_correction (bool supported)
+{
+    if (!supported)
+        correctable_messages.clear ();
+    correction_supported = supported;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void MessageModule::reset_correction (const uxmpp::Jid& to)
+{
+    string to_str = to_string (to);
+    if (!to.is_bare()) {
+        correctable_messages.erase (to_str);
+    }else{
+        // If 'to' is a bare JID, reset all resources for 'to'.
+        for (auto i=correctable_messages.begin(); i!=correctable_messages.end(); ++i) {
+            if (i->first.find(to_str) == 0)
+                correctable_messages.erase (i);
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool MessageModule::correct_message (const uxmpp::Jid& to, const std::string& body)
+{
+    if (!sess || !correction_supported)
+        return false;
+
+    auto iter = correctable_messages.find (to_string(to));
+    if (iter == correctable_messages.end())
+        return false;
+
+    MessageStanza& last_message = iter->second;
+
+    string lang {""};
+    if (last_message.find_node("body"))
+        lang = last_message.find_node("body").get_attribute("xml:lang");
+    last_message.set_body (body, lang);
+
+    bool replace_node_found = false;
+    for (auto& node : last_message.get_nodes()) {
+        if (node.get_full_name() == "urn:xmpp:message-correct:0:replace") {
+            node.set_attribute ("id", last_message.get_id());
+            replace_node_found = true;
+            break;
+        }
+    }
+    if (!replace_node_found) {
+        last_message.add_node (XmlObject("replace", "urn:xmpp:message-correct:0").
+                              set_attribute("id", last_message.get_id()));
+    }
+    last_message.set_id (Stanza::make_id());
+
+    sess->send_stanza (last_message);
+    return true;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void MessageModule::set_message_handler (std::function<void (MessageModule&,
+                                                             uxmpp::MessageStanza&,
+                                                             bool corr,
+                                                             const std::string& id)>
                                          on_message)
 {
     message_handler = on_message;

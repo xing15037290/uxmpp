@@ -274,29 +274,28 @@ MessageStanza& MessageStanza::set_body (const std::string& body, std::string lan
 {
     std::string configured_lang = get_attribute ("xml:lang");
     auto& nodes = get_nodes ();
+    bool have_body = false;
     for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
         if (i->get_tag_name() != "body")
             continue;
-        std::string node_lang = i->get_attribute ("xml:lang");
-        if (lang=="") {
-            if (node_lang=="" || node_lang==configured_lang) {
-                if (body == "")
-                    nodes.erase (i);
-                else
-                    i->set_content (body);
-                return *this;
-            }
-        }else{
-            if (lang==node_lang || (node_lang=="" && lang==configured_lang)) {
-                if (body == "")
-                    nodes.erase (i);
-                else
-                    i->set_content (body);
-                return *this;
-            }
+        if (body == "") {
+            nodes.erase (i);
+            continue;
         }
+        if (have_body) {
+            nodes.erase (i); // There can be only one!
+            continue;
+        }
+
+        have_body = true;
+        if (lang=="" || lang==configured_lang)
+            i->remove_attribute ("xml:lang");
+        else
+            i->set_attribute ("xml:lang", lang);
+        i->set_content (body);
     }
-    if (body != "") {
+
+    if (body!="" && !have_body) {
         XmlObject body_node ("body", xml::namespace_jabber_client, false);
         if (lang!="" && lang!=configured_lang)
             body_node.set_attribute ("xml:lang", lang);
@@ -304,16 +303,6 @@ MessageStanza& MessageStanza::set_body (const std::string& body, std::string lan
         add_node (body_node);
     }
     return *this;
-/*
-    for (auto& node : getNodes()) {
-        if (node.getName() == "body") {
-            node.setContent (body);
-            return *this;
-        }
-    }
-    addNode (XmlObject("body", XmlJabberClientNs, false).setContent(body));
-    return *this;
-*/
 }
 
 

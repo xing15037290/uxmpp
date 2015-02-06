@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/Jid.hpp>
@@ -32,6 +33,7 @@ namespace uxmpp { namespace mod {
 
     /**
      * An XMPP presence module.
+     * Supports XEP-0308 - Last Message Correction, XEP-0184 - Message Delivery Recepits.
      */
     class MessageModule : public uxmpp::XmppModule {
     public:
@@ -81,19 +83,44 @@ namespace uxmpp { namespace mod {
          * @param body The message body.
          * @param want_receipt If a recepipt is required as defined in XEP-0184.
          */
-        virtual void send_message (const uxmpp::Jid& to, const std::string& body, bool want_receipt=false);
+        virtual void send_message (const uxmpp::Jid& to,
+                                   const std::string& body,
+                                   bool want_receipt=false,
+                                   const std::string& lang="");
+
+        /**
+         * Set or disable support for Last Message Correction (XEP-0308).
+         * It is supported by default.
+         */
+        void support_correction (bool supported);
+
+        /**
+         * After this call, corrections to this JID will fail until a normal message has been sent.
+         * @param to A JID.
+         */
+        virtual void reset_correction (const uxmpp::Jid& to);
+
+        /**
+         * Try to send a correction for the last sent message.
+         * A correction can't be sent if no previous message to the recipient has been sent.
+         * @param body The corrected message body.
+         * @return <code>true</code> if a correction was sent, <code>false</code> if not.
+         */
+        virtual bool correct_message (const uxmpp::Jid& to, const std::string& body);
 
         /**
          *
          */
-        void set_message_handler (std::function<void (MessageModule&, uxmpp::MessageStanza&)> on_message);
+        void set_message_handler (std::function<void (MessageModule&,
+                                                      uxmpp::MessageStanza&,
+                                                      bool corr,
+                                                      const std::string& id)> on_message);
 
         /**
          *
          */
         void set_receipt_handler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
                                   on_receipt);
-
 
         /**
          * If true, a message receipt (XEP-0184) will always be sent even if the sender
@@ -104,9 +131,10 @@ namespace uxmpp { namespace mod {
 
 
     protected:
+        bool correction_supported;
         uxmpp::Session* sess;
-
-        std::function<void (MessageModule&, uxmpp::MessageStanza&)> message_handler;
+        std::map<std::string, uxmpp::MessageStanza> correctable_messages;
+        std::function<void (MessageModule&, uxmpp::MessageStanza&, bool corr, const std::string& id)> message_handler;
         std::function<void (MessageModule&, const uxmpp::Jid& from, const std::string& id)> receipt_handler;
     };
 

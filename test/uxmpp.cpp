@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -79,7 +79,10 @@ public:
     }
     virtual void on_presence (PresenceModule& module, uxmpp::PresenceStanza& presence);
 
-    virtual void on_message (MessageModule& module, uxmpp::MessageStanza& msg);
+    virtual void on_message (MessageModule& module,
+                             uxmpp::MessageStanza& msg,
+                             bool corr,
+                             const std::string& id);
     virtual void on_receipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id);
 
     Session           sess;
@@ -178,10 +181,16 @@ void AppLogic::on_presence (PresenceModule& module, uxmpp::PresenceStanza& prese
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void AppLogic::on_message (MessageModule& module, uxmpp::MessageStanza& msg)
+void AppLogic::on_message (MessageModule& module,
+                           uxmpp::MessageStanza& msg,
+                           bool corr,
+                           const std::string& id)
 {
     //cout << "Got message from " << to_string(msg.getFrom().bare()) << ": " << msg.getBody() << endl;
-    cout << "Got message from " << to_string(msg.get_from()) << ": " << msg.get_body() << endl;
+    if (corr)
+        cout << "Got correction from " << to_string(msg.get_from()) << ": " << msg.get_body() << endl;
+    else
+        cout << "Got message from " << to_string(msg.get_from()) << ": " << msg.get_body() << endl;
 }
 
 
@@ -213,7 +222,10 @@ void AppLogic::run ()
     mod_roster.set_roster_handler ([this](RosterModule& rm, Roster& r) { on_roster (rm, r); });
     mod_roster.set_roster_push_handler ([this](RosterModule& rm, RosterItem& ri) { on_roster_push (rm, ri); });
     mod_pr.set_presence_handler ([this](PresenceModule& pm, PresenceStanza& ps) { on_presence (pm, ps); });
-    mod_msg.set_message_handler ([this](MessageModule& mm, MessageStanza& ms) { on_message(mm, ms); });
+    mod_msg.set_message_handler ([this](MessageModule& mm,
+                                        MessageStanza& ms,
+                                        bool corr,
+                                        const std::string& id) { on_message(mm, ms, corr, id); });
     mod_msg.set_receipt_handler ([this](MessageModule& mm, const Jid& f, const string& id) { on_receipt(mm, f, id); });
 
     sess.add_session_listener (*this);
@@ -295,6 +307,7 @@ static void print_help ()
          << "| buddy-accept <index> - Accept a buddy request" << endl
          << "| buddy-del <index>    - Remove a buddy" << endl
          << "| msg <index|jid>      - Send a message to a buddy" << endl
+         << "| corr <index|jid>     - Correct the last message sent to a buddy" << endl
          << "| bn <index> <name>    - Set buddy name." << endl
          << "| get-vcard <jid>      - Get vCard for jid (empty for own vCard)." << endl
          << "| set-vcard            - Set own vCard." << endl
@@ -640,6 +653,31 @@ int main (int argc, char* argv[])
                     cout << "Send message to " << jid << ": " << msg << endl;
                     //app.mod_msg.sendMessage (MessageStanza(jid, app.sess.getJid(), msg));
                     app.mod_msg.send_message (jid, msg, true);
+                }
+            }
+        }
+        else if (cmd == "corr") {
+            pair<bool/*int-arg*/, bool/*sting-arg*/> got_arg;
+            int index {0};
+            string jid {""};
+
+            got_arg = get_int_or_string_argument ("Enter buddy index or JID: ", ss, index, jid);
+            if (got_arg.first) {
+                auto items = app.mod_roster.get_roster().get_items ();
+                if (index < 0 || (unsigned)index >= items.size()) {
+                    cout << "Invalid buddy index" << endl;
+                    continue;
+                }
+                jid = to_string (items[index].get_jid().bare());
+            }
+
+            if (jid != "") {
+                string msg {""};
+                get_string_argument ("Enter corrected message: ", ss, msg);
+                if (msg != "") {
+                    cout << "Send message to " << jid << ": " << msg << endl;
+                    //app.mod_msg.sendMessage (MessageStanza(jid, app.sess.getJid(), msg));
+                    app.mod_msg.correct_message (jid, msg);
                 }
             }
         }
