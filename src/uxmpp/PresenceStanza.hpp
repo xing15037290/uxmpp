@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -31,6 +31,7 @@ namespace uxmpp {
 
     /**
      * Presence subscription operation.
+     * Extensions implemented: XEP-0256.
      */
     enum class SubscribeOp {
         /**
@@ -75,12 +76,13 @@ namespace uxmpp {
          */
         PresenceStanza (const std::string& to="",
                         const std::string& from="",
+                        const unsigned last_active=0,
                         const std::string& id="");
 
         /**
          * Constructor.
          */
-        PresenceStanza (const Jid& to, const Jid& from, const std::string& id="");
+        PresenceStanza (const Jid& to, const Jid& from, const unsigned last_active=0, const std::string& id="");
 
         /**
          * Copy constructor.
@@ -137,8 +139,11 @@ namespace uxmpp {
          * * chat -- The entity or resource is actively interested in chatting.<br/>
          * * dnd -- The entity or resource is busy (dnd = "Do Not Disturb").<br/>
          * * xa -- The entity or resource is away for an extended period (xa = "eXtended Away").<br/>
+         * @param last_active The time in seconds since the client was active.
+         *                    If 0, this parameter isn't used.
+         *                    This parameter is only relevant for 'away' amd 'xa'.
          */
-        PresenceStanza& set_show (const std::string& content);
+        PresenceStanza& set_show (const std::string& content, const unsigned last_active=0);
 
         /**
          *
@@ -164,6 +169,11 @@ namespace uxmpp {
          *
          */
         PresenceStanza& set_priority (int prio);
+
+        /**
+         *
+         */
+        unsigned get_last_active ();
     };
 
 

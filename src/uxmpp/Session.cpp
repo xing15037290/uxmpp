@@ -374,7 +374,7 @@ void Session::del_session_listener (SessionListener& listener)
 {
     for (auto i=listeners.begin(); i!=listeners.end(); ++i) {
         if ((*i) == &listener) {
-            i = listeners.erase (i);
+            listeners.erase (i);
             uxmpp_log_trace (log_unit, "Removed session listener");
             return;
         }
@@ -454,7 +454,7 @@ void Session::unregister_module (XmppModule& module)
 {
     for (auto i=xmpp_modules.begin(); i!=xmpp_modules.end(); ++i) {
         if (*i == &module) {
-            i = xmpp_modules.erase (i);
+            xmpp_modules.erase (i);
             module.module_unregistered (*this);
             uxmpp_log_debug (log_unit, string("XMPP module '") + module.get_name() + "' - unregistered");
             return;

@@ -87,13 +87,13 @@ bool PresenceModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObje
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void PresenceModule::announce ()
+void PresenceModule::announce (const unsigned last_active)
 {
     if (!sess || sess->get_state()!=SessionState::bound) {
         uxmpp_log_trace (log_module, "Can't announce our presence, no session or session not bound");
         return;
     }
-    sess->send_stanza (PresenceStanza());
+    sess->send_stanza (PresenceStanza("", "", last_active));
 }
 
 
@@ -106,7 +106,7 @@ void PresenceModule::request_subscription (const uxmpp::Jid& jid)
         return;
     }
 
-    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", 0, Stanza::make_id()).
                        set_subscribe_op(SubscribeOp::subscribe));
 }
 
@@ -122,7 +122,7 @@ void PresenceModule::accept_subscription (const uxmpp::Jid& jid)
 
 #warning Check server for pre-approval support
 
-    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", 0, Stanza::make_id()).
                        set_subscribe_op(SubscribeOp::subscribed));
 }
 
@@ -136,7 +136,7 @@ void PresenceModule::deny_subscription (const uxmpp::Jid& jid)
         return;
     }
 
-    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", 0, Stanza::make_id()).
                        set_subscribe_op(SubscribeOp::unsubscribed));
 }
 
@@ -150,7 +150,7 @@ void PresenceModule::cancel_subscription (const uxmpp::Jid& jid)
         return;
     }
 
-    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", Stanza::make_id()).
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), "", 0, Stanza::make_id()).
                        set_subscribe_op(SubscribeOp::unsubscribe));
 }
 

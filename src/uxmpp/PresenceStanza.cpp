@@ -50,19 +50,24 @@ std::string to_string (const SubscribeOp& type)
 //------------------------------------------------------------------------------
 PresenceStanza::PresenceStanza (const std::string& to,
                                 const std::string& from,
+                                const unsigned last_active,
                                 const std::string& id)
     : Stanza (to, from, id)
 {
     set_tag_name ("presence");
+    if (last_active)
+        add_node(XmlObject("query", "jabber:iq:last").set_attribute ("seconds", std::to_string(last_active)));
 }
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-PresenceStanza::PresenceStanza (const Jid& to, const Jid& from, const std::string& id)
+PresenceStanza::PresenceStanza (const Jid& to, const Jid& from, const unsigned last_active, const std::string& id)
     : Stanza (to, from, id)
 {
     set_tag_name ("presence");
+    if (last_active)
+        add_node(XmlObject("query", "jabber:iq:last").set_attribute ("seconds", std::to_string(last_active)));
 }
 
 
@@ -136,20 +141,51 @@ std::string PresenceStanza::get_show ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-PresenceStanza& PresenceStanza::set_show (const std::string& content)
+PresenceStanza& PresenceStanza::set_show (const std::string& content, const unsigned last_active)
 {
-    auto& nodes = get_nodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+    bool show_is_set = false;
+    bool last_active_is_set = false;
+
+    auto i=nodes.begin();
+    while (i != nodes.end()) {
+        //
+        // Set 'show' element
+        //
         if (i->get_tag_name() == "show") {
-            if (content == "")
-                i = nodes.erase (i);
-            else
-                i->set_content (content);
-            return *this;
+            if (show_is_set) {
+                i = nodes.erase (i); // There can be only one !
+                continue;
+            }else{
+                if (content == "") {
+                    i = nodes.erase (i);
+                    continue;
+                }else{
+                    i->set_content (content);
+                }
+                show_is_set = true;
+            }
         }
+        //
+        // Set 'jabber:iq:last:query' element
+        //
+        if (i->get_full_name() == "jabber:iq:last:query") {
+            if (last_active) {
+                i->set_attribute ("seconds", std::to_string(last_active));
+                last_active_is_set = true;
+            }else{
+                i = nodes.erase (i);
+                continue;
+            }
+        }
+        ++i;
     }
-    if (content != "")
+
+    if (!show_is_set && content != "")
         add_node (XmlObject("show", xml::namespace_jabber_client, false).set_content(content));
+
+    if (!last_active_is_set && last_active>0)
+        add_node(XmlObject("query", "jabber:iq:last").set_attribute ("seconds", std::to_string(last_active)));
+
     return *this;
 }
 
@@ -196,27 +232,35 @@ PresenceStanza& PresenceStanza::set_status (const std::string& status, const std
 {
     std::string configured_lang = get_attribute ("xml:lang");
     auto& nodes = get_nodes ();
-    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
-        if (i->get_tag_name() != "status")
+    auto i = nodes.begin ();
+    while (i!=nodes.end()) {
+        if (i->get_tag_name() == "status") {
+            ++i;
             continue;
+        }
         std::string node_lang = i->get_attribute ("xml:lang");
         if (lang=="") {
             if (node_lang=="" || node_lang==configured_lang) {
-                if (status == "")
+                if (status == "") {
                     i = nodes.erase (i);
-                else
+                    continue;
+                }else{
                     i->set_content (status);
+                }
                 return *this;
             }
         }else{
             if (lang==node_lang || (node_lang=="" && lang==configured_lang)) {
-                if (status == "")
+                if (status == "") {
                     i = nodes.erase (i);
-                else
+                    continue;
+                }else{
                     i->set_content (status);
+                }
                 return *this;
             }
         }
+        ++i;
     }
     if (status != "") {
         XmlObject status_node ("status", xml::namespace_jabber_client, false);
@@ -261,7 +305,7 @@ PresenceStanza& PresenceStanza::set_priority (int prio)
         if (i->get_tag_name() != "priority")
             continue;
         if (prio == 0)
-            i = nodes.erase (i);
+            nodes.erase (i);
         else
             i->set_content (ss.str());
         return *this;
@@ -270,6 +314,25 @@ PresenceStanza& PresenceStanza::set_priority (int prio)
     if (prio != 0)
         add_node (XmlObject("priority", xml::namespace_jabber_client, false).set_content(ss.str()));
     return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+unsigned PresenceStanza::get_last_active ()
+{
+    unsigned retval = 0;
+    auto node = find_node ("jabber:iq:last:query", true);
+    if (node) {
+        try {
+            retval = static_cast<unsigned> (stoi(node.get_attribute("seconds")));
+        }
+        catch (...) {
+            // We treat faulty parameters as missing parameters
+            retval = 0;
+        }
+    }
+    return retval;
 }
 
 

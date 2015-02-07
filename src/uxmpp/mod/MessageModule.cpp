@@ -184,9 +184,11 @@ void MessageModule::send_message (const MessageStanza& msg, bool want_receipt)
         // Remove any receipt request
         //
         auto& nodes = ms.get_nodes ();
-        for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+        for (auto i=nodes.begin(); i!=nodes.end();) {
             if (i->get_full_name() == "urn:xmpp:receipts:request")
                 i = nodes.erase (i);
+            else
+                ++i;
         }
     }
 
@@ -237,9 +239,11 @@ void MessageModule::reset_correction (const uxmpp::Jid& to)
         correctable_messages.erase (to_str);
     }else{
         // If 'to' is a bare JID, reset all resources for 'to'.
-        for (auto i=correctable_messages.begin(); i!=correctable_messages.end(); ++i) {
+        for (auto i=correctable_messages.begin(); i!=correctable_messages.end();) {
             if (i->first.find(to_str) == 0)
                 i = correctable_messages.erase (i);
+            else
+                ++i;
         }
     }
 }

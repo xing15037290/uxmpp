@@ -421,7 +421,7 @@ void XmlInputStream::XmlParseData::start_stream_element (void* user_data,
     string xml_namespace;
     string default_namespace = "";
     string full_name = "";
-    XmlObject xml_obj (0);
+    XmlObject xml_obj;
 
     // Split the name into namespace and name
     //

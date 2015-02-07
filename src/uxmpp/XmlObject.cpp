@@ -506,7 +506,7 @@ XmlObject XmlObject::find_node (const std::string& name, bool full_name)
         if (node_name == name)
             return node;
     }
-    return XmlObject (0); // Return an empty object
+    return XmlObject (); // Return an empty object
 }
 
 
@@ -518,7 +518,7 @@ XmlObject XmlObject::find_node_by_namespace (const std::string& name_space)
         if (name_space == xml_namespace)
             return node;
     }
-    return XmlObject (0); // Return an empty object
+    return XmlObject (); // Return an empty object
 }
 
 

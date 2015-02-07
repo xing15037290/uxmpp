@@ -201,7 +201,7 @@ MessageStanza& MessageStanza::set_thread (const std::string& thread_id, const st
         if (i->get_tag_name() != "thread")
             continue;
         if (thread_id == "") {
-            i = nodes.erase (i);
+            nodes.erase (i);
         }else{
             i->set_content (thread_id);
             if (parent_thread_id == "")
@@ -277,24 +277,26 @@ MessageStanza& MessageStanza::set_body (const std::string& body, std::string lan
     std::string configured_lang = get_attribute ("xml:lang");
     auto& nodes = get_nodes ();
     bool have_body = false;
-    for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
-        if (i->get_tag_name() != "body")
-            continue;
-        if (body == "") {
-            i = nodes.erase (i);
-            continue;
-        }
-        if (have_body) {
-            i = nodes.erase (i); // There can be only one!
-            continue;
-        }
+    auto i = nodes.begin ();
+    while (i != nodes.end()) {
+        if (i->get_tag_name() == "body") {
+            if (body == "") {
+                i = nodes.erase (i);
+                continue;
+            }
+            if (have_body) {
+                i = nodes.erase (i); // There can be only one!
+                continue;
+            }
 
-        have_body = true;
-        if (lang=="" || lang==configured_lang)
-            i->remove_attribute ("xml:lang");
-        else
-            i->set_attribute ("xml:lang", lang);
-        i->set_content (body);
+            have_body = true;
+            if (lang=="" || lang==configured_lang)
+                i->remove_attribute ("xml:lang");
+            else
+                i->set_attribute ("xml:lang", lang);
+            i->set_content (body);
+        }
+        ++i;
     }
 
     if (body!="" && !have_body) {

@@ -64,8 +64,9 @@ namespace uxmpp { namespace mod {
 
         /**
          * Announce our presence.
+         * @param last_active Time in seconds since the clients last activity. Not used if 0.
          */
-        void announce ();
+        void announce (const unsigned last_active=0);
 
         /**
          * Request to subscribe to a JID's presence information.
