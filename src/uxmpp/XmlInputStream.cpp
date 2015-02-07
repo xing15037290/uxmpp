@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -50,7 +50,7 @@ using namespace std;
  */
 class XmlStreamParseElement {
 public:
-    XmlStreamParseElement (int reserved_nodes) : xml_obj(reserved_nodes) { }
+    XmlStreamParseElement () { }
 
     XmlObject xml_obj;
     string default_namespace;
@@ -352,8 +352,8 @@ void XmlInputStream::XmlParseData::start_xml_node (void* user_data,
     XmlParseData* pd = reinterpret_cast<XmlParseData*> (user_data);
     string tag_name;
     string xml_namespace;
-    XmlStreamParseElement* parent_element = pd->element_stack.empty() ? nullptr : pd->element_stack.front();
-    XmlStreamParseElement* element = new XmlStreamParseElement (parent_element ? 0 : 4);
+    //XmlStreamParseElement* parent_element = pd->element_stack.empty() ? nullptr : pd->element_stack.front();
+    XmlStreamParseElement* element = new XmlStreamParseElement ();
     XmlObject& xml_obj = element->xml_obj;
 
     // Split the full tag name into name and namespace.

@@ -715,7 +715,7 @@ int main (int argc, char* argv[])
             if (!got_arg)
                 continue;
             app.mod_priv_data.get (tag, "uxmpp:priv-data", [](Session& session,
-                                                              std::vector<uxmpp::XmlObject>& priv_data,
+                                                              std::list<uxmpp::XmlObject>& priv_data,
                                                               const std::string& stanza_id,
                                                               const std::string& error_name){
                                        cout << "Got private data: " << endl;

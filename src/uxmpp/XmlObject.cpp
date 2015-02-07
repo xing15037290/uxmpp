@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -200,12 +200,11 @@ std::string to_string (const XmlObject& xml_obj)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-XmlObject::XmlObject (int reserved_nodes)
+XmlObject::XmlObject ()
     :
     namespace_is_default {false},
     part {XmlObjPart::all}
 {
-    nodes.reserve (reserved_nodes);
 }
 
 
@@ -214,15 +213,13 @@ XmlObject::XmlObject (int reserved_nodes)
 XmlObject::XmlObject (const std::string& the_name,
                       const std::string& the_namespace,
                       const bool         set_namespace_attr,
-                      const bool         namespace_is_default,
-                      const int          reserved_nodes)
+                      const bool         namespace_is_default)
     :
     tag_name             {the_name},
     xml_namespace        {the_namespace},
     namespace_is_default {namespace_is_default},
     part                 {XmlObjPart::all}
 {
-    nodes.reserve (reserved_nodes);
     if (set_namespace_attr)
         set_default_namespace_attr (the_namespace);
 }
@@ -493,7 +490,8 @@ XmlObject& XmlObject::add_node (XmlObject&& xml_obj)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::vector<XmlObject>& XmlObject::get_nodes ()
+//std::vector<XmlObject>& XmlObject::get_nodes ()
+std::list<XmlObject>& XmlObject::get_nodes ()
 {
     return nodes;
 }

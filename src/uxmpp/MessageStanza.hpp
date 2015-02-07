@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -110,6 +110,7 @@ namespace uxmpp {
 
     /**
      * Message stanza.
+     * Implements XEP-0334 - Message Processing Hints.
      */
     class MessageStanza : public Stanza {
     public:
@@ -209,6 +210,36 @@ namespace uxmpp {
          * Return the chat state.
          */
         MessageStanza& set_chat_state (const ChatState state);
+
+        /**
+         * Look for hint 'No permanent storage' as defined in XEP-0334.
+         */
+        bool no_permanent_storage ();
+
+        /**
+         * Set of disable hint 'No permanent storage' as defined in XEP-0334.
+         */
+        MessageStanza& no_permanent_storage (bool enable_no_permanent_storage);
+
+        /**
+         * Look for hint 'No store' as defined in XEP-0334.
+         */
+        bool no_store ();
+
+        /**
+         * Set of disable hint 'No store' as defined in XEP-0334.
+         */
+        MessageStanza& no_store (bool enable_no_storage);
+
+        /**
+         * Look for hint 'No copy' as defined in XEP-0334.
+         */
+        bool no_copy ();
+
+        /**
+         * Set of disable hint 'No copy' as defined in XEP-0334.
+         */
+        MessageStanza& no_copy (bool enable_no_copy);
     };
 
 

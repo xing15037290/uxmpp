@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -34,7 +34,7 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem ()
-    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true)
 {
 }
 
@@ -42,7 +42,7 @@ RosterItem::RosterItem ()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle)
-    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true)
 {
     std::string strjid = to_string (jid);
     if (!strjid.empty())
@@ -55,7 +55,7 @@ RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem (const uxmpp::Jid& jid, const std::vector<std::string>& groups)
-    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true)
 {
     std::string strjid = to_string (jid);
     if (!strjid.empty())
@@ -68,7 +68,7 @@ RosterItem::RosterItem (const uxmpp::Jid& jid, const std::vector<std::string>& g
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 RosterItem::RosterItem (const uxmpp::Jid& jid, const std::string& handle, const std::vector<std::string>& groups)
-    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true, 1)
+    : uxmpp::XmlObject ("item", xml::namespace_iq_roster, false, true)
 {
     std::string strjid = to_string (jid);
     if (!strjid.empty())

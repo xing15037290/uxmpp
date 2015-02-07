@@ -294,7 +294,7 @@ void RosterModule::roster_set (const RosterItem& item, bool remove)
     // Send the stanza
     //
     sess->send_stanza (IqStanza(IqType::set, "", to_string(sess->get_jid()), (remove?"itemremove":"itemupdate")).
-                       add_node(XmlObject("query", "jabber:iq:roster", true, true, 1).
+                       add_node(XmlObject("query", "jabber:iq:roster", true, true).
                                 add_node(roster_item)));
 }
 

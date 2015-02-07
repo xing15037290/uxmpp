@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -34,7 +34,7 @@ using namespace uxmpp;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Roster::Roster (const std::string& version)
-    : uxmpp::XmlObject ("query", xml::namespace_iq_roster, true, true, 1)
+    : uxmpp::XmlObject ("query", xml::namespace_iq_roster, true, true)
 {
     if (!version.empty())
         set_attribute ("ver", version);

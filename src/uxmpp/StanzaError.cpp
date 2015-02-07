@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -68,7 +68,7 @@ static const std::string text_full_xml_name {"urn:ietf:params:xml:ns:xmpp-stanza
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StanzaError::StanzaError (const std::string& type, const std::string& condition, const std::string& text)
-    : XmlObject ("error", xml::namespace_jabber_client, false, true, 1)
+    : XmlObject ("error", xml::namespace_jabber_client, false, true)
 {
     set_type (type);
     set_condition (condition);

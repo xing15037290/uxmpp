@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -95,7 +95,8 @@ MessageStanza::MessageStanza (const std::string& to,
     : Stanza (to, from, id)
 {
     set_tag_name ("message");
-    set_message_type (type);
+    if (type != MessageType::normal)
+        set_message_type (type);
     set_chat_state (chat_state);
     set_body (body, lang);
 }
@@ -113,7 +114,8 @@ MessageStanza::MessageStanza (const Jid&         to,
     : Stanza (to, from, id)
 {
     set_tag_name ("message");
-    set_message_type (type);
+    if (type != MessageType::normal)
+        set_message_type (type);
     set_chat_state (chat_state);
     set_body (body, lang);
 }
@@ -344,6 +346,83 @@ MessageStanza& MessageStanza::set_chat_state (const ChatState state)
     // No xml object found, add it.
     //
     add_node (XmlObject(to_string(state), ChatStateNs));
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool MessageStanza::no_permanent_storage ()
+{
+    return find_node("urn:xmpp:hints:no-permanent-storage", true) == true;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza& MessageStanza::no_permanent_storage (bool enable_no_permanent_storage)
+{
+    if (enable_no_permanent_storage) {
+        if (!no_permanent_storage())
+            add_node (XmlObject("no-permanent-storage", "urn:xmpp:hints"));
+    }else{
+        for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+            if (i->get_full_name() == "urn:xmpp:hints:no-permanent-storage")
+                i = nodes.erase (i);
+        }
+    }
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool MessageStanza::no_store ()
+{
+    return find_node("urn:xmpp:hints:no-store", true) == true;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza& MessageStanza::no_store (bool enable_no_store)
+{
+    if (enable_no_store) {
+        if (!no_store())
+            add_node (XmlObject("no-store", "urn:xmpp:hints"));
+    }else{
+        for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+            if (i->get_full_name() == "urn:xmpp:hints:no-store") {
+                uxmpp_log_fatal ("no-store", "node removed");
+                i = nodes.erase (i);
+            }
+        }
+    }
+    return *this;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+bool MessageStanza::no_copy ()
+{
+    return find_node("urn:xmpp:hints:no-copy", true) == true;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+MessageStanza& MessageStanza::no_copy (bool enable_no_copy)
+{
+    if (enable_no_copy) {
+        if (!no_copy())
+            add_node (XmlObject("no-copy", "urn:xmpp:hints"));
+    }else{
+        for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
+            if (i->get_full_name() == "urn:xmpp:hints:no-copy")
+                i = nodes.erase (i);
+        }
+    }
     return *this;
 }
 

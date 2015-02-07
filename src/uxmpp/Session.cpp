@@ -326,7 +326,7 @@ void Session::on_rx_xml_obj (XmlStream& stream, XmlObject& xml_obj)
         for (auto& feature : features) {
             if (feature.get_tag_name() == xml::tag_bind) {
                 IqStanza iq (IqType::set, "", "", "b#1");
-                XmlObject bind_node (xml::tag_bind, xml::namespace_bind, true, true, 1);
+                XmlObject bind_node (xml::tag_bind, xml::namespace_bind, true, true);
                 if (!cfg.resource.empty()) {
                     bind_node.add_node (XmlObject("resource", xml::namespace_bind, false).set_content(cfg.resource));
                 }

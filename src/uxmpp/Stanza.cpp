@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -38,7 +38,7 @@ std::function<std::string (void)> Stanza::make_id = make_uuid_v4;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Stanza::Stanza (const std::string& to, const std::string& from, const std::string& id)
-    : XmlObject ("", xml::namespace_jabber_client, false, true, 1)
+    : XmlObject ("", xml::namespace_jabber_client, false, true)
 {
     if (!to.empty())
         set_attribute ("to", to);
@@ -52,7 +52,7 @@ Stanza::Stanza (const std::string& to, const std::string& from, const std::strin
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Stanza::Stanza (const Jid& to, const Jid& from, const std::string& id)
-    : XmlObject ("", xml::namespace_jabber_client, false, true, 1)
+    : XmlObject ("", xml::namespace_jabber_client, false, true)
 {
     set_to (to);
     set_from (from);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -22,6 +22,7 @@
 #include <uxmpp/types.hpp>
 #include <string>
 #include <vector>
+#include <list>
 //#include <map>
 #include <unordered_map>
 
@@ -59,12 +60,8 @@ namespace uxmpp {
          * This will create an empty nameless XML object that will be
          * treated as a false value in boolean expressions and as an
          * empty string when represented as a string.
-         * @param reserved_nodes The number of reserved child nodes for the XML object.
-         *                       If it is known at creation time how may child nodes
-         *                       that will be added to the XML object this can be used
-         *                       to optimize memory allocation a bit.
          */
-        XmlObject (int reserved_nodes=4);
+        XmlObject ();
 
         /**
          * Constructor.
@@ -89,16 +86,11 @@ namespace uxmpp {
          *                             as a string. If the namespace is the default namespace
          *                             it won't be printed as part of the XML tag. But if it
          *                             isn't, it will be printed like: <namespace:name ...
-         * @param reserved_nodes The number of reserved child nodes for the XML object.
-         *                       If it is known at creation time how may child nodes
-         *                       that will be added to the XML object this can be used
-         *                       to optimize memory allocation a bit.
          */
         XmlObject (const std::string& tag_name,
                    const std::string& xml_namespace="",
                    const bool         set_namespace_attr=true,
-                   const bool         namespace_is_default=true,
-                   const int          reserved_nodes=0);
+                   const bool         namespace_is_default=true);
 
         /**
          * Copy constructor.
@@ -326,7 +318,8 @@ namespace uxmpp {
          * Return all child nodes.
          * @return A reference to the list of all child elements.
          */
-        std::vector<XmlObject>& get_nodes ();
+        //std::vector<XmlObject>& get_nodes ();
+        std::list<XmlObject>& get_nodes ();
 
         /**
          * Return the first child node with a given name.
@@ -429,7 +422,8 @@ namespace uxmpp {
         /**
          * A list of child XML objects.
          */
-        std::vector<XmlObject> nodes;
+        //std::vector<XmlObject> nodes;
+        std::list<XmlObject> nodes;
 
         /**
          * The content of the XML object.

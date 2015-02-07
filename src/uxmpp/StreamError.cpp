@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -61,7 +61,7 @@ const std::string StreamError::unsupported_version      {"unsupported-version"};
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError ()
-    : XmlObject ("error", xml::alias_stream, false, false, 2)
+    : XmlObject ("error", xml::alias_stream, false, false)
 {
 }
 
@@ -69,7 +69,7 @@ StreamError::StreamError ()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError (XmlObject& xml_obj)
-    : XmlObject ("error", xml::alias_stream, false, false, 2)
+    : XmlObject ("error", xml::alias_stream, false, false)
 {
     nodes   = xml_obj.get_nodes ();
     content = xml_obj.get_content ();
@@ -79,7 +79,7 @@ StreamError::StreamError (XmlObject& xml_obj)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 StreamError::StreamError (const std::string& error)
-    : XmlObject ("error", xml::alias_stream, false, false, 2)
+    : XmlObject ("error", xml::alias_stream, false, false)
 {
     set_error_name (error);
 }
@@ -156,10 +156,9 @@ void StreamError::set_app_error (const std::string& app_error, const std::string
 //------------------------------------------------------------------------------
 std::string StreamError::get_app_error ()
 {
-    auto& nodes = get_nodes ();
-    for (unsigned i=1; i<nodes.size(); ++i) {
-        if (nodes[i].get_tag_name() != "text")
-            return nodes[i].get_tag_name ();
+    for (auto& node : get_nodes()) {
+        if (node.get_tag_name() != "text")
+            return node.get_tag_name ();
     }
     return "";
 }
