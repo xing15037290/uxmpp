@@ -163,7 +163,7 @@ void RosterModule::handle_roster_push (RosterItem& item)
             roster_updated = true;
             // Check if the item is removed
             if (item.get_subscription() == "remove") {
-                items.erase (i);
+                i = items.erase (i);
                 uxmpp_log_debug (THIS_FILE, "Roster item removed");
             }else{
                 (*i) = item;

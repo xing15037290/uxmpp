@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -142,7 +142,7 @@ PresenceStanza& PresenceStanza::set_show (const std::string& content)
     for (auto i=nodes.begin(); i!=nodes.end(); ++i) {
         if (i->get_tag_name() == "show") {
             if (content == "")
-                nodes.erase (i);
+                i = nodes.erase (i);
             else
                 i->set_content (content);
             return *this;
@@ -203,7 +203,7 @@ PresenceStanza& PresenceStanza::set_status (const std::string& status, const std
         if (lang=="") {
             if (node_lang=="" || node_lang==configured_lang) {
                 if (status == "")
-                    nodes.erase (i);
+                    i = nodes.erase (i);
                 else
                     i->set_content (status);
                 return *this;
@@ -211,7 +211,7 @@ PresenceStanza& PresenceStanza::set_status (const std::string& status, const std
         }else{
             if (lang==node_lang || (node_lang=="" && lang==configured_lang)) {
                 if (status == "")
-                    nodes.erase (i);
+                    i = nodes.erase (i);
                 else
                     i->set_content (status);
                 return *this;
@@ -261,7 +261,7 @@ PresenceStanza& PresenceStanza::set_priority (int prio)
         if (i->get_tag_name() != "priority")
             continue;
         if (prio == 0)
-            nodes.erase (i);
+            i = nodes.erase (i);
         else
             i->set_content (ss.str());
         return *this;

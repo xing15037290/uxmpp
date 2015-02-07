@@ -201,7 +201,7 @@ MessageStanza& MessageStanza::set_thread (const std::string& thread_id, const st
         if (i->get_tag_name() != "thread")
             continue;
         if (thread_id == "") {
-            nodes.erase (i);
+            i = nodes.erase (i);
         }else{
             i->set_content (thread_id);
             if (parent_thread_id == "")
@@ -281,11 +281,11 @@ MessageStanza& MessageStanza::set_body (const std::string& body, std::string lan
         if (i->get_tag_name() != "body")
             continue;
         if (body == "") {
-            nodes.erase (i);
+            i = nodes.erase (i);
             continue;
         }
         if (have_body) {
-            nodes.erase (i); // There can be only one!
+            i = nodes.erase (i); // There can be only one!
             continue;
         }
 
