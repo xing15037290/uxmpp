@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -21,6 +21,7 @@
 
 #include <uxmpp/types.hpp>
 #include <string>
+#include <array>
 
 
 namespace uxmpp {
@@ -72,6 +73,26 @@ namespace uxmpp {
      * Return the number of processor cores.
      */
     unsigned get_num_cores ();
+
+    /**
+     *
+     */
+    std::array<unsigned char, 20> get_sha1 (const void* buf, const size_t size);
+
+    /**
+     *
+     */
+    std::array<unsigned char, 20> get_sha1 (const std::string data);
+
+    /**
+     *
+     */
+    std::string get_sha1_str (const void* buf, const size_t size);
+
+    /**
+     *
+     */
+    std::string get_sha1_str (const std::string data);
 }
 
 

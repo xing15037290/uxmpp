@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -34,6 +34,7 @@ namespace uxmpp {
 
 #include <uxmpp/uxmpp_config.hpp>
 #include <uxmpp/types.hpp>
+#include <uxmpp/utils.hpp>
 #include <uxmpp/UxmppException.hpp>
 #include <uxmpp/Logger.hpp>
 

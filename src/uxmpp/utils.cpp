@@ -1,3 +1,21 @@
+/*
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
+ *
+ *  This file is part of uxmpp.
+ *
+ *  uxmpp is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include <uxmpp/utils.hpp>
 #include <uxmpp/Logger.hpp>
 
@@ -11,6 +29,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include <openssl/sha.h>
 
 UXMPP_START_NAMESPACE1(uxmpp)
 
@@ -232,6 +251,52 @@ unsigned long get_thread_id ()
 unsigned get_num_cores ()
 {
     return std::thread::hardware_concurrency ();
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::array<unsigned char, 20> get_sha1 (const void* buf, const size_t size)
+{
+    SHA_CTX ctx;
+    std::array<unsigned char, 20> md; // 160 bits
+
+    SHA1_Init   (&ctx);
+    SHA1_Update (&ctx, buf, buf==nullptr ? 0 : size);
+    SHA1_Final  (md.data(), &ctx);
+
+    return std::move (md);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::array<unsigned char, 20> get_sha1 (const std::string data)
+{
+    return get_sha1 (data.c_str(), data.length());
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string get_sha1_str (const void* buf, const size_t size)
+{
+    static const array<char, 16> hexcode {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+    string str;
+    str.reserve (40); // We know that the resulting string will be 40 caracters long
+    for (auto ch: get_sha1(buf, size)) {
+        str.push_back (hexcode[ch >> 4]);
+        str.push_back (hexcode[ch & 0x0f]);
+    }
+    return std::move (str);
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string get_sha1_str (const std::string data)
+{
+    return get_sha1_str (data.c_str(), data.length());
 }
 
 
