@@ -31,6 +31,7 @@
 #include <uxmpp/io/SocketConnection.hpp>
 
 #include <string>
+#include <list>
 
 
 namespace uxmpp {
@@ -154,7 +155,7 @@ namespace uxmpp {
         /**
          * Get the list of pointers to registered XMPP modules.
          */
-        std::vector<XmppModule*>& get_modules ();
+        std::list<XmppModule*>& get_modules ();
 
         /**
          * Return a reference to the underlaying XML stream.
@@ -164,7 +165,7 @@ namespace uxmpp {
         /**
          * Get the server features.
          */
-        std::vector<XmlObject>& get_features ();
+        std::list<XmlObject>& get_features ();
 
         /**
          * Reset the XML stream and re-send a new XML 'stream' start tag.
@@ -225,12 +226,12 @@ namespace uxmpp {
         /**
          * Stream features.
          */
-        std::vector<XmlObject> features;
+        std::list<XmlObject> features;
 
         /**
          * A list of event listeners.
          */
-        std::vector<SessionListener*> listeners;
+        std::list<SessionListener*> listeners;
 
         /**
          * An object to hold an eventual stream error.
@@ -250,7 +251,7 @@ namespace uxmpp {
         /**
          * Registered XMPP modules.
          */
-        std::vector<XmppModule*> xmpp_modules;
+        std::list<XmppModule*> xmpp_modules;
 
         /**
          * Called whan an XML object is received.

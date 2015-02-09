@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -27,7 +27,7 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void SessionListener::on_features (Session& session, std::vector<XmlObject>& features)
+void SessionListener::on_features (Session& session, std::list<XmlObject>& features)
 {
 }
 

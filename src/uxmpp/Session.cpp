@@ -468,7 +468,7 @@ void Session::unregister_module (XmppModule& module)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::vector<XmppModule*>& Session::get_modules ()
+std::list<XmppModule*>& Session::get_modules ()
 {
     return xmpp_modules;
 }
@@ -484,7 +484,7 @@ XmlStream& Session::get_xml_stream ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::vector<XmlObject>& Session::get_features ()
+std::list<XmlObject>& Session::get_features ()
 {
     return features;
 }

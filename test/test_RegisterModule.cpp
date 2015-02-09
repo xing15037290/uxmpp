@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -54,7 +54,7 @@ public:
     virtual ~AppLogic () = default;
 
     virtual void on_state_change (Session& session, SessionState new_state, SessionState old_state);
-    virtual void on_features (Session& session, std::vector<XmlObject>& features);
+    virtual void on_features (Session& session, std::list<XmlObject>& features);
 
     void print_status ();
     void run ();
@@ -167,7 +167,7 @@ void AppLogic::on_state_change (Session& session, SessionState new_state, Sessio
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void AppLogic::on_features (Session& session, std::vector<XmlObject>& features)
+void AppLogic::on_features (Session& session, std::list<XmlObject>& features)
 {
 /*
     bool got_register {false};

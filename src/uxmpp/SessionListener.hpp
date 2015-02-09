@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -57,7 +57,7 @@ namespace uxmpp {
         /**
          * Called when feature list updated.
          */
-        virtual void on_features (Session& session, std::vector<XmlObject>& features);
+        virtual void on_features (Session& session, std::list<XmlObject>& features);
     };
 
 
