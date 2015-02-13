@@ -110,22 +110,23 @@ bool RosterModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject
             // Check for roster query push
             //
             XmlObject query = iq.find_node ("jabber:iq:roster:query", true);
-            //XmlObject node = iq.find_node ("jabber:iq:roster", true);
             XmlObject item = query.find_node ("jabber:iq:roster:item", true);
             if (query && item) {
                 //
                 // Check 'from' (RFC 6121, section 2.1.6)
                 //
-                if (to_string(iq.get_from()).empty()!=false &&
+                if (to_string(iq.get_from()).empty()==false &&
                     iq.get_from().bare() != sess->get_jid().bare())
                 {
                     uxmpp_log_info (THIS_FILE, "Got roster push with faulty 'from' attribute: ",
-                                    to_string(query, true));
-                    // Return an empty result stanza
-                    sess->send_stanza (IqStanza(IqType::result,
+                                    to_string(iq, true));
+                    // Return an error stanza
+                    sess->send_stanza (IqStanza(IqType::error,
                                                 "",
                                                 to_string(sess->get_jid()),
-                                                iq.get_id()));
+                                                iq.get_id()).
+                                       add_node(StanzaError(StanzaError::type_modify,
+                                                            StanzaError::not_acceptable)));
                     return true;
                 }
 
