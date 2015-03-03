@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -44,7 +44,7 @@ public:
     /**
      * Destructor.
      */
-    ~ConnectionManager ();
+    virtual ~ConnectionManager ();
 
     /**
      * Disabled copy constructor.
@@ -108,15 +108,24 @@ private:
     public:
         std::queue<io_operation_t> rx_queue;
         std::queue<io_operation_t> tx_queue;
+        // Flag to see if I/O operations have been cancelled from a callback
+        bool cancel_in_callback;
     };
 
+    // This is a singleton
     ConnectionManager () throw (IoException);
     static ConnectionManager* instance;
 
+    // Map a connection pointer to a ConnectionInfo object
     std::map<Connection*, ConnectionInfo> connections;
+
+    // Map a file dscriptor to a Connection pointer
     std::map<int, Connection*> poll_fd_map;
+
+    // Protect the above maps
     std::mutex map_mutex;
 
+    // Worker thread
     std::thread worker;
 
     static void run_worker (ConnectionManager& cm);
@@ -126,6 +135,7 @@ private:
     void del_poll_fd (Connection* conn, int& nfds, bool rx);
     void del_poll_fd (int fd, int& nfds);
 
+    // Internal file descriptor command handling
     int cmd_pipe[2];
     struct pollfd* fds;
     bool*          fds_tx_more;

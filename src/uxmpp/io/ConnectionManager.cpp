@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -323,6 +323,10 @@ void ConnectionManager::cancel (Connection& conn)
     while (!ci.tx_queue.empty())
         ci.tx_queue.pop ();
 
+    // Let method 'handle_poll_io' know that a
+    // callback have cancelled I/O operations
+    ci.cancel_in_callback = true;
+
     // Remove the file descripto from the poll list
     //
     DEBUG_TRACE (THIS_FILE, "Remove file descriptor " , conn.get_fd(), " from poll list");
@@ -469,12 +473,13 @@ int ConnectionManager::handle_poll_io  (struct pollfd& pfd, int& nfds, bool rx)
         op.errnum = errno;
 
         if (op.callback) {
+            ci.cancel_in_callback = false;
             map_mutex.unlock ();
             DEBUG_TRACE (THIS_FILE, "Call RX/TX callback");
             op.callback (*conn, op.buf, op.result, op.errnum);
             map_mutex.lock ();
         }
-        if (!queue.empty()) {
+        if (!queue.empty() && !ci.cancel_in_callback/*don't pop if queue was cancelled*/) {
             queue.pop ();
             DEBUG_TRACE (THIS_FILE, "Remove RX/TX op, ", queue.size(), " operations left");
         }
