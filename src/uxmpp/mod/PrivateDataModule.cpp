@@ -212,7 +212,7 @@ bool PrivateDataModule::handle_get_result (const std::string& id, uxmpp::IqStanz
     priv_data_get_callback_t cb = get_ids[id].second;
     get_ids.erase (id);
     string error_cond {""};
-    std::list<uxmpp::XmlObject> priv_data;
+    std::vector<uxmpp::XmlObject> priv_data;
 
     if (iq_result.get_type() == IqType::result) {
         // Ok

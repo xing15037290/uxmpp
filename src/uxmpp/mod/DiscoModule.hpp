@@ -87,7 +87,7 @@ namespace uxmpp { namespace mod {
          * @param jid The JID where to send the query.
          * @param query_id An optional identifier for the query. If not given,
          *                 <code>uxmpp::Stanza::makeId()</code> will be used.
-         *                 The identifier should be unique.
+         *                 The identifier must be unique.
          */
         std::string query_info (const uxmpp::Jid& jid, const std::string& query_id="");
 
@@ -99,6 +99,7 @@ namespace uxmpp { namespace mod {
 
         std::vector<DiscoIdentity> server_identities; /**< The server identities. */
         std::vector<std::string> server_features;     /**< The server features. */
+        std::vector<std::string> server_items;       /**< The server itemd. */
         uxmpp::XmlObject server_info_query_result;    /**< The xmlobject returned when querying server features. */
 
         std::set<std::string> query_ids; /**< A set of id strings of sent stanzas. */

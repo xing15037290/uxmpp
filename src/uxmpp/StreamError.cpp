@@ -156,9 +156,10 @@ void StreamError::set_app_error (const std::string& app_error, const std::string
 //------------------------------------------------------------------------------
 std::string StreamError::get_app_error ()
 {
-    for (auto& node : get_nodes()) {
-        if (node.get_tag_name() != "text")
-            return node.get_tag_name ();
+    auto& nodes = get_nodes ();
+    for (unsigned i=1; i<nodes.size(); ++i) {
+        if (nodes[i].get_tag_name() != "text")
+            return nodes[i].get_tag_name ();
     }
     return "";
 }

@@ -22,7 +22,7 @@
 #include <uxmpp/types.hpp>
 #include <uxmpp/SessionState.hpp>
 #include <uxmpp/XmlObject.hpp>
-#include <vector>
+#include <list>
 
 
 namespace uxmpp {

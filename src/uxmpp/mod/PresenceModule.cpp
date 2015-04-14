@@ -99,6 +99,20 @@ void PresenceModule::announce (const unsigned last_active)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+void PresenceModule::probe (const uxmpp::Jid& jid)
+{
+    if (!sess || sess->get_state()!=SessionState::bound) {
+        uxmpp_log_debug (log_module, "Can't send presence probe, no session or session not bound");
+        return;
+    }
+
+    sess->send_stanza (PresenceStanza(to_string(jid.bare()), sess->get_jid().bare(), 0, Stanza::make_id()).
+                       set_attribute("type", "probe"));
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void PresenceModule::request_subscription (const uxmpp::Jid& jid)
 {
     if (!sess || sess->get_state()!=SessionState::bound) {

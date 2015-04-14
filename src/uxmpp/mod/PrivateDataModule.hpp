@@ -62,7 +62,7 @@ namespace uxmpp { namespace mod {
          *                   <code>error_code</code> is non-zero.
          */
         typedef std::function<void (Session& session,
-                                    std::list<uxmpp::XmlObject>& priv_data,
+                                    std::vector<uxmpp::XmlObject>& priv_data,
                                     const std::string& stanza_id,
                                     const std::string& error_cond)> priv_data_get_callback_t;
 

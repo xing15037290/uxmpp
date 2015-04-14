@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+# Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
 #
 # This file is part of uxmpp.
 #

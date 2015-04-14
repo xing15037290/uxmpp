@@ -69,6 +69,12 @@ namespace uxmpp { namespace mod {
         void announce (const unsigned last_active=0);
 
         /**
+         * Request 'probe' a contact's presence informaion.
+         * @param jid The bare JID of the contect to probe.
+         */
+        void probe (const uxmpp::Jid& jid);
+
+        /**
          * Request to subscribe to a JID's presence information.
          * This vill send a presence stanza with the type 'subscribe'.
          */

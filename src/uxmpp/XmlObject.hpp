@@ -22,8 +22,6 @@
 #include <uxmpp/types.hpp>
 #include <string>
 #include <vector>
-#include <list>
-//#include <map>
 #include <unordered_map>
 
 
@@ -318,8 +316,7 @@ namespace uxmpp {
          * Return all child nodes.
          * @return A reference to the list of all child elements.
          */
-        //std::vector<XmlObject>& get_nodes ();
-        std::list<XmlObject>& get_nodes ();
+        std::vector<XmlObject>& get_nodes ();
 
         /**
          * Return the first child node with a given name.
@@ -422,8 +419,7 @@ namespace uxmpp {
         /**
          * A list of child XML objects.
          */
-        //std::vector<XmlObject> nodes;
-        std::list<XmlObject> nodes;
+        std::vector<XmlObject> nodes;
 
         /**
          * The content of the XML object.

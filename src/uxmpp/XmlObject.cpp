@@ -490,8 +490,7 @@ XmlObject& XmlObject::add_node (XmlObject&& xml_obj)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-//std::vector<XmlObject>& XmlObject::get_nodes ()
-std::list<XmlObject>& XmlObject::get_nodes ()
+std::vector<XmlObject>& XmlObject::get_nodes ()
 {
     return nodes;
 }

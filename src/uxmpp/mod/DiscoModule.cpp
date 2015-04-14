@@ -128,6 +128,13 @@ void DiscoModule::handle_feature_request_result (IqStanza& iq)
                 uxmpp_log_trace (THIS_FILE, "Added feature ", feature);
             }
         }
+/*
+        else if (xml_obj.get_tag_name() == "item") {
+                server_features.push_back (xml_obj);
+                uxmpp_log_trace (THIS_FILE, "Added item ", to_string(xml_obj));
+            }
+        }
+*/
     }
 }
 
@@ -172,9 +179,12 @@ bool DiscoModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
         return true;
     }
 
-    // Check for incoming info request
+    // Check for incoming info request/response
     //
     if (iq.get_type() == IqType::get) {
+        XmlObject query = iq.find_node (XmlDiscoInfoQueryTagFull, true);
+        if (query) {
+        }
     }else{
         //
         // Check for result

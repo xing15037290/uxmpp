@@ -316,6 +316,7 @@ static void print_help ()
          << "| pr-subscribe <jid>   - Request presence subscription" << endl
          << "| pr-accept <index>    - Accept presence subscription" << endl
          << "| pr-deny <index>      - Deny presence subscription" << endl
+         << "| pr-probe <index>     - Probe presence information" << endl
          << "|" << endl
          << "+----- Roster (low level) ------------------------------------------" << endl
          << "| r-add <jid>          - Add a roster item" << endl
@@ -625,6 +626,25 @@ int main (int argc, char* argv[])
             }
             app.mod_pr.deny_subscription (items[index].get_jid().bare());
         }
+        //
+        // Command 'pr-probe' - Probe presence information
+        //
+        else if (cmd == "pr-probe") {
+            int index;
+            bool got_arg;
+
+            got_arg = get_int_argument ("Enter buddy index: ", ss, index);
+            if (!got_arg || index<0) {
+                cout << "Invalid buddy index" << endl;
+                continue;
+            }
+            auto items = app.mod_roster.get_roster().get_items ();
+            if ((unsigned)index >= items.size()) {
+                cout << "Invalid buddy index" << endl;
+                continue;
+            }
+            app.mod_pr.probe (items[index].get_jid().bare());
+        }
         else if (cmd == "buddy-add") {
         }
         else if (cmd == "buddy-accept") {
@@ -715,7 +735,7 @@ int main (int argc, char* argv[])
             if (!got_arg)
                 continue;
             app.mod_priv_data.get (tag, "uxmpp:priv-data", [](Session& session,
-                                                              std::list<uxmpp::XmlObject>& priv_data,
+                                                              std::vector<uxmpp::XmlObject>& priv_data,
                                                               const std::string& stanza_id,
                                                               const std::string& error_name){
                                        cout << "Got private data: " << endl;
