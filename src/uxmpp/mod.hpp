@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014,2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -49,5 +49,7 @@ namespace uxmpp {
 #include <uxmpp/mod/SearchModule.hpp>
 #include <uxmpp/mod/VcardModule.hpp>
 #include <uxmpp/mod/IBBModule.hpp>
+#include <uxmpp/mod/PepModule.hpp>
+#include <uxmpp/mod/PubSubModule.hpp>
 
 #endif
