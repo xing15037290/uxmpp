@@ -204,5 +204,60 @@ void Stanza::set_error (const StanzaError& error)
 }
 
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Stanza::set_delay (const std::string& from, const std::string& stamp, const std::string& reason)
+{
+    auto i=nodes.begin();
+    while (i != nodes.end()) {
+        if (i->get_full_name() != "urn:xmpp:delay:delay") {
+            ++i;
+            continue;            // This isn't the droid we're looking for
+        }
+        if (stamp == "")
+            i = nodes.erase (i); // Remove delay node
+        else
+            break;               // Found delay node
+    }
+    if (stamp == "")
+        return;
+
+    if (i != nodes.end()) {
+        i->set_attribute ("from", from);
+        i->set_attribute ("stamp", stamp);
+        i->set_content (reason);
+    }else{
+        add_node (XmlObject("delay", "urn:xmpp:delay")
+                  .set_attribute("from", from)
+                  .set_attribute("stamp", stamp)
+                  .set_content(reason));
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string Stanza::get_delay_from ()
+{
+    return find_node("urn:xmpp:delay:delay", true).get_attribute ("from");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string Stanza::get_delay_stamp ()
+{
+    return find_node("urn:xmpp:delay:delay", true).get_attribute ("stamp");
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+std::string Stanza::get_delay_reason ()
+{
+    return find_node("urn:xmpp:delay:delay", true).get_content ();
+}
+
+
 
 UXMPP_END_NAMESPACE1

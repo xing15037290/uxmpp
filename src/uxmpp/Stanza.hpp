@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -125,6 +125,42 @@ namespace uxmpp {
          * Set a stanza error.
          */
         void set_error (const StanzaError& error);
+
+        /**
+         * Set a delay child node as described in XEP-0203.
+         * To remove the delay node, set parameter 'stamp' to an empty string.
+         * @param from The Jabber ID of the entity that originally
+         *             sent the XML stanza or that delayed the
+         *             delivery of the stanza.
+         * @param stamp The time stamp that the stanza was originally
+         *              sent. The timstamp must be of the DateTime
+         *              format as described in XEP-0082.
+         *              If an empty string, the delay node is removed.
+         * @param reason Optional reason of the delay.
+         */
+        void set_delay (const std::string& from, const std::string& stamp, const std::string& reason="");
+
+        /**
+         * If the stanza is delayed, get the Jabber ID that originally
+         * sent the stanza as described in XEP-0203.
+         * @return A Jabber ID or an empty string.
+         */
+        std::string get_delay_from ();
+
+        /**
+         * If the stanza is delayed, get the time stamp of the
+         * originally sent stanza as described in XEP-0203.
+         * @return A time stamp or an empty string.
+         */
+        std::string get_delay_stamp ();
+
+        /**
+         * If the stanza is delayed, get the optional
+         * delay reason of the originally sent stanza
+         * as described in XEP-0203.
+         * @return A delay message or an empty string.
+         */
+        std::string get_delay_reason ();
 
         /**
          * Generate a pseudo random id string.
