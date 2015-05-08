@@ -82,6 +82,7 @@ libuxmpp_la_SOURCES += uxmpp/mod/VcardModule.cpp
 libuxmpp_la_SOURCES += uxmpp/mod/IBBModule.cpp
 libuxmpp_la_SOURCES += uxmpp/mod/PubSubModule.cpp
 libuxmpp_la_SOURCES += uxmpp/mod/PepModule.cpp
+libuxmpp_la_SOURCES += uxmpp/mod/VersionModule.cpp
 
 # Header files
 #libuxmppdir = $(includedir)/uxmpp
@@ -147,6 +148,7 @@ nobase_libuxmpp_HEADERS += uxmpp/mod/VcardModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/IBBModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/PubSubModule.hpp
 nobase_libuxmpp_HEADERS += uxmpp/mod/PepModule.hpp
+nobase_libuxmpp_HEADERS += uxmpp/mod/VersionModule.hpp
 
 
 # Header files that is not to be installed

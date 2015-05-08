@@ -100,7 +100,7 @@ namespace uxmpp { namespace io {
          *                  If the socket is bound to a local address the proto
          *                  attribute of the local address will be set to the
          *                  same as the peer address.
-         * @param tls_config TLS configuration used if the prot attribute of
+         * @param tls_config TLS configuration used if the proto attribute of
          *                   the peer_addr object is AddrProto::tls or AddrProto::dtls.
          */
         void connect (const IpHostAddr& peer_addr, const TlsConfig& tls_config);

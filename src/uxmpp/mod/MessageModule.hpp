@@ -109,7 +109,8 @@ namespace uxmpp { namespace mod {
         virtual bool correct_message (const uxmpp::Jid& to, const std::string& body);
 
         /**
-         *
+         * Set a callback that will be called when a message is received.
+         * @param on_message Callback that is called when a message is received.
          */
         void set_message_handler (std::function<void (MessageModule&,
                                                       uxmpp::MessageStanza&,
@@ -117,7 +118,8 @@ namespace uxmpp { namespace mod {
                                                       const std::string& id)> on_message);
 
         /**
-         *
+         * Set a callback that will be called when a message receipt is received.
+         * @param on_message Callback that is called when a message receipt is received.
          */
         void set_receipt_handler (std::function<void (MessageModule&, const uxmpp::Jid&, const std::string&)>
                                   on_receipt);

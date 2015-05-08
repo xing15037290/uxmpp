@@ -56,6 +56,9 @@ struct app_config_t {
     string   dir;
     string   server;
     unsigned short    port;
+    string   client_version;
+    string   client_name;
+    string   client_os;
 };
 
 /**
@@ -99,6 +102,7 @@ public:
     DiscoModule       mod_disco;
     RegisterModule    mod_register;
     VcardModule       mod_vcard;
+    VersionModule     mod_version;
 
     thread session_thread;
 };
@@ -138,6 +142,23 @@ AppLogic::AppLogic (app_config_t& app_cfg)
             }
             cout << "Got vCard for " << to_string(j) << ": " << to_string(vc, true) << endl;
         });
+
+    mod_version.set_version_callback ([](Session& s, Jid& j, XmlObject& vc, StanzaError& e){
+            cout << endl;
+            if (e) {
+                cout << "Error getting version for " << to_string(j) << ": " << e.get_condition() << endl;
+                return;
+            }
+            cout << "Got version for " << to_string(j) << ": " << to_string(vc, true) << endl;
+        });
+
+    // Configure module Version
+    if (!app_cfg.client_name.empty())
+        mod_version.set_name (app_cfg.client_name);
+    if (!app_cfg.client_version.empty())
+        mod_version.set_version (app_cfg.client_version);
+    if (!app_cfg.client_os.empty())
+        mod_version.set_os (app_cfg.client_os);
 
     // Configure xmpp session
     //
@@ -218,6 +239,7 @@ void AppLogic::run ()
     sess.register_module (mod_disco);
     sess.register_module (mod_register);
     sess.register_module (mod_vcard);
+    sess.register_module (mod_version);
 
     mod_roster.set_roster_handler ([this](RosterModule& rm, Roster& r) { on_roster (rm, r); });
     mod_roster.set_roster_push_handler ([this](RosterModule& rm, RosterItem& ri) { on_roster_push (rm, ri); });
@@ -325,6 +347,7 @@ static void print_help ()
          << "+----- Account------------------------------------------------------" << endl
          << "| reg-info             - Send registration info query." << endl
          << "+----- Misc --------------------------------------------------------" << endl
+         << "| version <jid>        - Get version (xep-0092)." << endl
          << "| data-set [tag]       - Set private data on server." << endl
          << "| data-get [tag]       - Get private data from server." << endl
          << "| ping [index|jid]     - Send XMPP ping." << endl
@@ -720,6 +743,14 @@ int main (int argc, char* argv[])
                 });
             app.mod_register.request_info ();
         }
+        else if (cmd == "version") {
+            string str_jid;
+            get_string_argument ("Enter JID (empty for own JID): ", ss, str_jid);
+            if (str_jid.empty())
+                app.mod_version.request_version (app.sess.get_jid());
+            else
+                app.mod_version.request_version (Jid(str_jid));
+        }
         else if (cmd == "data-set") {
             string tag;
             bool got_arg = get_string_argument ("Enter data tag: ", ss, tag);
@@ -802,6 +833,9 @@ static void print_cmdline_help ()
         "  -a, --keep-alive <interval>  Keep-alive interval in seconds, 0 to disable. Default is 300.\n"
         "  -r, --always-receipt         Always send message receipts even if sender isn't authorized.\n"
         "  -d, --dir <directory>        Directory where to store cache files. Default is $HOME/.uxmpp\n"
+        "      --name                   Optional name of the XMPP client.\n"
+        "      --version                Optional version of the XMPP client.\n"
+        "      --os                     Optional OS of the XMPP client.\n"
         "      --help                   Print this help text.\n\n";
 }
 
@@ -827,6 +861,9 @@ static int handle_arguments (int argc, char* argv[], app_config_t& cfg)
         { "keep-alive",     required_argument, NULL, 'a' },
         { "always-receipt", no_argument,       NULL, 'r' },
         { "dir",            required_argument, NULL, 'd' },
+        { "name",           required_argument, NULL,  0  },
+        { "version",        required_argument, NULL,  0  },
+        { "os",             required_argument, NULL,  0  },
         { "help",           no_argument,       NULL,  0  },
     };
 
@@ -840,8 +877,16 @@ static int handle_arguments (int argc, char* argv[], app_config_t& cfg)
 
         switch (c) {
         case 0:
-            print_cmdline_help ();
-            exit (0);
+            if (string("name") == string(long_options[option_index].name)) {
+                cfg.client_name = optarg;
+            }else if (string("version") == string(long_options[option_index].name)) {
+                cfg.client_version = optarg;
+            }else if (string("os") == string(long_options[option_index].name)) {
+                cfg.client_os = optarg;
+            }else{
+                print_cmdline_help ();
+                exit (0);
+            }
             break;
 
         case 'p':
