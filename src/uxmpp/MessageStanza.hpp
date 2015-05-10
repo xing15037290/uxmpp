@@ -110,7 +110,7 @@ namespace uxmpp {
 
     /**
      * Message stanza.
-     * Implements XEP-0334 - Message Processing Hints.
+     * Implements XEP-0085 - Char State Notifications, XEP-0334 - Message Processing Hints.
      */
     class MessageStanza : public Stanza {
     public:
@@ -202,12 +202,12 @@ namespace uxmpp {
         MessageStanza& set_body (const std::string& body, std::string lang="");
 
         /**
-         * Return the chat state.
+         * Return the chat state (XEP-0085).
          */
         ChatState get_chat_state ();
 
         /**
-         * Return the chat state.
+         * Set the chat state (XEP-0085).
          */
         MessageStanza& set_chat_state (const ChatState state);
 
