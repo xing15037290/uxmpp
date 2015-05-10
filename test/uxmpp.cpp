@@ -88,21 +88,23 @@ public:
                              const std::string& id);
     virtual void on_receipt (MessageModule& module, const uxmpp::Jid& from, const std::string& id);
 
+    virtual void on_server_disco (StanzaError& error);
+
     Session           sess;
     SessionConfig     cfg;
-    TlsModule         mod_tls;
-    AuthModule        mod_auth;
-    SessionModule     mod_session;
-    KeepAliveModule   mod_alive;
-    RosterModule      mod_roster;
-    PresenceModule    mod_pr;
-    MessageModule     mod_msg;
-    PingModule        mod_ping;
-    PrivateDataModule mod_priv_data;
-    DiscoModule       mod_disco;
-    RegisterModule    mod_register;
-    VcardModule       mod_vcard;
-    VersionModule     mod_version;
+    TlsModule         mod_tls;       // RFC-6120
+    AuthModule        mod_auth;      // RFC-6120
+    SessionModule     mod_session;   // RFC-6120
+    KeepAliveModule   mod_alive;     //
+    RosterModule      mod_roster;    // RFC-6120
+    PresenceModule    mod_pr;        // RFC-6121, XEP-0256
+    MessageModule     mod_msg;       // RFC-6121, XEP-0085, XEP-0184, XEP-0308, XEP-0334
+    PingModule        mod_ping;      // XEP-0199
+    PrivateDataModule mod_priv_data; // XEP-0049
+    DiscoModule       mod_disco;     // XEP-0030
+    RegisterModule    mod_register;  // XEP-0077
+    VcardModule       mod_vcard;     // XEP-0054
+    VersionModule     mod_version;   // XEP-0092
 
     thread session_thread;
 };
@@ -225,6 +227,29 @@ void AppLogic::on_receipt (MessageModule& module, const uxmpp::Jid& from, const 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+void AppLogic::on_server_disco (StanzaError& error)
+{
+    if (error) {
+        cout << "Unable to get server features: " << error.get_condition() << endl;
+        return;
+    }
+
+    cout << "Server identities: " << endl;
+    for (auto& identity : mod_disco.get_server_identities()) {
+        cout << "\tCategory: " << identity.get_category()
+             << "\t Name: " << identity.get_name()
+             << "\t Type: " << identity.get_type()
+             << endl;
+    }
+    cout << "Server features: " << endl;
+    for (auto& feature : mod_disco.get_server_features()) {
+        cout << "\t" << feature << endl;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void AppLogic::run ()
 {
     sess.register_module (mod_tls);
@@ -249,6 +274,12 @@ void AppLogic::run ()
                                         bool corr,
                                         const std::string& id) { on_message(mm, ms, corr, id); });
     mod_msg.set_receipt_handler ([this](MessageModule& mm, const Jid& f, const string& id) { on_receipt(mm, f, id); });
+    mod_disco.set_on_server_disco ([this](Session& session,
+                                          DiscoModule& module,
+                                          StanzaError& error)
+                                   {
+                                       on_server_disco (error);
+                                   });
 
     sess.add_session_listener (*this);
 

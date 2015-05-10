@@ -19,6 +19,7 @@
 #ifndef UXMPP_MOD_DISCOMODULE_HPP
 #define UXMPP_MOD_DISCOMODULE_HPP
 
+#include <functional>
 #include <uxmpp/types.hpp>
 #include <uxmpp/XmppModule.hpp>
 #include <uxmpp/Session.hpp>
@@ -37,6 +38,13 @@ namespace uxmpp { namespace mod {
      */
     class DiscoModule : public uxmpp::XmppModule, uxmpp::SessionListener {
     public:
+
+        /**
+         *
+         */
+        typedef std::function <void (uxmpp::Session&,
+                                     DiscoModule& module,
+                                     uxmpp::StanzaError& error)> on_server_disco_cb_t;
 
         /**
          * Default Constructor.
@@ -89,10 +97,16 @@ namespace uxmpp { namespace mod {
          *                 <code>uxmpp::Stanza::makeId()</code> will be used.
          *                 The identifier must be unique.
          */
-        std::string query_info (const uxmpp::Jid& jid, const std::string& query_id="");
+        std::string query_info (const uxmpp::Jid& jid);
+
+        /**
+         * Set a callback to be called when the server features has been received.
+         * @param callback The callback to be called.
+         */
+        void set_on_server_disco (on_server_disco_cb_t callback);
 
 
-    protected:
+    private:
         uxmpp::Session* sess; /**< The XMPP session */
         std::string server_feature_request_id; /**< Id string used when querying the server features. */
         std::string server_feature_version;    /**< The version of the server features. */
@@ -104,13 +118,14 @@ namespace uxmpp { namespace mod {
 
         std::set<std::string> query_ids; /**< A set of id strings of sent stanzas. */
 
-    private:
         void handle_feature_request_result (uxmpp::IqStanza& iq);
 
         //std::function<void (DiscoModule&, DiscoInfo&)>  info_handler;
         //std::function<void (DiscoModule&, DiscoItems&)> items_handler;
         std::function<void (DiscoModule&, XmlObject&)> info_handler;
         std::function<void (DiscoModule&, XmlObject&)> items_handler;
+
+        on_server_disco_cb_t on_server_disco_cb;
     };
 
 

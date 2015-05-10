@@ -154,18 +154,20 @@ bool DiscoModule::process_xml_object (uxmpp::Session& session, uxmpp::XmlObject&
         return false;
 
     IqStanza& iq = reinterpret_cast<IqStanza&> (xml_obj);
+    StanzaError error = iq.get_error ();
 
     // Chec for server feature query result
     //
     if (iq.get_id() == server_feature_request_id) {
         if (iq.get_type() == IqType::result) {
             handle_feature_request_result (iq);
-            return true;
         }
-        else if (iq.get_type() == IqType::error) {
-            uxmpp_log_info (THIS_FILE, "Got disco query error: ", iq.get_error().get_condition());
+        else if (error) {
+            uxmpp_log_info (THIS_FILE, "Got disco query error: ", error.get_condition());
         }
         server_feature_request_id = "";
+        if (on_server_disco_cb)
+            on_server_disco_cb (*sess, *this, error);
         return true;
     }
 
@@ -226,7 +228,7 @@ std::vector<std::string>& DiscoModule::get_server_features ()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-std::string DiscoModule::query_info (const uxmpp::Jid& jid, const std::string& query_id)
+std::string DiscoModule::query_info (const uxmpp::Jid& jid)
 {
     // Sanity check
     //
@@ -235,16 +237,24 @@ std::string DiscoModule::query_info (const uxmpp::Jid& jid, const std::string& q
 
     // Save the query id
     //
-    string qid = query_id=="" ? Stanza::make_id() : query_id;
+    string qid = Stanza::make_id ();
     query_ids.insert (qid);
 
     // Send the query
     //
     sess->send_stanza (IqStanza(IqType::get, jid, sess->get_jid(), qid).
-                       add_node(XmlObject(XmlDiscoQueryTag, "http://jabber.org/protocol/disco#info")));
-//                      addNode(XmlObject(XmlDiscoQueryTag, XmlDiscoInfoNS)));
+                       add_node(XmlObject(XmlDiscoQueryTag, XmlDiscoInfoNS)));
+//                       add_node(XmlObject(XmlDiscoQueryTag, "http://jabber.org/protocol/disco#info")));
 
     return qid;
+}
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void DiscoModule::set_on_server_disco (on_server_disco_cb_t callback)
+{
+    on_server_disco_cb = callback;
 }
 
 
