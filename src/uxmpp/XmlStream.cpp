@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013,2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2013-2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -371,8 +371,9 @@ void XmlStream::set_timeout (const std::string& id, unsigned msec)
 
     // Set the timer
     //
-    timers[id].set (msec, [this, id](Timer& t){
-            timer_callback (t, id);
+    auto& timer = timers[id];
+    timer.set (Timer::milliseconds(msec), [this, &timer, id](){
+            timer_callback (timer, id);
         });
 }
 

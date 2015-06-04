@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014,2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -201,7 +201,7 @@ bool SocketConnection::open_socket (const IpHostAddr& addr,
     }
     else {
         uxmpp_log_warning (log_unit, "Unable to create socket - Wrong address type");
-        msg_timer.set (0, [this](Timer& timer){
+        msg_timer.set (Timer::now, [this](){
                 // Notify the connection result.
                 if (connected_cb)
                     connected_cb (*this, EINVAL);
@@ -215,7 +215,7 @@ bool SocketConnection::open_socket (const IpHostAddr& addr,
     //
     if (get_fd() == -1) {
         uxmpp_log_error (log_unit, "Error creating socket: ", string(strerror(errnum)));
-        msg_timer.set (0, [errnum, this](Timer& timer){
+        msg_timer.set (Timer::now, [errnum, this](){
                 // Notify the connection result.
                 if (connected_cb)
                     connected_cb (*this, errnum);
@@ -296,7 +296,7 @@ bool SocketConnection::bind_socket ()
                            " - ",
                            string(strerror(errno)));
         close ();
-        msg_timer.set (0, [errnum, this](Timer& timer){
+        msg_timer.set (Timer::now, [errnum, this](){
                 // Notify the connection result.
                 if (connected_cb)
                     connected_cb (*this, errnum);
@@ -361,7 +361,7 @@ void SocketConnection::connect (const IpHostAddr& addr, const TlsConfig& tls_cfg
                          to_string(peer_addr),
                          " - ",
                          string(strerror(errnum)));
-        msg_timer.set (0, [errnum, this](Timer& timer){
+        msg_timer.set (Timer::now, [errnum, this](){
                 close ();
                 // Notify the connection result.
                 if (connected_cb)
@@ -432,7 +432,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
 {
     if (!connected) {
         uxmpp_log_warning (log_unit, "Can't enable TLS, not connected");
-        msg_timer.set (0, [this](Timer& timer){
+        msg_timer.set (Timer::now, [this](){
                 // Notify the TLS connection result.
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, "Socket not connected");
@@ -485,7 +485,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
     ssl_ctx = SSL_CTX_new (method);
     if (!ssl_ctx) {
         uxmpp_log_error (log_unit, "Unable to create SSL context");
-        msg_timer.set (0, [this](Timer& timer){
+        msg_timer.set (Timer::now, [this](){
                 // Notify the TLS connection result.
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, "Unable to create SSL context");
@@ -505,7 +505,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
         uxmpp_log_error (log_unit, "Unable to create SSL object");
         SSL_CTX_free (ssl_ctx);
         ssl_ctx = nullptr;
-        msg_timer.set (0, [this](Timer& timer){
+        msg_timer.set (Timer::now, [this](){
                 // Notify the connection result.
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, "Unable to create SSL object");
@@ -527,7 +527,7 @@ void SocketConnection::enable_tls (const TlsConfig& tls_cfg)
             SSL_CTX_free (ssl_ctx);
             ssl_ctx = nullptr;
         }
-        msg_timer.set (0, [tls_error, this](Timer& timer){
+        msg_timer.set (Timer::now, [tls_error, this](){
                 // Notify the connection result.
                 if (tls_connected_cb)
                     tls_connected_cb (*this, SSL_ERROR_SSL, tls_error);

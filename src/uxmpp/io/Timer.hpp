@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014,2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -19,131 +19,83 @@
 #ifndef UXMPP_IO_TIMER_HPP
 #define UXMPP_IO_TIMER_HPP
 
-#include <uxmpp/types.hpp>
-#include <uxmpp/io/TimerException.hpp>
-#include <mutex>
 #include <functional>
-#include <signal.h>
-#include <time.h>
-
+#include <chrono>
+#include <uxmpp/types.hpp>
 
 namespace uxmpp { namespace io {
 
 
 /**
- * Class used to represent a timer.
- * The timer is implemented using POSIX per-process timers.
+ * A timer.
  */
 class Timer {
 public:
 
-    /**
-     * Callback that is called when a timer expires.
-     * @param timer The timed that has expired.
-     */
-    typedef std::function<void (Timer& timer)> timer_callback_t;
+    using hours        = std::chrono::hours;
+    using minutes      = std::chrono::minutes;
+    using seconds      = std::chrono::seconds;
+    using milliseconds = std::chrono::milliseconds;
+    using microseconds = std::chrono::microseconds;
+
+    static std::chrono::microseconds now;
+    static std::chrono::microseconds zero;
 
     /**
      * Constructor.
-     * @param signal_number The signal timer that will be used by the process to
-     *                      handle the timer. Default is SIGRTMIN.
-     *                      One worker thread will be created for each signal to
-     *                      manage all threads that use the same signal number.
-     * @param cb Callback to be called when the timer expires. The parameter to
-     *           the callback is a reference to the timer that expired.
-     * @throws TimerException If unsuccessful to install a signal handler or
-     *                        create a system timer object.
      */
-    Timer (int signal_number=SIGRTMIN, timer_callback_t cb=nullptr) throw (TimerException);
-
-    /**
-     * Constructor.
-     * @param cb Callback to be called when the timer expires. The parameter to
-     *           the callback is a reference to the timer that expired.
-     * @throws TimerException If unsuccessful to install a signal handler or
-     *                        create a system timer object.
-     */
-    Timer (timer_callback_t cb) throw (TimerException) : Timer (SIGRTMIN, cb) {}
+    Timer ();
 
     /**
      * Destructor.
-     * Stops an deinitializes the timer.
      */
-    virtual ~Timer ();
+    ~Timer ();
 
     /**
-     * Set the timer expration time in milliseconds.
-     * @param initial The initial time in milliseconds until the times shall expire.
-     *                A value of zero means as soon as possible.
-     * @param interval The inteval in milliseconds that the timer
-     *                 shall expire after the initial expiration.
-     *                 Set this to zero for a one-shot timer.
-     * @param callback If not nullptr, set the callback that will
-     *                 be called when the timer expires.
+     * Set a timeout.
+     * The supplied callback will be called after a specified time duration.
+     * @param duration The duration after which the callback will be called.
+     *                 If this is set to zero, the callback will be called
+     *                 as soon as possible.
+     * @param callback This function will be called when the timer expires.
      */
-    void set (unsigned initial, unsigned interval, timer_callback_t callback=nullptr);
-
-    /**
-     * Set the timer expration time in milliseconds. This will set a one-shot timer.
-     * @param initial The initial time in milliseconds until the times shall expire.
-     *                A value of zero means as soon as possible.
-     * @param callback If not nullptr, set the callback that will
-     *                 be called when the timer expires.
-     */
-    void set (unsigned initial, timer_callback_t callback=nullptr) {
-        set (initial, 0, callback);
+    template <typename A>
+    void set (A duration, std::function<void()> callback) {
+        set_impl (std::chrono::duration_cast<std::chrono::microseconds>(duration),
+                  Timer::microseconds(0),
+                  callback);
     }
 
     /**
-     * Set the timer expration time in microseconds.
-     * @param initial The initial time in microseconds until the times shall expire.
-     *                A value of zero means as soon as possible.
-     * @param interval The inteval in microseconds that the timer
-     *                 shall expire after the initial expiration.
-     *                 Set this to zero for a one-shot timer.
-     * @param callback If not nullptr, set the callback that will
-     *                 be called when the timer expires.
+     * Set a timeout.
+     * The supplied callback will be called after a specified time duration.
+     * After that it will be called periodically at a specified time interval.
+     * @param duration The duration after which the callback will be called.
+     * @param period The time period between callbacks. Disabled if zero.
+     * @param callback This function will be called when the timer expires.
      */
-    void uset (unsigned initial, unsigned interval, timer_callback_t callback=nullptr);
-
-    /**
-     * Set the timer expration time in microseconds. This will set a one-shot timer.
-     * @param initial The initial time in microseconds until the times shall expire.
-     *                A value of zero means as soon as possible.
-     * @param callback If not nullptr, set the callback that will
-     *                 be called when the timer expires.
-     */
-    void uset (unsigned initial, timer_callback_t callback=nullptr) {
-        uset (initial, 0, callback);
+    template <typename A, typename B>
+    void set (A duration, B period, std::function<void()> callback) {
+        set_impl (std::chrono::duration_cast<std::chrono::microseconds>(duration),
+                  std::chrono::duration_cast<std::chrono::microseconds>(period),
+                  callback);
     }
 
     /**
-     * Cancel the timer.
-     * After this call the callback will not be called until the timer is set again.
+     * Cancel the timeout.
      */
     void cancel ();
 
     /**
-     * Set the callback that will be called when the timer expires.
+     * Get the current number of timeout overruns.
      */
-    void set_callback (timer_callback_t new_callback);
-
-    /**
-     * Get the current overrun count for the timer.
-     * @return The current overrun count for the timer.
-     */
-    int get_overrun ();
+    unsigned get_overrun ();
 
 
 private:
-    timer_t id;
-    int signum;
-    std::mutex set_mutex;
-    timer_callback_t callback;
-    unsigned initial;
-    unsigned interval;
-    static void initialize_controller (int signal_number) throw (TimerException);
-    void set (struct itimerspec& ts, bool stop, bool now, timer_callback_t new_callback);
+    void set_impl (std::chrono::microseconds duration,
+                   std::chrono::microseconds period,
+                   std::function<void()> callback);
 };
 
 

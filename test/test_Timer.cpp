@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Ultramarin Design AB <dan@ultramarin.se>
+ *  Copyright (C) 2014,2015 Ultramarin Design AB <dan@ultramarin.se>
  *
  *  This file is part of uxmpp.
  *
@@ -42,36 +42,39 @@ int main (int argc, char* argv[])
     try {
         uxmpp_set_log_level (LogLevel::trace);
 
-        Timer t1 ([](Timer& t){
-                uxmpp_log_info (THIS_FILE, "t1 expired - overrun: ", t.get_overrun());
-            });
-
+        Timer t1;
         string name {"name"};
-        Timer t3 ([name](Timer& t){
-                uxmpp_log_info (THIS_FILE, "t3(", name, ") expired - overrun: ", t.get_overrun());
+        Timer t3;
+        Timer t2;
+
+        t3.set (Timer::now, [&name, &t3](){
+                uxmpp_log_info (THIS_FILE, "t3(", name, ") expired - overrun: ", t3.get_overrun());
                 //t.cancel ();
             });
 
-        Timer t2 (SIGRTMIN+1, [&t3](Timer& t){
-                uxmpp_log_info (THIS_FILE, "t2 expired - overrun: ", t.get_overrun());
+        //t3.set (1000, 80);
+
+        t1.set (Timer::milliseconds(1000), Timer::milliseconds(500), [&t1](){
+                uxmpp_log_info (THIS_FILE, "t1 expired - overrun: ", t1.get_overrun());
+            });
+
+        t2.set (Timer::milliseconds(1000), Timer::milliseconds(500), [&t2](){
+                uxmpp_log_info (THIS_FILE, "t2 expired - overrun: ", t2.get_overrun());
                 this_thread::sleep_for (chrono::milliseconds(400));
                 uxmpp_log_info (THIS_FILE, "t2 expired - done");
             });
 
-        t3.set (0); // As soon as possible
-        //t3.set (1000, 80);
-        t1.set (1000, 500);
-        t2.set (1000, 500);
-
-        this_thread::sleep_for (chrono::milliseconds(1));
-        t3.set (0, [](Timer& timer){
+        this_thread::sleep_for (chrono::milliseconds(1001));
+        t3.set (Timer::now, [&t2](){
                 uxmpp_log_info (THIS_FILE, "t3 - run directly now!");
+                //t2.cancel ();
+
+                t2.set (Timer::milliseconds(2000), [&t2](){
+                        uxmpp_log_info (THIS_FILE, "t2 expired again");
+                    });
             });
 
-        this_thread::sleep_for (chrono::seconds(4));
-    }
-    catch (UxmppException& ue) {
-        uxmpp_log_fatal (THIS_FILE, ue.what());
+        this_thread::sleep_for (chrono::seconds(12));
     }
     catch (...) {
         uxmpp_log_fatal (THIS_FILE, "Unknown exception caught");
